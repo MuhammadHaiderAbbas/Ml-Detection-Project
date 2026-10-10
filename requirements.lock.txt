@@ -1,0 +1,10 @@
+# Exact versions the test suite was run against (Python 3.10).
+# PROVISIONAL: the original MSc environment's versions are not yet known. Before
+# loading the original .joblib model, replace these with the versions recorded in
+# the original project (scikit-learn in particular must match the training version).
+numpy==1.26.4
+pandas==2.2.3
+scikit-learn==1.5.2
+scipy==1.13.1
+joblib==1.4.2
+pytest==8.3.3

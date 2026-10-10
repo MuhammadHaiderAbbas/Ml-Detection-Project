@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+build/
+dist/
+
+# Secrets / local config
+.env
+
+# Data and artifacts: never commit datasets, captures or model binaries
+data/raw/*
+data/processed/*
+data/sample/*
+!data/**/.gitkeep
+*.pcap
+*.pcapng
+*.joblib
+*.pkl
+*.pickle
+models/*
+!models/README.md
+!models/trusted_artifacts.example.json
+
+# Experiment run outputs (keep curated reports under docs/)
+experiments/runs/
+docs/inventory/
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
