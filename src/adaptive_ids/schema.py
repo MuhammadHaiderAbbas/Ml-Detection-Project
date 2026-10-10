@@ -43,6 +43,13 @@ class FeatureSchema:
     timestamp_column: str | None = None
     event_id_column: str | None = None
     excluded_columns: tuple[str, ...] = ()
+    context_columns: tuple[str, ...] = ()
+    """Non-feature columns kept with each event for investigation (e.g. IPs).
+    They never reach the model; they may overlap features or excluded columns."""
+    source_column: str | None = None
+    """Context column holding the traffic source (e.g. source IP), if any."""
+    destination_column: str | None = None
+    """Context column holding the traffic destination (e.g. destination IP), if any."""
     missing_value_policy: str = "reject_row"
     infinite_value_policy: str = "reject_row"
     status: str = "unverified"
@@ -81,6 +88,14 @@ class FeatureSchema:
         return [f.name for f in self.features]
 
     @property
+    def all_context_columns(self) -> list[str]:
+        cols = list(self.context_columns)
+        for c in (self.source_column, self.destination_column):
+            if c and c not in cols:
+                cols.append(c)
+        return cols
+
+    @property
     def schema_hash(self) -> str:
         return sha256_json(self.to_dict())
 
@@ -92,6 +107,7 @@ class FeatureSchema:
         d = asdict(self)
         d["features"] = [asdict(f) for f in self.features]
         d["excluded_columns"] = list(self.excluded_columns)
+        d["context_columns"] = list(self.context_columns)
         return d
 
     @classmethod
@@ -104,6 +120,7 @@ class FeatureSchema:
         except TypeError as exc:
             raise SchemaError(f"invalid feature definition: {exc}") from exc
         data["excluded_columns"] = tuple(data.get("excluded_columns", ()))
+        data["context_columns"] = tuple(data.get("context_columns", ()))
         try:
             return cls(features=features, **data)
         except TypeError as exc:

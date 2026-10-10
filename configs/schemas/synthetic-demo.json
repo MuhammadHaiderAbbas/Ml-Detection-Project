@@ -1,6 +1,6 @@
 {
   "name": "synthetic-flows-demo",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "status": "verified",
   "notes": "Schema for the SYNTHETIC demonstration dataset produced by `adaptive-ids make-synthetic`. Not a research schema.",
   "label_column": "Label",
@@ -8,8 +8,16 @@
   "timestamp_column": "Timestamp",
   "event_id_column": "Flow ID",
   "excluded_columns": [
-    "Src IP"
+    "Src IP",
+    "Dst IP"
   ],
+  "context_columns": [
+    "Src IP",
+    "Dst IP",
+    "Dst Port"
+  ],
+  "source_column": "Src IP",
+  "destination_column": "Dst IP",
   "missing_value_policy": "reject_row",
   "infinite_value_policy": "reject_row",
   "features": [

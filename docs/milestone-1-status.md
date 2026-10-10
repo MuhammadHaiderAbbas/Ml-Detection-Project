@@ -38,7 +38,7 @@ The "86%" mentioned in the transcripts appears to be the dissertation **grade**.
 | Reproduced predictions and metrics | **Blocked** | Runner ready: `adaptive-ids run configs/experiments/baseline-reproduction.template.json` |
 | Baseline report | **Blocked** (generator ready and tested) | Written to `experiments/runs/<id>/report.md` and `result.json` |
 | Pinned dependency environment | **Provisional** | `requirements.lock.txt` (Python 3.10). Must be re-pinned to the original scikit-learn version before the original model is loaded |
-| Automated tests for validation and inference | **Done** — 70 tests passing | `tests/`, CI in `.github/workflows/ci.yml` |
+| Automated tests for validation and inference | **Done** — 70 engine tests passing (89 including the Phase 3 API tests) | `tests/`, CI in `.github/workflows/ci.yml` |
 | Documented list of unresolved issues | **Done** (below) | This file |
 
 ## 3. What is implemented and tested
@@ -64,10 +64,16 @@ The "86%" mentioned in the transcripts appears to be the dissertation **grade**.
 8. **CIC timestamp format.** CSE-CIC-IDS2018 timestamps are day-first (`14/02/2018 08:31:01`). Set `split.timestamp_format` to `"%d/%m/%Y %H:%M:%S"` for chronological splits so dates aren't misread.
 9. **Python 3.10 environment on Windows** has not been exercised on the target laptop yet. CI covers `windows-latest` with Python 3.10.
 
-## 5. Not started (deliberately)
+## 5. Work beyond Milestone 1
 
-Per spec §22 ("do not begin major model improvements until this milestone is
-complete") and the phase plan in §21, these are **not** started: FastAPI backend,
-PostgreSQL schema, React dashboard, alert and incident workflow, drift engine
-(River/ADWIN), SHAP explanations, model registry lifecycle, authentication.
+At the user's request, Phase 3 (backend and persistence) has been built on top of the engine. See
+`docs/phase-3-backend.md`. It contains no model improvements, so the §22 rule ("do not begin
+major model improvements until this milestone is complete") still holds: the only model that runs
+through it is the SYNTHETIC demo model.
+
+## 6. Not started (deliberately)
+
+Not started yet: the React dashboard (Phase 4), the drift engine (Phase 5),
+SHAP explanations, candidate-vs-baseline comparison workflow (Phase 6), and model
+improvements of any kind (blocked on Milestone 1).
 `docs/architecture.md` shows where each one fits on top of the modules above.

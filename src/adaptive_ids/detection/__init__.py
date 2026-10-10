@@ -3,6 +3,7 @@ from .artifacts import (
     ArtifactTrustError,
     LoadedModel,
     TrustedArtifactManifest,
+    load_verified_artifact,
     write_manifest,
 )
 from .predictor import PREDICTION_COLUMNS, InferenceError, Predictor
@@ -15,5 +16,6 @@ __all__ = [
     "LoadedModel",
     "Predictor",
     "TrustedArtifactManifest",
+    "load_verified_artifact",
     "write_manifest",
 ]

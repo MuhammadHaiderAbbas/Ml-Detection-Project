@@ -1,0 +1,60 @@
+"""Application settings from environment variables (see .env.example).
+
+Secrets and machine-specific paths live in the environment, never in source.
+"""
+
+from __future__ import annotations
+
+import os
+from dataclasses import dataclass, field
+from pathlib import Path
+
+
+def _load_dotenv(path: Path) -> None:
+    """Minimal .env loader: KEY=VALUE lines; existing environment wins."""
+    if not path.is_file():
+        return
+    for line in path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        os.environ.setdefault(key.strip(), value.strip().strip('"').strip("'"))
+
+
+def _int(name: str, default: int) -> int:
+    raw = os.environ.get(name)
+    return int(raw) if raw not in (None, "") else default
+
+
+@dataclass(frozen=True)
+class Settings:
+    database_url: str = "sqlite:///./var/adaptive_ids.db"
+    storage_dir: Path = Path("var/storage")
+    schemas_dir: Path = Path("configs/schemas")
+    runs_dir: Path = Path("experiments/runs")
+    severity_rules_path: Path = Path("configs/severity-rules.json")
+    max_upload_mb: int = 200
+    max_import_rows: int = 1_000_000
+    max_rejected_rows_stored: int = 10_000
+    session_hours: int = 12
+    cors_origins: tuple[str, ...] = field(default_factory=lambda: ("http://localhost:5173",))
+
+    @classmethod
+    def from_env(cls, *, dotenv: Path | None = Path(".env")) -> "Settings":
+        if dotenv is not None:
+            _load_dotenv(dotenv)
+        env = os.environ.get
+        origins = env("ADAPTIVE_IDS_CORS_ORIGINS")
+        return cls(
+            database_url=env("ADAPTIVE_IDS_DATABASE_URL") or cls.database_url,
+            storage_dir=Path(env("ADAPTIVE_IDS_STORAGE_DIR") or cls.storage_dir),
+            schemas_dir=Path(env("ADAPTIVE_IDS_SCHEMAS_DIR") or cls.schemas_dir),
+            runs_dir=Path(env("ADAPTIVE_IDS_RUNS_DIR") or cls.runs_dir),
+            severity_rules_path=Path(env("ADAPTIVE_IDS_SEVERITY_RULES") or cls.severity_rules_path),
+            max_upload_mb=_int("ADAPTIVE_IDS_MAX_UPLOAD_MB", cls.max_upload_mb),
+            max_import_rows=_int("ADAPTIVE_IDS_MAX_IMPORT_ROWS", cls.max_import_rows),
+            max_rejected_rows_stored=_int("ADAPTIVE_IDS_MAX_REJECTED_ROWS_STORED", cls.max_rejected_rows_stored),
+            session_hours=_int("ADAPTIVE_IDS_SESSION_HOURS", cls.session_hours),
+            cors_origins=tuple(o.strip() for o in origins.split(",") if o.strip()) if origins else ("http://localhost:5173",),
+        )

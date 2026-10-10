@@ -126,6 +126,7 @@ def check_columns(columns: list[str], schema: FeatureSchema, require_label: bool
     for col in (schema.label_column, schema.timestamp_column, schema.event_id_column):
         if col:
             known.add(col)
+    known |= set(schema.all_context_columns)
     dupes = sorted({c for c in columns if columns.count(c) > 1})
     return {
         "missing": [c for c in required if c not in columns],
@@ -225,6 +226,7 @@ def import_csv(
     limits: ImportLimits = ImportLimits(),
     progress: Callable[[int], None] | None = None,
     cancel_event: threading.Event | None = None,
+    import_id: str | None = None,
 ) -> ImportResult:
     """Validate and import a CSV file.
 
@@ -237,7 +239,7 @@ def import_csv(
     path = Path(path)
     mapping = dict(column_mapping or {})
     record = ImportRecord(
-        import_id=str(uuid.uuid4()),
+        import_id=import_id or str(uuid.uuid4()),
         dataset_name=dataset_name,
         dataset_version=dataset_version,
         source_path=str(path),
@@ -280,6 +282,10 @@ def import_csv(
         c
         for c in (schema.label_column, schema.timestamp_column, schema.event_id_column)
         if c and c in columns
+    ]
+    passthrough += [
+        c for c in schema.all_context_columns
+        if c in columns and c not in passthrough and c not in schema.feature_names
     ]
     accepted_parts: list[pd.DataFrame] = []
     rejected_parts: list[pd.DataFrame] = []

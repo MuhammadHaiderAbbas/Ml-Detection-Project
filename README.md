@@ -3,11 +3,10 @@
 A research-driven network intrusion detection platform that extends an MSc
 project. This repository is being built in small, tested milestones.
 
-> **Current state: Milestone 1 (reproducible ML baseline) in progress.**
-> The ML engine and the reproduction tooling are implemented and tested. The
-> original dissertation baseline has **not yet been reproduced**, because the
-> original notebooks, data and model files are not in this repository yet.
-> See [`docs/milestone-1-status.md`](docs/milestone-1-status.md).
+> **Current state**
+> - **Milestone 1 (reproducible ML baseline): in progress.** The ML engine and the reproduction tooling are implemented and tested. The original dissertation baseline has **not yet been reproduced**, because the original notebooks, data and model files aren't in this repository yet. See [`docs/milestone-1-status.md`](docs/milestone-1-status.md).
+> - **Phase 3 (backend and persistence): implemented.** API, database, migrations, alerts and incidents. See [`docs/phase-3-backend.md`](docs/phase-3-backend.md). Until the baseline is reproduced, only the clearly labelled SYNTHETIC demo model runs through it.
+>
 > No original research results are claimed here.
 
 ## What works today
@@ -22,8 +21,18 @@ project. This repository is being built in small, tested milestones.
 - **Research recovery tools**: a hash-verified backup and a static inventory of the original project.
 - **Synthetic demo data**, clearly labelled as synthetic everywhere.
 
-The API, database, dashboard, drift monitoring, explanations and model registry
-are later phases. See [`docs/architecture.md`](docs/architecture.md).
+**Backend (Phase 3)**
+
+- **FastAPI** service with **SQLAlchemy** models and **Alembic** migrations. PostgreSQL is the target; SQLite works with no setup.
+- **Imports**: CSV upload with background validation, rejected-row reports and cancellation.
+- **Scoring**: runs the active model and stores traceable predictions.
+- **Alerts**: created from suspicious predictions, with severity from configurable rules; lifecycle New → Investigating → Resolved or False Positive; assignment, notes, history, grouping and CSV export.
+- **Incidents**: group alerts and keep a timeline, evidence and the analyst's disposition; Markdown export.
+- **Model registry**: explicit approval and activation, plus rollback.
+- **Dashboard summary**: every number comes with its counting rule.
+- **Security**: scrypt password hashing, expiring bearer sessions, server-side admin/analyst roles and an audit log.
+
+Not built yet: the web dashboard (Phase 4), drift monitoring (Phase 5) and SHAP explanations. See [`docs/architecture.md`](docs/architecture.md).
 
 ## Quick start (Windows PowerShell)
 
@@ -39,7 +48,17 @@ python -m pytest
 On Linux or macOS, use `python3.10 -m venv .venv` and `source .venv/bin/activate`.
 No GPU, cloud account or API key is required.
 
-## Demo on synthetic data
+## Run the API
+
+```powershell
+copy .env.example .env                 # SQLite by default; PostgreSQL: docker compose up -d postgres
+adaptive-ids db-upgrade
+adaptive-ids create-user admin --role admin
+adaptive-ids demo --admin admin        # optional: repeatable SYNTHETIC demo data, model and alerts
+adaptive-ids serve                     # http://127.0.0.1:8000/docs
+```
+
+## Demo on synthetic data (ML engine only)
 
 ```powershell
 adaptive-ids make-synthetic                       # data/sample/flows_SYNTHETIC_demo.csv
@@ -76,13 +95,19 @@ model → run → record discrepancies.
 | `adaptive-ids preview CSV --schema S` | Column compatibility check and first rows |
 | `adaptive-ids make-synthetic` | Labelled synthetic demo dataset |
 | `adaptive-ids run CONFIG` | Run an experiment and write its report |
+| `adaptive-ids db-upgrade` | Apply database migrations |
+| `adaptive-ids create-user NAME --role admin\|analyst` | Create an application user |
+| `adaptive-ids demo --admin NAME` | Load the SYNTHETIC end-to-end demonstration into the database |
+| `adaptive-ids serve` | Start the API (OpenAPI docs at `/docs`) |
 
 ## Layout
 
 ```
 src/adaptive_ids/   schema, provenance, ingestion/, preprocessing/, detection/,
-                    evaluation/, experiments/, research/, cli.py
-configs/            schemas/ and experiments/ (JSON)
+                    evaluation/, experiments/, research/   (ML engine)
+                    db/, services/, api/, settings, security   (backend)
+migrations/         Alembic migrations
+configs/            schemas/, experiments/, severity-rules.json
 models/             trusted-artifact manifest (binaries git-ignored)
 data/               raw/ processed/ sample/ (git-ignored)
 experiments/runs/   run outputs (git-ignored)

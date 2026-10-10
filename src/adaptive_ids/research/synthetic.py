@@ -93,7 +93,9 @@ def generate_synthetic_flows(
                 frame.loc[mask, col] = rows[col]
     frame.insert(0, "Flow ID", [f"synth-{i:07d}" for i in range(n_rows)])
     frame.insert(1, "Src IP", [f"10.0.{rng.integers(0, 4)}.{rng.integers(2, 250)}" for _ in range(n_rows)])
-    frame.insert(2, "Timestamp", [(start + timedelta(seconds=float(o))).strftime("%Y-%m-%d %H:%M:%S") for o in offsets])
+    # Destinations come from a small documentation-range pool (RFC 5737), so "top destinations" is meaningful.
+    frame.insert(2, "Dst IP", [f"192.0.2.{rng.integers(10, 30)}" for _ in range(n_rows)])
+    frame.insert(3, "Timestamp", [(start + timedelta(seconds=float(o))).strftime("%Y-%m-%d %H:%M:%S") for o in offsets])
     frame["Label"] = labels
     frame = frame.astype(str)
 

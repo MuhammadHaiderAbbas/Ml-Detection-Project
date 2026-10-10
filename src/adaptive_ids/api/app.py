@@ -1,0 +1,64 @@
+"""FastAPI application factory."""
+
+from __future__ import annotations
+
+import logging
+import uuid
+
+from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+
+from .. import __version__
+from ..db import make_engine, make_session_factory
+from ..services.errors import ServiceError
+from ..services.imports import CancelRegistry
+from ..services.scoring import ModelCache
+from ..services.severity import SeverityRules
+from ..settings import Settings
+from .routes import alerts, auth, imports, incidents, models, scoring, system
+
+log = logging.getLogger("adaptive_ids.api")
+
+
+def create_app(settings: Settings | None = None) -> FastAPI:
+    settings = settings or Settings.from_env()
+    app = FastAPI(
+        title="Adaptive IDS API",
+        version=__version__,
+        description=(
+            "Network anomaly detection research platform. Predictions are suspicions, not confirmed attacks; "
+            "model scores are uncalibrated unless stated."
+        ),
+    )
+    engine = make_engine(settings.database_url)
+    app.state.settings = settings
+    app.state.engine = engine
+    app.state.session_factory = make_session_factory(engine)
+    app.state.severity_rules = SeverityRules.load(settings.severity_rules_path)
+    app.state.cancels = CancelRegistry()
+    app.state.model_cache = ModelCache()
+
+    app.add_middleware(CORSMiddleware, allow_origins=list(settings.cors_origins), allow_credentials=False,
+                       allow_methods=["GET", "POST", "PATCH", "DELETE"], allow_headers=["Authorization", "Content-Type"])
+
+    @app.exception_handler(ServiceError)
+    async def service_error(_: Request, exc: ServiceError):
+        headers = {"WWW-Authenticate": "Bearer"} if exc.status_code == 401 else None
+        return JSONResponse({"detail": exc.message}, status_code=exc.status_code, headers=headers)
+
+    @app.exception_handler(RequestValidationError)
+    async def validation_error(_: Request, exc: RequestValidationError):
+        errors = [{"loc": e.get("loc"), "msg": e.get("msg")} for e in exc.errors()]  # never echo submitted values
+        return JSONResponse({"detail": "invalid request", "errors": errors}, status_code=422)
+
+    @app.exception_handler(Exception)
+    async def unexpected(_: Request, exc: Exception):
+        ref = uuid.uuid4().hex[:12]
+        log.exception("unhandled error ref=%s", ref)
+        return JSONResponse({"detail": "internal server error", "reference": ref}, status_code=500)
+
+    for r in (system, auth, imports, models, scoring, alerts, incidents):
+        app.include_router(r.router, prefix="/api")
+    return app

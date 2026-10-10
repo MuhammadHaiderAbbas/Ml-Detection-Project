@@ -13,6 +13,14 @@
     "Src Port",
     "Dst IP"
   ],
+  "context_columns": [
+    "Src IP",
+    "Dst IP",
+    "Dst Port",
+    "Protocol"
+  ],
+  "source_column": "Src IP",
+  "destination_column": "Dst IP",
   "missing_value_policy": "reject_row",
   "infinite_value_policy": "reject_row",
   "features": [

@@ -1,0 +1,19 @@
+# Local PostgreSQL for Adaptive IDS. Development only: change the password and keep it in .env.
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: adaptive_ids
+      POSTGRES_PASSWORD: ${ADAPTIVE_IDS_DB_PASSWORD:-change-me-local-only}
+      POSTGRES_DB: adaptive_ids
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - adaptive_ids_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U adaptive_ids"]
+      interval: 5s
+      retries: 10
+
+volumes:
+  adaptive_ids_pg:

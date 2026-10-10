@@ -18,7 +18,7 @@ preprocessing.Preprocessor (fit on train only, JSON state, version_id)
 detection.TrustedArtifactManifest ──► detection.Predictor
         │                                   │ prediction rows (model + pp versions, status)
         ▼                                   ▼
-evaluation (metrics, splits, benchmark)    (Phase 3+) alerts ─► incidents
+evaluation (metrics, splits, benchmark)    services.scoring ─► alerts ─► incidents  (API + PostgreSQL)
         │
         ▼
 experiments.run_experiment ──► result.json + report.md (provenance-labelled)
@@ -37,8 +37,10 @@ experiments.run_experiment ──► result.json + report.md (provenance-labelle
 | `adaptive_ids.research` | Backup, inventory, synthetic demo data | §2, §22 | Implemented |
 | `adaptive_ids.drift` | Feature/prediction drift, ADWIN on suitable signals | §10 | Phase 5 |
 | `adaptive_ids.explainability` | SHAP for supported models | §11 | Phase 2–4 |
-| `adaptive_ids.registry` | Model lifecycle, approval, rollback | §14 | Phase 6 |
-| `apps/api` (FastAPI, SQLAlchemy, Alembic, PostgreSQL) | Persistence, alerts, incidents, auth, audit | §3, §12, §13, §17 | Phase 3 |
+| `adaptive_ids.services.registry` | Model lifecycle: register from run, approve, activate, rollback | §14 | Core implemented (Phase 3); candidate comparison and evaluation workflow in Phase 6 |
+| `adaptive_ids.db` + `migrations/` | SQLAlchemy models, Alembic migrations (PostgreSQL target) | §4 | Implemented (Phase 3) |
+| `adaptive_ids.services` | Imports, scoring, alerts, incidents, dashboard, auth, audit | §6, §7, §12, §13, §17 | Implemented (Phase 3) |
+| `adaptive_ids.api` (FastAPI) | HTTP API, roles, safe errors | §4, §17, §18 | Implemented (Phase 3) |
 | `apps/web` (React, TypeScript, Vite, Recharts) | Dashboard and the 12 sidebar pages | §5, §6, §19 | Phase 4 |
 
 ## Provenance

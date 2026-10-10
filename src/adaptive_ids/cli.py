@@ -81,6 +81,61 @@ def _cmd_run(a: argparse.Namespace) -> int:
     return 0
 
 
+def _settings():
+    from .settings import Settings
+
+    return Settings.from_env()
+
+
+def _cmd_db_upgrade(a: argparse.Namespace) -> int:
+    from alembic import command
+    from alembic.config import Config
+
+    ini = Path(__file__).resolve().parents[2] / "alembic.ini"
+    if not ini.is_file():
+        print(f"error: alembic.ini not found at {ini}; run from a source checkout", file=sys.stderr)
+        return 2
+    cfg = Config(str(ini))
+    cfg.attributes["database_url"] = _settings().database_url
+    command.upgrade(cfg, a.revision)
+    print(f"Database upgraded to {a.revision}.")
+    return 0
+
+
+def _cmd_create_user(a: argparse.Namespace) -> int:
+    import getpass
+    import os
+
+    from .db import make_engine, make_session_factory, session_scope
+    from .services import auth
+    from .services.errors import ServiceError
+
+    password = os.environ.get("ADAPTIVE_IDS_NEW_USER_PASSWORD") or getpass.getpass("Password (min 12 chars): ")
+    factory = make_session_factory(make_engine(_settings().database_url))
+    try:
+        with session_scope(factory) as db:
+            u = auth.create_user(db, a.username, password, a.role)
+            print(f"Created {u.role} '{u.username}' (id {u.id}).")
+    except ServiceError as exc:
+        print(f"error: {exc.message}", file=sys.stderr)
+        return 1
+    return 0
+
+
+def _cmd_serve(a: argparse.Namespace) -> int:
+    import uvicorn
+
+    uvicorn.run("adaptive_ids.api.app:create_app", factory=True, host=a.host, port=a.port, reload=a.reload)
+    return 0
+
+
+def _cmd_demo(a: argparse.Namespace) -> int:
+    from .demo import run_demo
+
+    run_demo(_settings(), admin_username=a.admin)
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="adaptive-ids", description="Adaptive IDS research and ML engine tools")
     sub = p.add_subparsers(dest="command", required=True)
@@ -119,6 +174,25 @@ def main(argv: list[str] | None = None) -> int:
     s = sub.add_parser("run", help="run an experiment config and write a reproducibility report")
     s.add_argument("config")
     s.set_defaults(fn=_cmd_run)
+
+    s = sub.add_parser("db-upgrade", help="apply database migrations (ADAPTIVE_IDS_DATABASE_URL)")
+    s.add_argument("--revision", default="head")
+    s.set_defaults(fn=_cmd_db_upgrade)
+
+    s = sub.add_parser("create-user", help="create an application user (password prompted)")
+    s.add_argument("username")
+    s.add_argument("--role", choices=["admin", "analyst"], default="analyst")
+    s.set_defaults(fn=_cmd_create_user)
+
+    s = sub.add_parser("serve", help="run the API server")
+    s.add_argument("--host", default="127.0.0.1")
+    s.add_argument("--port", type=int, default=8000)
+    s.add_argument("--reload", action="store_true")
+    s.set_defaults(fn=_cmd_serve)
+
+    s = sub.add_parser("demo", help="load the repeatable, clearly labelled SYNTHETIC demonstration into the database")
+    s.add_argument("--admin", required=True, help="existing admin username recorded as the actor")
+    s.set_defaults(fn=_cmd_demo)
 
     a = p.parse_args(argv)
     return a.fn(a)

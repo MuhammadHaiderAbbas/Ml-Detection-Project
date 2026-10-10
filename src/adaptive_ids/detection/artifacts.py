@@ -101,34 +101,46 @@ class TrustedArtifactManifest:
 
     def load_model(self, artifact_id: str) -> LoadedModel:
         entry, path = self.resolve(artifact_id)
-        if not path.is_file():
-            raise ArtifactTrustError(f"artifact file not found: {path}")
-        actual = sha256_file(path)
-        if actual.lower() != entry.sha256.lower():
-            raise ArtifactTrustError(
-                f"artifact {artifact_id!r} hash mismatch: manifest {entry.sha256}, file {actual}; refusing to load"
-            )
-        with warnings.catch_warnings(record=True) as caught:
-            warnings.simplefilter("always")
-            if entry.format == "joblib":
-                import joblib
+        model, load_warnings = load_verified_artifact(path, entry.sha256, entry.format, label=artifact_id)
+        return LoadedModel(model=model, entry=entry, resolved_path=str(path), warnings=load_warnings)
 
-                model = joblib.load(path)
-            else:
-                import pickle
 
-                with open(path, "rb") as fh:
-                    model = pickle.load(fh)  # noqa: S301 - hash-verified trusted artifact
-        if not hasattr(model, "predict"):
-            raise ArtifactTrustError(
-                f"artifact {artifact_id!r} loaded an object of type {type(model).__name__} with no predict()"
-            )
-        return LoadedModel(
-            model=model,
-            entry=entry,
-            resolved_path=str(path),
-            warnings=[f"{w.category.__name__}: {w.message}" for w in caught],
+def load_verified_artifact(
+    path: str | Path, expected_sha256: str, fmt: str = "joblib", *, label: str = ""
+) -> tuple[Any, list[str]]:
+    """Deserialise ``path`` only if its SHA-256 equals ``expected_sha256``.
+
+    Callers must take ``expected_sha256`` from a trusted record (a manifest
+    written by a person, or a registry row created from one) — never from the
+    file itself.
+    """
+    path = Path(path)
+    label = label or path.name
+    if fmt not in SUPPORTED_FORMATS:
+        raise ArtifactTrustError(f"{label}: unsupported format {fmt!r}")
+    if not path.is_file():
+        raise ArtifactTrustError(f"artifact file not found: {path}")
+    actual = sha256_file(path)
+    if actual.lower() != expected_sha256.lower():
+        raise ArtifactTrustError(
+            f"artifact {label!r} hash mismatch: manifest {expected_sha256}, file {actual}; refusing to load"
         )
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        if fmt == "joblib":
+            import joblib
+
+            model = joblib.load(path)
+        else:
+            import pickle
+
+            with open(path, "rb") as fh:
+                model = pickle.load(fh)  # noqa: S301 - hash-verified trusted artifact
+    if not hasattr(model, "predict"):
+        raise ArtifactTrustError(
+            f"artifact {label!r} loaded an object of type {type(model).__name__} with no predict()"
+        )
+    return model, [f"{w.category.__name__}: {w.message}" for w in caught]
 
 
 def write_manifest(entries: list[ArtifactEntry], path: str | Path) -> None:

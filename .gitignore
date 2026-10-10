@@ -34,3 +34,6 @@ docs/inventory/
 Thumbs.db
 .idea/
 .vscode/
+
+# Local runtime data (database, uploads)
+var/
