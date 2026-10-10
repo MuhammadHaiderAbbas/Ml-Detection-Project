@@ -50,6 +50,16 @@ adaptive-ids run configs/experiments/synthetic-demo.json
 The synthetic classes are easy to separate, so near-perfect scores are expected.
 They show that the software works, **not** how well it detects intrusions.
 
+## Screenshots
+
+Real output captured on 2026-10-10 (images 2–4 use SYNTHETIC demo data; the scores show the pipeline works, not detection performance):
+
+| | |
+|---|---|
+| [Test suite](docs/screenshots/01-test-suite.png) | [CLI experiment run](docs/screenshots/02-cli-experiment-run.png) |
+| [Experiment report](docs/screenshots/03-experiment-report.png) | [Import validation](docs/screenshots/04-import-validation.png) |
+| [Safety checks](docs/screenshots/05-safety-checks.png) | |
+
 ## Reproducing the original baseline
 
 Follow [`docs/reproducing-the-baseline.md`](docs/reproducing-the-baseline.md):
