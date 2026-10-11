@@ -187,6 +187,18 @@ class ModelVersion(Base):
     approved_by_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"))
     approved_at: Mapped[datetime | None]
     activated_at: Mapped[datetime | None]
+    # Phase 6 governance: the evaluation an approval relied on, a small recorded
+    # input sample with the outputs the model gave at approval (used to prove the
+    # artifact can be restored), and the latest restorability check.
+    approval_evaluation_id: Mapped[int | None] = mapped_column(
+        ForeignKey("model_evaluations.id", use_alter=True, ondelete="SET NULL"))
+    approval_override: Mapped[bool] = mapped_column(Boolean, default=False)
+    reference_sample: Mapped[dict[str, Any] | None] = mapped_column(JSON)
+    restore_check: Mapped[dict[str, Any] | None] = mapped_column(JSON)
+
+    @property
+    def has_reference_sample(self) -> bool:
+        return bool(self.reference_sample)
 
 
 class ModelStatusChange(Base):
@@ -198,6 +210,30 @@ class ModelStatusChange(Base):
     changed_by_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"))
     changed_at: Mapped[datetime] = mapped_column(default=utcnow)
     reason: Mapped[str | None] = mapped_column(Text)
+
+
+class ModelEvaluation(Base):
+    """A candidate scored side by side with the baseline on one labelled import, under a versioned protocol."""
+
+    __tablename__ = "model_evaluations"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    model_version_id: Mapped[int] = mapped_column(ForeignKey("model_versions.id", ondelete="CASCADE"), index=True)
+    baseline_model_version_id: Mapped[int | None] = mapped_column(ForeignKey("model_versions.id"))
+    import_id: Mapped[int] = mapped_column(ForeignKey("dataset_imports.id"), index=True)
+    protocol: Mapped[dict[str, Any]]
+    protocol_version: Mapped[str] = mapped_column(String(40))
+    status: Mapped[str] = mapped_column(String(20), index=True)
+    verdict: Mapped[str | None] = mapped_column(String(30))
+    gates: Mapped[list[Any] | None] = mapped_column(JSON)
+    results: Mapped[dict[str, Any] | None] = mapped_column(JSON)
+    data: Mapped[dict[str, Any]] = mapped_column(default=dict)
+    reference_sample: Mapped[dict[str, Any] | None] = mapped_column(JSON)
+    error: Mapped[str | None] = mapped_column(Text)
+    created_by_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"))
+    created_at: Mapped[datetime] = mapped_column(default=utcnow, index=True)
+    started_at: Mapped[datetime | None]
+    completed_at: Mapped[datetime | None]
+    duration_ms: Mapped[float | None] = mapped_column(Float)
 
 
 # --------------------------------------------------------------------------- scoring

@@ -4,6 +4,13 @@ Lifecycle: candidate -> approved -> active -> archived, or candidate -> rejected
 Promotion is always an explicit admin action with a recorded reason; nothing in
 the system promotes a model automatically (not even a drift signal).
 Rollback = activating an archived version that was previously approved.
+
+Approval needs a completed evaluation of the candidate under the *current*
+protocol and against the *current* baseline (see ``services.governance``):
+``pass`` approves; ``fail`` approves only with an explicit, justified override
+(audited as ``model.approve_override``); ``insufficient_evidence`` never does.
+Approval and every activation or rollback first prove the artifact can be
+restored (hash, trusted load, preprocessing, replay of a recorded sample).
 """
 
 from __future__ import annotations
@@ -16,7 +23,7 @@ from typing import Any
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from ..db.models import ModelStatusChange, ModelVersion, User, utcnow
+from ..db.models import ModelEvaluation, ModelStatusChange, ModelVersion, User, utcnow
 from ..preprocessing import PreprocessingError, Preprocessor
 from ..provenance import sha256_file
 from ..schema import FeatureSchema, SchemaError
@@ -121,17 +128,64 @@ def _need_reason(reason: str | None) -> str:
     return reason.strip()
 
 
-def approve(db: Session, model_id: int, actor: User, reason: str | None, client_ip: str | None = None) -> ModelVersion:
+MIN_OVERRIDE_JUSTIFICATION = 20
+
+
+def approve(db: Session, model_id: int, actor: User, reason: str | None, settings: Settings, *,
+            evaluation_id: int | None = None, override: bool = False, client_ip: str | None = None) -> ModelVersion:
+    from . import governance
+
     mv = get(db, model_id)
     reason = _need_reason(reason)
     if mv.status not in ("candidate", "evaluating"):
         raise Conflict(f"only candidate models can be approved (status is {mv.status})")
     if not (mv.evaluation or {}).get("test"):
         raise InvalidRequest("a model cannot be approved without recorded test-set evaluation results")
-    _change(db, mv, "approved", actor, reason)
+    if evaluation_id is not None:
+        ev = governance.get_evaluation(db, evaluation_id)
+        if ev.model_version_id != mv.id:
+            raise InvalidRequest("that evaluation belongs to another model version")
+    else:
+        ev = db.scalar(select(ModelEvaluation).where(ModelEvaluation.model_version_id == mv.id,
+                                                     ModelEvaluation.status == "completed")
+                       .order_by(ModelEvaluation.completed_at.desc(), ModelEvaluation.id.desc()))
+    if ev is None or ev.status != "completed":
+        raise Conflict("approval requires a completed candidate evaluation; evaluate the model on labelled data first")
+    proto = governance.current_protocol(settings)
+    if ev.protocol != proto.to_dict():
+        raise Conflict(f"evaluation {ev.id} used protocol v{ev.protocol_version}; the current protocol is "
+                       f"v{proto.version}. Re-evaluate the candidate")
+    active = get_active(db)
+    if (active.id if active else None) != ev.baseline_model_version_id:
+        raise Conflict(f"the active model changed after evaluation {ev.id}; re-evaluate against the current baseline")
+    failed = [g["id"] for g in ev.gates or [] if g["passed"] is False]
+    if ev.verdict == "insufficient_evidence":
+        raise Conflict(f"evaluation {ev.id} did not have enough valid evidence ({', '.join(failed)}); "
+                       "this cannot be overridden")
+    if ev.verdict == "fail":
+        if not override:
+            raise Conflict(f"evaluation {ev.id} failed {', '.join(failed)}; approving needs an explicit override "
+                           "with a written justification")
+        if len(reason) < MIN_OVERRIDE_JUSTIFICATION:
+            raise InvalidRequest(f"an override needs a justification of at least {MIN_OVERRIDE_JUSTIFICATION} characters")
+    elif ev.verdict != "pass":
+        raise Conflict(f"evaluation {ev.id} has no usable verdict")
+    elif override:
+        raise InvalidRequest("override is only for evaluations that failed a performance gate")
+    check = governance.verify_restorable(mv, ev.reference_sample)
+    mv.restore_check = check
+    if not check["ok"]:
+        raise Conflict("the artifact could not be restored and replayed: "
+                       + "; ".join(c["detail"] for c in check["checks"] if c["passed"] is False))
+    _change(db, mv, "approved", actor, f"[override of failed gates: {', '.join(failed)}] {reason}" if override else reason)
     mv.approved_by_id, mv.approved_at = actor.id, utcnow()
-    audit.record(db, "model.approve", actor=actor, entity_type="model_version", entity_id=mv.id,
-                 details={"version_id": mv.version_id, "reason": reason}, client_ip=client_ip)
+    mv.approval_evaluation_id, mv.approval_override = ev.id, bool(override)
+    mv.reference_sample = ev.reference_sample
+    audit.record(db, "model.approve_override" if override else "model.approve", actor=actor,
+                 entity_type="model_version", entity_id=mv.id,
+                 details={"version_id": mv.version_id, "reason": reason, "evaluation_id": ev.id,
+                          "verdict": ev.verdict, "failed_gates": failed, "protocol": ev.protocol_version},
+                 client_ip=client_ip)
     return mv
 
 
@@ -154,6 +208,13 @@ def activate(db: Session, model_id: int, actor: User, reason: str | None, client
         raise Conflict("model is already active")
     if mv.status not in ("approved", "archived") or mv.approved_at is None:
         raise Conflict("only approved models (or archived models that were approved) can be activated")
+    from . import governance
+
+    check = governance.verify_restorable(mv)
+    mv.restore_check = check
+    if not check["ok"]:
+        raise Conflict(f"{mv.version_id} cannot be restored, so it was not activated: "
+                       + "; ".join(c["detail"] for c in check["checks"] if c["passed"] is False))
     current = get_active(db)
     if current is not None:
         _change(db, current, "archived", actor, f"replaced by {mv.version_id}: {reason}")
@@ -162,7 +223,8 @@ def activate(db: Session, model_id: int, actor: User, reason: str | None, client
     mv.activated_at = utcnow()
     audit.record(db, "model.rollback" if rollback else "model.activate", actor=actor, entity_type="model_version",
                  entity_id=mv.id, details={"version_id": mv.version_id, "reason": reason,
-                                           "previous_active": current.version_id if current else None},
+                                           "previous_active": current.version_id if current else None,
+                                           "restore_check": {"ok": check["ok"], "partial": check["partial"]}},
                  client_ip=client_ip)
     return mv
 

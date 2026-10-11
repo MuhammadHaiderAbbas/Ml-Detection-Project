@@ -184,6 +184,11 @@ class ModelDetail(ModelOut):
     training_config: dict[str, Any]
     software_versions: dict[str, Any]
     evaluation: dict[str, Any]
+    feature_schema: dict[str, Any]
+    approval_evaluation_id: int | None
+    approval_override: bool
+    restore_check: dict[str, Any] | None
+    has_reference_sample: bool
 
 
 class ModelStatusChangeOut(ORM):
@@ -200,6 +205,38 @@ class RegisterRun(BaseModel):
 
 class ReasonBody(BaseModel):
     reason: str = Field(min_length=1, max_length=2000)
+
+
+class ApproveBody(ReasonBody):
+    evaluation_id: int | None = Field(None, description="Defaults to the latest completed evaluation.")
+    override: bool = Field(False, description="Approve despite failed performance gates (justification required).")
+
+
+class EvaluationCreate(BaseModel):
+    import_id: int
+
+
+class EvaluationOut(ORM):
+    id: int
+    model_version_id: int
+    baseline_model_version_id: int | None
+    import_id: int
+    protocol_version: str
+    status: str
+    verdict: str | None
+    error: str | None
+    data: dict[str, Any]
+    created_by_id: int | None
+    created_at: datetime
+    started_at: datetime | None
+    completed_at: datetime | None
+    duration_ms: float | None
+
+
+class EvaluationDetail(EvaluationOut):
+    protocol: dict[str, Any]
+    gates: list[dict[str, Any]] | None
+    results: dict[str, Any] | None
 
 
 class RunOut(BaseModel):

@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 from ...db.models import ModelVersion, User
 from ...services import registry as svc
 from ..deps import client_ip, current_user, get_db, require
-from ..schemas import ModelDetail, ModelOut, ModelStatusChangeOut, ReasonBody, RegisterRun, RunOut
+from ..schemas import ApproveBody, ModelDetail, ModelOut, ModelStatusChangeOut, ReasonBody, RegisterRun, RunOut
 
 router = APIRouter(tags=["models"])
 
@@ -59,9 +59,11 @@ def register(body: RegisterRun, request: Request, admin: User = Depends(require(
 
 
 @router.post("/models/{model_id}/approve", response_model=ModelDetail)
-def approve(model_id: int, body: ReasonBody, request: Request, admin: User = Depends(require("admin")),
+def approve(model_id: int, body: ApproveBody, request: Request, admin: User = Depends(require("admin")),
             db: Session = Depends(get_db)):
-    return svc.approve(db, model_id, admin, body.reason, client_ip(request))
+    """Approve a candidate that passed its evaluation (or, with ``override``, a justified exception)."""
+    return svc.approve(db, model_id, admin, body.reason, request.app.state.settings,
+                       evaluation_id=body.evaluation_id, override=body.override, client_ip=client_ip(request))
 
 
 @router.post("/models/{model_id}/reject", response_model=ModelDetail)

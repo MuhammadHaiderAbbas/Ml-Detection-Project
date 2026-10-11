@@ -43,6 +43,9 @@ def test_shipped_schemas_load():
 
     for p in (REPO_ROOT / "configs" / "schemas").glob("*.json"):
         s = FeatureSchema.load(p)
-        assert s.label_column == "Label"
+        assert s.label_column in ("Label", "label") and s.label_column not in s.feature_names
     cand = FeatureSchema.load(REPO_ROOT / "configs/schemas/cse-cic-ids2018.candidate.json")
     assert cand.status == "unverified"
+    nsl = FeatureSchema.load(REPO_ROOT / "configs/schemas/nsl-kdd.json")
+    assert len(nsl.feature_names) == 38 and "difficulty" not in nsl.feature_names
+    assert "difficulty" in nsl.excluded_columns and nsl.benign_label == "normal"

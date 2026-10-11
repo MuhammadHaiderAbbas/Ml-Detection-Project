@@ -156,6 +156,15 @@ def _cmd_msc_reproduce(a: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_prepare_nsl_kdd(a: argparse.Namespace) -> int:
+    from .research.msc_reproduction import prepare_named_csv
+
+    info = prepare_named_csv(a.src, a.dest)
+    print(f"Wrote {info['rows']} rows to {info['dest']} (schema configs/schemas/nsl-kdd.json; "
+          "row_order_time is synthetic ordering, not real time)")
+    return 0
+
+
 def _cmd_demo(a: argparse.Namespace) -> int:
     from .demo import run_demo
 
@@ -230,6 +239,11 @@ def main(argv: list[str] | None = None) -> int:
     s.add_argument("--train", help="KDDTrain+.txt (enables the official train/test split variant)")
     s.add_argument("--out", default="experiments/runs")
     s.set_defaults(fn=_cmd_msc_reproduce)
+
+    s = sub.add_parser("prepare-nsl-kdd", help="write an NSL-KDD .txt file as a headed CSV the importer accepts")
+    s.add_argument("src", help="KDDTrain+.txt or KDDTest+.txt")
+    s.add_argument("dest", help="output CSV path (keep it under data/, which is git-ignored)")
+    s.set_defaults(fn=_cmd_prepare_nsl_kdd)
 
     s = sub.add_parser("demo", help="load the repeatable, clearly labelled SYNTHETIC demonstration into the database")
     s.add_argument("--admin", required=True, help="existing admin username recorded as the actor")

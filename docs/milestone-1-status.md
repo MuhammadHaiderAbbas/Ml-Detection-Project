@@ -1,14 +1,26 @@
 # Milestone 1 — Reproducible ML baseline: status
 
-_Last updated: 2026-10-10_
+_Last updated: 2026-10-11_
 
-Milestone 1 (spec §22) is **not complete**. The software needed to reproduce the
-baseline exists and is tested. The baseline itself has **not** been reproduced,
-because the original research files (notebooks, datasets, trained models and
-results) have not been provided to this repository yet.
+**The supervised baseline has been reproduced.** On 2026-10-11 the original research
+notebook (`MSc_Project_Research.ipynb`) was provided. A static review and a
+re-implementation of its protocol reproduced all 15 reported supervised metrics
+(Random Forest, XGBoost and LightGBM × accuracy, precision, recall, F1 and ROC-AUC)
+exactly, using the notebook's library versions. The full write-up is in
+[`docs/msc-notebook-review.md`](msc-notebook-review.md).
 
-No accuracy, detection rate or other result from the original dissertation is
-claimed anywhere in this repository.
+Two caveats:
+
+- **Retrained, not the original artifacts.** The notebook's saved `.pkl` models were
+  not provided, so the models were retrained with the notebook's settings and seeds.
+- **The data was NSL-KDD, not CIC-IDS2018.** The CIC-IDS2018 download failed and the
+  notebook fell back to NSL-KDD `KDDTest+`. It also kept NSL-KDD's difficulty column as
+  a feature and evaluated on a random split of a single file. Without the difficulty
+  column, accuracy drops by about 1 point. On the dataset's official train/test split,
+  accuracy is about 77–79 % and recall 62–64 %.
+
+The unsupervised, deep-learning and drift results in the notebook are recorded as
+*reported, not reproduced*.
 
 ## 1. What was received and inspected
 
@@ -33,11 +45,11 @@ The "86%" mentioned in the transcripts appears to be the dissertation **grade**.
 |---|---|---|
 | Separate backup of the original project | **Tool ready, not run** (needs your PC) | `adaptive-ids backup` — hash-verified, read-only copy, refuses to overwrite |
 | Inventory of available files | **Tool ready, not run** on the original | `adaptive-ids inventory` — static, never executes code or unpickles |
-| One verified dataset and its schema | **Blocked** — dataset not provided | Candidate schema: `configs/schemas/cse-cic-ids2018.candidate.json` (status `unverified`) |
-| One trusted model and compatible preprocessing | **Blocked** — model not provided | Trusted loader: `adaptive_ids.detection`; manifest example in `models/` |
-| Reproduced predictions and metrics | **Blocked** | Runner ready: `adaptive-ids run configs/experiments/baseline-reproduction.template.json` |
-| Baseline report | **Blocked** (generator ready and tested) | Written to `experiments/runs/<id>/report.md` and `result.json` |
-| Pinned dependency environment | **Provisional** | `requirements.lock.txt` (Python 3.10). Must be re-pinned to the original scikit-learn version before the original model is loaded |
+| One verified dataset and its schema | **Done** for the data actually used: NSL-KDD (hashes recorded) | `docs/msc-notebook-review.md`; platform schema `configs/schemas/nsl-kdd.json` (difficulty excluded) |
+| One trusted model and compatible preprocessing | **Retrained** — original `.pkl` files not provided | `adaptive_ids.research.msc_reproduction` (notebook preprocessing re-implemented step by step) |
+| Reproduced predictions and metrics | **Done** — 15 of 15 supervised metrics match exactly | `adaptive-ids msc-reproduce`; `docs/results/msc-reproduction-nsl-kdd.json` |
+| Baseline report | **Done** | `docs/msc-notebook-review.md` (reported vs reproduced, plus controlled variants) |
+| Pinned dependency environment | **Done** for the reproduction: scikit-learn 1.3.2, xgboost 2.0.2, lightgbm 4.1.0 (the notebook's versions) | `docs/msc-notebook-review.md` §6; platform lock stays `requirements.lock.txt` |
 | Automated tests for validation and inference | **Done** — 70 engine tests passing (89 including the Phase 3 API tests) | `tests/`, CI in `.github/workflows/ci.yml` |
 | Documented list of unresolved issues | **Done** (below) | This file |
 
@@ -54,15 +66,19 @@ The "86%" mentioned in the transcripts appears to be the dissertation **grade**.
 
 ## 4. Unresolved issues
 
-1. **Original project files not available.** Run `adaptive-ids backup` and `adaptive-ids inventory` on the original folder (see `docs/reproducing-the-baseline.md`), then share the generated `inventory.md`. Do not share private data.
-2. **Exact dataset unknown.** CIC-IDS2018, CIC-IDS2017 and UNSW-NB15 were all mentioned. The inventory's `referenced_data_files` will show which files the notebooks actually load.
-3. **Feature list unknown.** The CIC-IDS2018 schema is a *candidate* built from the public CSV header. Edit a copy to match the notebooks exactly, then mark it `verified`.
-4. **Original split unknown.** Recover `test_size` and `random_state` from the inventory. If the held-out test set was saved, evaluate with `split.method = "all_test"`. Note that the same `train_test_split` arguments reproduce the same split only when the row order and the cleaning are identical.
-5. **Preprocessing outside a sklearn `Pipeline`.** If a scaler or encoder was fitted separately, its fitted object must also be recovered. Refitting it on test data would invalidate the reproduction.
-6. **SMOTE leakage risk.** If SMOTE was applied before the train/test split, the original metrics are optimistic. Record this as a discrepancy. Do not "fix" the original run silently.
-7. **Dependency versions.** The original scikit-learn version is unknown. Loading a model under a different version can change predictions, and the runner records any warning. Re-pin `requirements.lock.txt` once known.
-8. **CIC timestamp format.** CSE-CIC-IDS2018 timestamps are day-first (`14/02/2018 08:31:01`). Set `split.timestamp_format` to `"%d/%m/%Y %H:%M:%S"` for chronological splits so dates aren't misread.
-9. **Python 3.10 environment on Windows** has not been exercised on the target laptop yet. CI covers `windows-latest` with Python 3.10.
+1. **Original model artifacts not available.** The `.pkl` files saved by the notebook were not
+   provided. If they turn up, register them in a trusted manifest (hash first, never unpickle
+   unknown files) and evaluate them with `adaptive-ids run`.
+2. **CIC-IDS2018 never used.** The notebook's CIC-IDS2018 path failed. The candidate schema
+   `configs/schemas/cse-cic-ids2018.candidate.json` stays `unverified` until a CIC-IDS2018 run exists.
+3. **Dissertation label.** The dissertation's tables say "CIC-IDS". They should say NSL-KDD
+   KDDTest+ (random split, difficulty column included). This is for the author to correct. The
+   repository does not edit the original work.
+4. **Unsupervised and deep models not reproduced.** The autoencoders, Transformer, Isolation Forest,
+   bootstrap CIs, McNemar tests and drift-scenario numbers are recorded as reported only.
+5. **CIC timestamp format** (for future CIC-IDS2018 work): timestamps are day-first. Set
+   `split.timestamp_format` to `"%d/%m/%Y %H:%M:%S"`.
+6. **Windows target laptop** not exercised directly. CI covers `windows-latest` with Python 3.10.
 
 ## 5. Work beyond Milestone 1
 
@@ -75,6 +91,7 @@ through it is the SYNTHETIC demo model.
 ## 6. Not started (deliberately)
 
 Not started yet:
-SHAP explanations, candidate-vs-baseline comparison workflow (Phase 6), and model
-improvements of any kind (blocked on Milestone 1).
+SHAP explanations and model improvements of any kind. Model improvements are now
+unblocked for NSL-KDD, but must be measured with the leak-free protocol. Phase 6
+(model registry and governance, `docs/phase-6-governance.md`) provides that workflow.
 `docs/architecture.md` shows where each one fits on top of the modules above.

@@ -34,6 +34,7 @@ class Settings:
     schemas_dir: Path = Path("configs/schemas")
     runs_dir: Path = Path("experiments/runs")
     severity_rules_path: Path = Path("configs/severity-rules.json")
+    evaluation_protocol_path: Path = Path("configs/evaluation-protocol.json")
     max_upload_mb: int = 200
     max_import_rows: int = 1_000_000
     max_rejected_rows_stored: int = 10_000
@@ -53,6 +54,7 @@ class Settings:
             schemas_dir=Path(env("ADAPTIVE_IDS_SCHEMAS_DIR") or cls.schemas_dir),
             runs_dir=Path(env("ADAPTIVE_IDS_RUNS_DIR") or cls.runs_dir),
             severity_rules_path=Path(env("ADAPTIVE_IDS_SEVERITY_RULES") or cls.severity_rules_path),
+            evaluation_protocol_path=Path(env("ADAPTIVE_IDS_EVALUATION_PROTOCOL") or cls.evaluation_protocol_path),
             max_upload_mb=_int("ADAPTIVE_IDS_MAX_UPLOAD_MB", cls.max_upload_mb),
             max_import_rows=_int("ADAPTIVE_IDS_MAX_IMPORT_ROWS", cls.max_import_rows),
             max_rejected_rows_stored=_int("ADAPTIVE_IDS_MAX_REJECTED_ROWS_STORED", cls.max_rejected_rows_stored),

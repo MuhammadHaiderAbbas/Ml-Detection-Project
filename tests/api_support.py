@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import json
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 import pytest
@@ -58,7 +58,12 @@ def demo_runs(tmp_path_factory):
         p = base / f"{exp_id}.json"
         p.write_text(json.dumps(c))
         names.append(Path(run_experiment(p, base_dir=REPO)["run_dir"]).name)
-    return {"runs_dir": base / "runs", "run_names": names, "replay": replay, "replay_drift": replay_drift}
+    weak = dict(cfg, experiment_id="api-demo-weak", output_dir=str(base / "runs"), dataset=dict(cfg["dataset"], path=str(train)),
+                model={"mode": "train", "estimator": "DecisionTreeClassifier", "params": {"max_depth": 1, "random_state": 0}},
+                evaluation=dict(cfg["evaluation"], benchmark={"enabled": False}))
+    (base / "weak.json").write_text(json.dumps(weak))
+    weak_run = Path(run_experiment(base / "weak.json", base_dir=REPO)["run_dir"]).name
+    return {"weak_run": weak_run, "runs_dir": base / "runs", "run_names": names, "replay": replay, "replay_drift": replay_drift, "train": train}
 
 
 @dataclass
@@ -67,6 +72,7 @@ class Env:
     settings: Settings
     factory: object
     runs: dict
+    cache: dict = field(default_factory=dict)
 
     def login(self, username: str, password: str) -> dict:
         r = self.client.post("/api/auth/login", json={"username": username, "password": password})
@@ -84,6 +90,7 @@ def env(tmp_path, demo_runs):
         schemas_dir=REPO / "configs/schemas",
         runs_dir=demo_runs["runs_dir"],
         severity_rules_path=REPO / "configs/severity-rules.json",
+        evaluation_protocol_path=REPO / "configs/evaluation-protocol.json",
         max_upload_mb=2,
     )
     engine = make_engine(url)
@@ -100,11 +107,37 @@ def env(tmp_path, demo_runs):
         alembic(url, "downgrade")
 
 
+def evaluation_import(e: Env, headers: dict) -> int:
+    """A labelled import (not the training file) used to evaluate candidates; uploaded once per test."""
+    if "eval_import" not in e.cache:
+        r = upload(e, headers, dataset_name="evaluation-replay")
+        assert r.status_code == 202, r.text
+        e.cache["eval_import"] = r.json()["id"]
+    return e.cache["eval_import"]
+
+
+def evaluate(e: Env, admin: dict, model_id: int, import_id: int | None = None) -> dict:
+    import_id = import_id or evaluation_import(e, admin)
+    r = e.client.post(f"/api/models/{model_id}/evaluations", json={"import_id": import_id}, headers=admin)
+    assert r.status_code == 202, r.text
+    ev = e.client.get(f"/api/evaluations/{r.json()['id']}", headers=admin).json()
+    assert ev["status"] == "completed", ev
+    return ev
+
+
+def approve(e: Env, admin: dict, model_id: int, reason: str = "test approval after a passing evaluation") -> dict:
+    ev = evaluate(e, admin, model_id)
+    assert ev["verdict"] == "pass", ev["gates"]
+    r = e.client.post(f"/api/models/{model_id}/approve", json={"reason": reason}, headers=admin)
+    assert r.status_code == 200, r.text
+    return r.json()
+
+
 def activate_model(e: Env, admin: dict, run_index: int = 0) -> dict:
     r = e.client.post("/api/models/register-run", json={"run_name": e.runs["run_names"][run_index]}, headers=admin)
     assert r.status_code == 201, r.text
     mid = r.json()["id"]
-    assert e.client.post(f"/api/models/{mid}/approve", json={"reason": "test approval"}, headers=admin).status_code == 200
+    approve(e, admin, mid)
     r = e.client.post(f"/api/models/{mid}/activate", json={"reason": "test activation"}, headers=admin)
     assert r.status_code == 200, r.text
     return r.json()

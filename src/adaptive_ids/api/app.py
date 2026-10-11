@@ -18,7 +18,7 @@ from ..services.imports import CancelRegistry
 from ..services.scoring import ModelCache
 from ..services.severity import SeverityRules
 from ..settings import Settings
-from .routes import alerts, auth, drift, imports, incidents, models, scoring, system
+from .routes import alerts, auth, drift, governance, imports, incidents, models, scoring, system
 
 log = logging.getLogger("adaptive_ids.api")
 
@@ -60,7 +60,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         log.exception("unhandled error ref=%s", ref)
         return JSONResponse({"detail": "internal server error", "reference": ref}, status_code=500)
 
-    for r in (system, auth, imports, models, scoring, alerts, incidents, drift):
+    for r in (system, auth, imports, models, governance, scoring, alerts, incidents, drift):
         app.include_router(r.router, prefix="/api")
     if settings.web_dist_dir is not None:
         _mount_web(app, settings.web_dist_dir)

@@ -2,7 +2,7 @@ import csv
 from pathlib import Path
 import io
 
-from api_support import ADMIN_PW, ANALYST_PW, activate_model, demo_runs, env, scored_import, upload  # noqa: F401
+from api_support import ADMIN_PW, ANALYST_PW, activate_model, approve, demo_runs, env, scored_import, upload  # noqa: F401
 from sqlalchemy import select
 
 from adaptive_ids.db.models import AuditLog, ModelVersion, Prediction
@@ -77,8 +77,8 @@ def test_model_lifecycle_requires_explicit_approval_and_supports_rollback(env):
 
     activate_model(env, admin, run_index=1)  # m2 becomes active
     m1_id = m1["id"]
-    env.client.post(f"/api/models/{m1_id}/approve", json={"reason": "ok"}, headers=admin)
-    env.client.post(f"/api/models/{m1_id}/activate", json={"reason": "switch"}, headers=admin)
+    approve(env, admin, m1_id)  # evaluated against m2, the active baseline
+    assert env.client.post(f"/api/models/{m1_id}/activate", json={"reason": "switch"}, headers=admin).status_code == 200
     models = {m["version_id"]: m["status"] for m in env.client.get("/api/models", headers=admin).json()}
     assert sorted(models.values()) == ["active", "archived"]
     # roll back to the previously approved, now archived version
@@ -276,13 +276,16 @@ def test_dashboard_counts_match_records(env):
     import_id = scored_import(env, admin, analyst)
     s = env.client.get("/api/dashboard/summary", headers=analyst).json()
     run = env.client.get("/api/scoring-runs", headers=analyst).json()[0]
-    assert s["events_processed"] == 594 and s["events_scored"] == run["events_scored"]
+    # two imports of 594 accepted rows: the evaluation import used for approval, and the scored one
+    assert s["events_processed"] == 2 * 594 and s["events_scored"] == run["events_scored"]
     assert s["suspicious_predictions"] == run["suspicious"] == sum(s["alerts_by_status"].values())
     assert s["demo_data_present"] is True
     assert s["active_model"]["provenance"] == "synthetic_demo"
     assert s["processing_latency"]["events"] == 594
     assert s["top_destinations"] and all(d["value"].startswith("192.0.2.") for d in s["top_destinations"])
     assert set(s["definitions"]) >= {"events_processed", "suspicious_predictions", "confirmed_attacks"}
+    only = env.client.get("/api/dashboard/summary", params={"import_id": import_id}, headers=analyst).json()
+    assert only["events_processed"] == 594
     filtered = env.client.get("/api/dashboard/summary", params={"import_id": import_id + 999}, headers=analyst).json()
     assert filtered["events_processed"] == 0 and filtered["suspicious_predictions"] == 0
 
@@ -291,8 +294,8 @@ def test_audit_log_records_sensitive_actions(env):
     admin, analyst = env.login("admin", ADMIN_PW), env.login("analyst", ANALYST_PW)
     scored_import(env, admin, analyst)
     actions = {a["action"] for a in env.client.get("/api/audit-logs", params={"limit": 1000}, headers=admin).json()["items"]}
-    assert {"user.create", "auth.login", "model.register", "model.approve", "model.activate",
-            "import.create", "scoring.start"} <= actions
+    assert {"user.create", "auth.login", "model.register", "model.evaluation_start", "model.approve",
+            "model.activate", "import.create", "scoring.start"} <= actions
 
 
 def test_validation_errors_do_not_echo_input(env):

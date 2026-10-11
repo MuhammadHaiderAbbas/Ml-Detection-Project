@@ -1,0 +1,17 @@
+{
+  "_doc": "Candidate evaluation protocol. Rules are documented in src/adaptive_ids/governance/protocol.py and docs/phase-6-governance.md. Changing any value requires a new version; evaluations made under an older version cannot be used to approve a model.",
+  "version": "1.0.0",
+  "min_labelled_events": 200,
+  "min_events_per_class": 30,
+  "max_failed_prediction_rate": 0.01,
+  "recall_margin": 0.01,
+  "fpr_margin": 0.005,
+  "f1_margin": 0.01,
+  "min_attack_recall": null,
+  "max_false_positive_rate": null,
+  "bootstrap_iterations": 1000,
+  "confidence": 0.95,
+  "seed": 20261011,
+  "mcnemar_alpha": 0.05,
+  "reference_sample_size": 25
+}
