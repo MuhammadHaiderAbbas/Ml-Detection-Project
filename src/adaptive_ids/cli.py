@@ -142,6 +142,20 @@ def _cmd_drift_experiment(a: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_msc_reproduce(a: argparse.Namespace) -> int:
+    from .research.msc_reproduction import run_reproduction
+
+    res = run_reproduction(a.test, a.train, a.out)
+    print("[baseline_reproduction - retrained; the notebook's .pkl artifacts were not provided]")
+    for row in res["comparison_with_reported"]:
+        print(f"{row['model']:<14} {row['metric']:<10} reported={row['reported']} reproduced={row['reproduced']} diff={row['difference']}")
+    for v, d in res["variants"].items():
+        print(f"{v}: " + " | ".join(f"{m} acc={x['accuracy']:.4f} recall={x['recall']:.4f} fpr={x['false_positive_rate']:.4f}"
+                                    for m, x in d["models"].items()))
+    print(f"Result: {res['run_dir']}/result.json")
+    return 0
+
+
 def _cmd_demo(a: argparse.Namespace) -> int:
     from .demo import run_demo
 
@@ -210,6 +224,12 @@ def main(argv: list[str] | None = None) -> int:
     s.add_argument("--window-size", type=int, default=500)
     s.add_argument("--out", default="experiments/runs")
     s.set_defaults(fn=_cmd_drift_experiment)
+
+    s = sub.add_parser("msc-reproduce", help="re-run the MSc notebook's supervised protocol on NSL-KDD and its controlled variants")
+    s.add_argument("--test", required=True, help="KDDTest+.txt (the file the notebook actually loaded)")
+    s.add_argument("--train", help="KDDTrain+.txt (enables the official train/test split variant)")
+    s.add_argument("--out", default="experiments/runs")
+    s.set_defaults(fn=_cmd_msc_reproduce)
 
     s = sub.add_parser("demo", help="load the repeatable, clearly labelled SYNTHETIC demonstration into the database")
     s.add_argument("--admin", required=True, help="existing admin username recorded as the actor")

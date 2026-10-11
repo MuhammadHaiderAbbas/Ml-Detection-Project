@@ -11,7 +11,7 @@ from importlib import metadata
 from pathlib import Path
 from typing import Any
 
-TRACKED_PACKAGES = ("numpy", "pandas", "scikit-learn", "scipy", "joblib", "imbalanced-learn", "shap", "river")
+TRACKED_PACKAGES = ("numpy", "pandas", "scikit-learn", "scipy", "joblib", "xgboost", "lightgbm", "imbalanced-learn", "shap", "river")
 
 
 def _package_versions() -> dict[str, str | None]:
