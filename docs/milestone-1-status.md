@@ -66,14 +66,14 @@ The "86%" mentioned in the transcripts appears to be the dissertation **grade**.
 
 ## 5. Work beyond Milestone 1
 
-At the user's request, Phase 3 (backend and persistence) has been built on top of the engine. See
-`docs/phase-3-backend.md`. It contains no model improvements, so the §22 rule ("do not begin
+At the user's request, Phase 3 (backend and persistence, `docs/phase-3-backend.md`) and Phase 4
+(web dashboard, `docs/phase-4-frontend.md`) have been built on top of the engine. It contains no model improvements, so the §22 rule ("do not begin
 major model improvements until this milestone is complete") still holds: the only model that runs
 through it is the SYNTHETIC demo model.
 
 ## 6. Not started (deliberately)
 
-Not started yet: the React dashboard (Phase 4), the drift engine (Phase 5),
+Not started yet: the drift engine (Phase 5),
 SHAP explanations, candidate-vs-baseline comparison workflow (Phase 6), and model
 improvements of any kind (blocked on Milestone 1).
 `docs/architecture.md` shows where each one fits on top of the modules above.

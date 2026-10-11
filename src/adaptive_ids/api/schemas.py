@@ -146,6 +146,11 @@ class EventOut(ORM):
     context: dict[str, Any]
 
 
+class TrafficRow(BaseModel):
+    event: EventOut
+    prediction: PredictionOut | None
+
+
 class EventWithPredictions(BaseModel):
     event: EventOut
     predictions: list[PredictionOut]

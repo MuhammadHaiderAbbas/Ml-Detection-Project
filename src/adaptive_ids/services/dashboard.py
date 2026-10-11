@@ -131,3 +131,51 @@ def summary(
         "recent_alert_ids": [a.id for a in recent],
         "definitions": DEFINITIONS,
     }
+
+
+BUCKETS = {"minute": ("%Y-%m-%dT%H:%M:00", "minute"), "hour": ("%Y-%m-%dT%H:00:00", "hour"), "day": ("%Y-%m-%dT00:00:00", "day")}
+
+
+def timeline(db: Session, *, import_id: int | None = None, model_version_id: int | None = None,
+             bucket: str = "hour", since: datetime | None = None, until: datetime | None = None) -> dict[str, Any]:
+    """Events per time bucket (by event timestamp), split by the model's verdict.
+
+    ``suspicious`` / ``not_flagged`` count events with an OK prediction from the chosen
+    model version (default: every prediction); ``unscored`` counts events without one.
+    Events without a parseable timestamp are reported separately, not dropped silently.
+    """
+    from sqlalchemy import and_, case, literal_column
+
+    if bucket not in BUCKETS:
+        raise ValueError(f"bucket must be one of {sorted(BUCKETS)}")
+    fmt, pg_unit = BUCKETS[bucket]
+    dialect = db.get_bind().dialect.name
+    if dialect == "postgresql":
+        b = func.to_char(func.date_trunc(pg_unit, func.timezone("UTC", Event.occurred_at)),
+                         literal_column("'YYYY-MM-DD\"T\"HH24:MI:SS'"))
+    else:
+        b = func.strftime(fmt, Event.occurred_at)
+    join_cond = and_(Prediction.event_id == Event.id, Prediction.status == "ok")
+    if model_version_id:
+        join_cond = and_(join_cond, Prediction.model_version_id == model_version_id)
+    q = (select(b.label("bucket"), func.count(func.distinct(Event.id)).label("events"),
+                func.count(func.distinct(case((Prediction.is_suspicious.is_(True), Event.id)))).label("suspicious"),
+                func.count(func.distinct(case((Prediction.is_suspicious.is_(False), Event.id)))).label("not_flagged"))
+         .select_from(Event).outerjoin(Prediction, join_cond).where(Event.occurred_at.is_not(None)))
+    if import_id:
+        q = q.where(Event.import_id == import_id)
+    if since:
+        q = q.where(Event.occurred_at >= since)
+    if until:
+        q = q.where(Event.occurred_at < until)
+    rows = db.execute(q.group_by(b).order_by(b)).all()
+    no_ts = select(func.count(Event.id)).where(Event.occurred_at.is_(None))
+    if import_id:
+        no_ts = no_ts.where(Event.import_id == import_id)
+    points = [{"bucket_start": f"{r.bucket}Z", "events": r.events, "suspicious": r.suspicious,
+               "not_flagged": r.not_flagged, "unscored": r.events - r.suspicious - r.not_flagged} for r in rows]
+    return {"bucket": bucket, "basis": "event timestamp (UTC)", "points": points,
+            "events_without_timestamp": db.scalar(no_ts) or 0,
+            "definitions": {"suspicious": DEFINITIONS["suspicious_predictions"],
+                            "not_flagged": "Events whose prediction is the benign class (status ok).",
+                            "unscored": "Events with no successful prediction from the selected model."}}

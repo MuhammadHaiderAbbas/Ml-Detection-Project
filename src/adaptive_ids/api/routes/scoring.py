@@ -8,7 +8,7 @@ from ...db.models import Event, Prediction, ScoringRun, User
 from ...services import scoring as svc
 from ...services.errors import NotFound
 from ..deps import client_ip, current_user, get_db
-from ..schemas import EventOut, EventWithPredictions, Page, PredictionOut, ScoreRequest, ScoringRunOut
+from ..schemas import EventOut, EventWithPredictions, Page, PredictionOut, ScoreRequest, ScoringRunOut, TrafficRow
 
 router = APIRouter(tags=["scoring", "events"])
 
@@ -54,6 +54,28 @@ def events(import_id: int | None = None, source: str | None = None, destination:
         q = q.where(Event.id.in_(select(Prediction.event_id).where(Prediction.is_suspicious.is_(True))))
     total = db.scalar(select(func.count()).select_from(q.subquery())) or 0
     items = list(db.scalars(q.order_by(Event.id).limit(limit).offset(offset)))
+    return Page(items=items, total=total, limit=limit, offset=offset)
+
+
+@router.get("/traffic", response_model=Page[TrafficRow])
+def traffic(import_id: int | None = None, model_version_id: int | None = None, suspicious_only: bool = False,
+            limit: int = Query(50, ge=1, le=500), offset: int = Query(0, ge=0),
+            _: User = Depends(current_user), db: Session = Depends(get_db)):
+    """Recorded events in event-time order with the latest prediction (optionally from one model version)."""
+    latest = select(Prediction.event_id, func.max(Prediction.id).label("pid"))
+    if model_version_id is not None:
+        latest = latest.where(Prediction.model_version_id == model_version_id)
+    latest = latest.group_by(Prediction.event_id).subquery()
+    q = (select(Event, Prediction).outerjoin(latest, latest.c.event_id == Event.id)
+         .outerjoin(Prediction, Prediction.id == latest.c.pid))
+    if import_id is not None:
+        q = q.where(Event.import_id == import_id)
+    if suspicious_only:
+        q = q.where(Prediction.is_suspicious.is_(True))
+    total = db.scalar(select(func.count()).select_from(q.subquery())) or 0
+    rows = db.execute(q.order_by(Event.occurred_at.desc().nulls_last(), Event.id.desc()).limit(limit).offset(offset)).all()
+    items = [TrafficRow(event=EventOut.model_validate(e), prediction=PredictionOut.model_validate(p) if p else None)
+             for e, p in rows]
     return Page(items=items, total=total, limit=limit, offset=offset)
 
 

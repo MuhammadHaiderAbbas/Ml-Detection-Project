@@ -1,4 +1,5 @@
 import csv
+from pathlib import Path
 import io
 
 from api_support import ADMIN_PW, ANALYST_PW, activate_model, demo_runs, env, scored_import, upload  # noqa: F401
@@ -297,3 +298,55 @@ def test_audit_log_records_sensitive_actions(env):
 def test_validation_errors_do_not_echo_input(env):
     r = env.client.post("/api/auth/login", json={"username": "x" * 500, "password": "secret-value"})
     assert r.status_code == 422 and "secret-value" not in r.text and "xxxx" not in r.text
+
+
+def test_timeline_buckets_match_event_counts(env):
+    admin, analyst = env.login("admin", ADMIN_PW), env.login("analyst", ANALYST_PW)
+    import_id = scored_import(env, admin, analyst)
+    for bucket in ("minute", "hour", "day"):
+        t = env.client.get("/api/dashboard/timeline", params={"import_id": import_id, "bucket": bucket}, headers=analyst).json()
+        pts = t["points"]
+        assert sum(p["events"] for p in pts) + t["events_without_timestamp"] == 594
+        assert all(p["events"] == p["suspicious"] + p["not_flagged"] + p["unscored"] for p in pts)
+        assert [p["bucket_start"] for p in pts] == sorted(p["bucket_start"] for p in pts)
+        assert all(p["bucket_start"].endswith("Z") for p in pts)
+    run = env.client.get("/api/scoring-runs", headers=analyst).json()[0]
+    assert sum(p["suspicious"] for p in pts) == run["suspicious"]
+    assert env.client.get("/api/dashboard/timeline", params={"bucket": "week"}, headers=analyst).status_code == 400
+    hourly = env.client.get("/api/dashboard/timeline", params={"bucket": "hour"}, headers=analyst).json()["points"]
+    assert hourly[0]["bucket_start"].endswith(":00:00Z")
+
+
+def test_traffic_joins_latest_prediction(env):
+    admin, analyst = env.login("admin", ADMIN_PW), env.login("analyst", ANALYST_PW)
+    import_id = scored_import(env, admin, analyst)
+    page = env.client.get("/api/traffic", params={"import_id": import_id, "limit": 500}, headers=analyst).json()
+    assert page["total"] == 594 and all(r["prediction"] for r in page["items"])
+    times = [r["event"]["occurred_at"] for r in page["items"]]
+    assert times == sorted(times, reverse=True)
+    sus = env.client.get("/api/traffic", params={"import_id": import_id, "suspicious_only": True}, headers=analyst).json()
+    run = env.client.get("/api/scoring-runs", headers=analyst).json()[0]
+    assert sus["total"] == run["suspicious"]
+    assert all(r["prediction"]["is_suspicious"] for r in sus["items"])
+
+
+def test_spa_is_served_when_configured(tmp_path, demo_runs):
+    from fastapi.testclient import TestClient
+
+    from adaptive_ids.api import create_app
+    from adaptive_ids.settings import Settings
+
+    dist = tmp_path / "dist"
+    (dist / "assets").mkdir(parents=True)
+    (dist / "index.html").write_text("<!doctype html><title>app</title>")
+    (dist / "assets" / "app.js").write_text("console.log(1)")
+    (dist / "favicon.svg").write_text("<svg/>")
+    app = create_app(Settings(database_url=f"sqlite:///{tmp_path / 'x.db'}", web_dist_dir=dist,
+                              severity_rules_path=Path(__file__).resolve().parents[1] / "configs/severity-rules.json"))
+    with TestClient(app) as c:
+        assert "<title>app</title>" in c.get("/alerts/12").text  # client-side route falls back to index.html
+        assert c.get("/assets/app.js").text == "console.log(1)"
+        assert c.get("/favicon.svg").text == "<svg/>"
+        assert c.get("/api/does-not-exist").status_code == 404
+        assert "<title>app</title>" in c.get("/../../etc/passwd").text  # traversal never escapes dist
+    app.state.engine.dispose()

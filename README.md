@@ -5,6 +5,7 @@ project. This repository is being built in small, tested milestones.
 
 > **Current state**
 > - **Milestone 1 (reproducible ML baseline): in progress.** The ML engine and the reproduction tooling are implemented and tested. The original dissertation baseline has **not yet been reproduced**, because the original notebooks, data and model files aren't in this repository yet. See [`docs/milestone-1-status.md`](docs/milestone-1-status.md).
+> - **Phase 4 (web dashboard): implemented.** React + TypeScript UI for all twelve sections. See [`docs/phase-4-frontend.md`](docs/phase-4-frontend.md).
 > - **Phase 3 (backend and persistence): implemented.** API, database, migrations, alerts and incidents. See [`docs/phase-3-backend.md`](docs/phase-3-backend.md). Until the baseline is reproduced, only the clearly labelled SYNTHETIC demo model runs through it.
 >
 > No original research results are claimed here.
@@ -32,7 +33,13 @@ project. This repository is being built in small, tested milestones.
 - **Dashboard summary**: every number comes with its counting rule.
 - **Security**: scrypt password hashing, expiring bearer sessions, server-side admin/analyst roles and an audit log.
 
-Not built yet: the web dashboard (Phase 4), drift monitoring (Phase 5) and SHAP explanations. See [`docs/architecture.md`](docs/architecture.md).
+**Web dashboard (Phase 4)**
+
+- React + TypeScript + Vite UI in `apps/web/` with dashboard, live traffic (recorded replay), alerts, the investigation view, incidents, model management, data sources, experiments, reports, audit logs and settings.
+- Light and dark themes, a phone-width layout and keyboard accessibility.
+- Every number comes from the API, and every synthetic record is labelled.
+
+Not built yet: drift monitoring (Phase 5) and SHAP explanations. See [`docs/architecture.md`](docs/architecture.md).
 
 ## Quick start (Windows PowerShell)
 
@@ -55,8 +62,12 @@ copy .env.example .env                 # SQLite by default; PostgreSQL: docker c
 adaptive-ids db-upgrade
 adaptive-ids create-user admin --role admin
 adaptive-ids demo --admin admin        # optional: repeatable SYNTHETIC demo data, model and alerts
-adaptive-ids serve                     # http://127.0.0.1:8000/docs
+adaptive-ids serve                     # API docs: http://127.0.0.1:8000/docs
 ```
+
+Web UI: `cd apps/web && npm ci && npm run build`, then set `ADAPTIVE_IDS_WEB_DIST=apps/web/dist` and start
+`adaptive-ids serve` again; the dashboard is at http://127.0.0.1:8000. For hot reload, run `npm run dev` instead
+(http://localhost:5173). Requires Node.js 20.19+ or 22.12+.
 
 ## Demo on synthetic data (ML engine only)
 
@@ -71,7 +82,15 @@ They show that the software works, **not** how well it detects intrusions.
 
 ## Screenshots
 
-Real output captured on 2026-10-10 (images 2–4 use SYNTHETIC demo data; the scores show the pipeline works, not detection performance):
+Web dashboard, captured from the running app on 2026-10-11 with the SYNTHETIC demo loaded:
+
+| | |
+|---|---|
+| [Dashboard](docs/screenshots/ui-01-dashboard.png) | [Dashboard (dark)](docs/screenshots/ui-02-dashboard-dark.png) |
+| [Alert investigation](docs/screenshots/ui-03-alert-investigation.png) | [Incident](docs/screenshots/ui-04-incident.png) |
+| [Model governance](docs/screenshots/ui-05-model.png) | [Phone width](docs/screenshots/ui-06-mobile.png) |
+
+Engine output captured on 2026-10-10 (images 2–4 use SYNTHETIC demo data; the scores show the pipeline works, not detection performance):
 
 | | |
 |---|---|
@@ -107,6 +126,7 @@ src/adaptive_ids/   schema, provenance, ingestion/, preprocessing/, detection/,
                     evaluation/, experiments/, research/   (ML engine)
                     db/, services/, api/, settings, security   (backend)
 migrations/         Alembic migrations
+apps/web/           React + TypeScript dashboard (Vite)
 configs/            schemas/, experiments/, severity-rules.json
 models/             trusted-artifact manifest (binaries git-ignored)
 data/               raw/ processed/ sample/ (git-ignored)

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 import uuid
+from pathlib import Path
 
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
@@ -61,4 +62,27 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     for r in (system, auth, imports, models, scoring, alerts, incidents):
         app.include_router(r.router, prefix="/api")
+    if settings.web_dist_dir is not None:
+        _mount_web(app, settings.web_dist_dir)
     return app
+
+
+def _mount_web(app: FastAPI, dist: Path) -> None:
+    """Serve the built React app (apps/web/dist); unknown non-API paths fall back to index.html."""
+    from fastapi.responses import FileResponse
+    from fastapi.staticfiles import StaticFiles
+
+    dist = dist.resolve()
+    index = dist / "index.html"
+    if not index.is_file():
+        raise RuntimeError(f"web build not found at {dist}; run `npm run build` in apps/web")
+    app.mount("/assets", StaticFiles(directory=dist / "assets"), name="assets")
+
+    @app.get("/{path:path}", include_in_schema=False)
+    async def spa(path: str):
+        if path.startswith("api/"):
+            return JSONResponse({"detail": "not found"}, status_code=404)
+        candidate = (dist / path).resolve()
+        if path and dist in candidate.parents and candidate.is_file():
+            return FileResponse(candidate)
+        return FileResponse(index)

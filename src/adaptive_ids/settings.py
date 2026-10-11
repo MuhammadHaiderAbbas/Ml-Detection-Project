@@ -38,6 +38,7 @@ class Settings:
     max_import_rows: int = 1_000_000
     max_rejected_rows_stored: int = 10_000
     session_hours: int = 12
+    web_dist_dir: Path | None = None
     cors_origins: tuple[str, ...] = field(default_factory=lambda: ("http://localhost:5173",))
 
     @classmethod
@@ -56,5 +57,6 @@ class Settings:
             max_import_rows=_int("ADAPTIVE_IDS_MAX_IMPORT_ROWS", cls.max_import_rows),
             max_rejected_rows_stored=_int("ADAPTIVE_IDS_MAX_REJECTED_ROWS_STORED", cls.max_rejected_rows_stored),
             session_hours=_int("ADAPTIVE_IDS_SESSION_HOURS", cls.session_hours),
+            web_dist_dir=Path(env("ADAPTIVE_IDS_WEB_DIST")) if env("ADAPTIVE_IDS_WEB_DIST") else None,
             cors_origins=tuple(o.strip() for o in origins.split(",") if o.strip()) if origins else ("http://localhost:5173",),
         )

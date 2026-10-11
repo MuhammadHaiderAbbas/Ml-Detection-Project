@@ -32,6 +32,19 @@ def summary(import_id: int | None = None, model_version_id: int | None = None, s
     return dashboard.summary(db, import_id=import_id, model_version_id=model_version_id, since=since, until=until)
 
 
+@router.get("/dashboard/timeline")
+def timeline(import_id: int | None = None, model_version_id: int | None = None, bucket: str = "hour",
+             since: datetime | None = None, until: datetime | None = None,
+             _: User = Depends(current_user), db: Session = Depends(get_db)):
+    from ...services.errors import InvalidRequest
+
+    try:
+        return dashboard.timeline(db, import_id=import_id, model_version_id=model_version_id, bucket=bucket,
+                                  since=since, until=until)
+    except ValueError as exc:
+        raise InvalidRequest(str(exc)) from exc
+
+
 @router.get("/severity-rules")
 def severity_rules(request: Request, _: User = Depends(current_user)):
     return request.app.state.severity_rules.to_dict()
