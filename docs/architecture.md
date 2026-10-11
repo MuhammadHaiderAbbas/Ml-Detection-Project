@@ -35,13 +35,13 @@ experiments.run_experiment ──► result.json + report.md (provenance-labelle
 | `adaptive_ids.evaluation` | Metrics, splits, benchmark | §9, §15 | Implemented |
 | `adaptive_ids.experiments` | Reproducible runs and reports | §15, §16 | Implemented |
 | `adaptive_ids.research` | Backup, inventory, synthetic demo data | §2, §22 | Implemented |
-| `adaptive_ids.drift` | Feature/prediction drift, ADWIN on suitable signals | §10 | Phase 5 |
+| `adaptive_ids.drift` | Feature, prediction, performance and suspected concept drift; ADWIN on bounded signals; controlled experiments | §10, §15 | Implemented (Phase 5) |
 | `adaptive_ids.explainability` | SHAP for supported models | §11 | Phase 2–4 |
 | `adaptive_ids.services.registry` | Model lifecycle: register from run, approve, activate, rollback | §14 | Core implemented (Phase 3); candidate comparison and evaluation workflow in Phase 6 |
 | `adaptive_ids.db` + `migrations/` | SQLAlchemy models, Alembic migrations (PostgreSQL target) | §4 | Implemented (Phase 3) |
 | `adaptive_ids.services` | Imports, scoring, alerts, incidents, dashboard, auth, audit | §6, §7, §12, §13, §17 | Implemented (Phase 3) |
 | `adaptive_ids.api` (FastAPI) | HTTP API, roles, safe errors | §4, §17, §18 | Implemented (Phase 3) |
-| `apps/web` (React, TypeScript, Vite, Recharts) | Dashboard and the 12 sidebar pages | §5, §6, §11, §19 | Implemented (Phase 4); drift page awaits Phase 5 |
+| `apps/web` (React, TypeScript, Vite, Recharts) | Dashboard and the 12 sidebar pages | §5, §6, §11, §19 | Implemented (Phases 4–5) |
 
 ## Provenance
 

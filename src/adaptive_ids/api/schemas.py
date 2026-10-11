@@ -391,3 +391,100 @@ class AuditOut(ORM):
     entity_id: str | None
     details: dict[str, Any]
     client_ip: str | None
+
+
+# --- drift --------------------------------------------------------------------
+
+
+class DriftSpec(BaseModel):
+    import_id: int
+    since: datetime | None = None
+    until: datetime | None = None
+
+
+class DriftWindowSpec(BaseModel):
+    mode: Literal["events", "time"] = "events"
+    size: int | None = Field(500, ge=50, le=1_000_000)
+    bucket: Literal["hour", "day", "week"] | None = None
+
+
+class DriftAnalysisCreate(BaseModel):
+    name: str = Field(min_length=1, max_length=200)
+    reference: DriftSpec
+    current: DriftSpec
+    model_version_id: int | None = None
+    use_active_model: bool = True
+    features: list[str] | None = Field(None, max_length=500)
+    window: DriftWindowSpec = Field(default_factory=DriftWindowSpec)
+    config: dict[str, Any] | None = None
+
+
+class DriftAnalysisOut(ORM):
+    id: int
+    name: str
+    model_version_id: int | None
+    reference_spec: dict[str, Any]
+    current_spec: dict[str, Any]
+    window_spec: dict[str, Any]
+    features: list[str]
+    config: dict[str, Any]
+    status: str
+    n_reference: int | None
+    n_current: int | None
+    summary: dict[str, Any] | None
+    timings: dict[str, Any] | None
+    error: str | None
+    created_by_id: int | None
+    created_at: datetime
+    started_at: datetime | None
+    completed_at: datetime | None
+
+
+class DriftAnalysisDetail(DriftAnalysisOut):
+    overall: dict[str, Any] | None
+
+
+class DriftWindowOut(ORM):
+    window_index: int
+    start: datetime | None
+    end: datetime | None
+    n_events: int
+    max_feature_psi: float | None
+    drifted_features: list[str]
+    features: dict[str, Any]
+    prediction: dict[str, Any] | None
+    performance: dict[str, Any] | None
+
+
+class DriftEventOut(ORM):
+    id: int
+    analysis_id: int
+    drift_type: str
+    signal: str
+    severity: str
+    rule: str
+    window_index: int | None
+    detected_at: datetime | None
+    details: dict[str, Any]
+    status: str
+    created_at: datetime
+    updated_at: datetime
+
+
+class DriftEventNoteOut(BaseModel):
+    id: int
+    author: str | None
+    kind: str
+    body: str
+    created_at: datetime
+
+
+class DriftEventDetail(BaseModel):
+    event: DriftEventOut
+    notes: list[DriftEventNoteOut]
+    interpretation: str = "A drift event is a signal for review. It is not evidence of an attack and does not retrain or promote any model."
+
+
+class DriftStatusChange(BaseModel):
+    status: Literal["new", "acknowledged", "investigating", "closed"]
+    note: str | None = Field(None, max_length=10_000)

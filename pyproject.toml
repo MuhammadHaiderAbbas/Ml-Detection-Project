@@ -22,6 +22,7 @@ dependencies = [
     "alembic>=1.13,<1.15",
     "pydantic>=2.9,<2.11",
     "python-multipart>=0.0.18,<0.1",
+    "river>=0.21,<0.22",
 ]
 
 [project.optional-dependencies]

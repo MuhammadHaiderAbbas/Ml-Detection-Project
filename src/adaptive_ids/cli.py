@@ -129,6 +129,19 @@ def _cmd_serve(a: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_drift_experiment(a: argparse.Namespace) -> int:
+    from .drift.experiment import run_experiment
+
+    res = run_experiment(a.modes, repeats=a.repeats, seed=a.seed, out_dir=a.out, window_size=a.window_size)
+    print(f"[{res['banner']}]")
+    for mode, dets in res["aggregate"].items():
+        parts = [f"{name}: rate={v['detection_rate']} delay={v['mean_delay_events']} false_alarms={v['false_alarms_total']}"
+                 for name, v in dets.items() if name != "mean_us_per_event"]
+        print(f"{mode}: " + " | ".join(parts))
+    print(f"Report: {res['run_dir']}/report.md")
+    return 0
+
+
 def _cmd_demo(a: argparse.Namespace) -> int:
     from .demo import run_demo
 
@@ -189,6 +202,14 @@ def main(argv: list[str] | None = None) -> int:
     s.add_argument("--port", type=int, default=8000)
     s.add_argument("--reload", action="store_true")
     s.set_defaults(fn=_cmd_serve)
+
+    s = sub.add_parser("drift-experiment", help="controlled drift experiment on SYNTHETIC data (detection delay, false alarms, overhead)")
+    s.add_argument("--modes", nargs="+", default=["none", "sudden", "gradual", "concept"], choices=["none", "sudden", "gradual", "concept"])
+    s.add_argument("--repeats", type=int, default=3)
+    s.add_argument("--seed", type=int, default=11)
+    s.add_argument("--window-size", type=int, default=500)
+    s.add_argument("--out", default="experiments/runs")
+    s.set_defaults(fn=_cmd_drift_experiment)
 
     s = sub.add_parser("demo", help="load the repeatable, clearly labelled SYNTHETIC demonstration into the database")
     s.add_argument("--admin", required=True, help="existing admin username recorded as the actor")

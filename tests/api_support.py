@@ -46,6 +46,8 @@ def demo_runs(tmp_path_factory):
     write_synthetic_dataset(train, n_rows=1500, seed=7)
     replay = base / "flows_SYNTHETIC_replay.csv"
     write_synthetic_dataset(replay, n_rows=600, seed=11)
+    replay_drift = base / "flows_SYNTHETIC_replay_drift.csv"
+    write_synthetic_dataset(replay_drift, n_rows=1200, seed=12, drift_after_fraction=0.5, drift_strength=0.8)
     cfg = json.loads((REPO / "configs/experiments/synthetic-demo.json").read_text())
     names = []
     for exp_id, n_est in (("api-demo-a", 20), ("api-demo-b", 10)):
@@ -56,7 +58,7 @@ def demo_runs(tmp_path_factory):
         p = base / f"{exp_id}.json"
         p.write_text(json.dumps(c))
         names.append(Path(run_experiment(p, base_dir=REPO)["run_dir"]).name)
-    return {"runs_dir": base / "runs", "run_names": names, "replay": replay}
+    return {"runs_dir": base / "runs", "run_names": names, "replay": replay, "replay_drift": replay_drift}
 
 
 @dataclass

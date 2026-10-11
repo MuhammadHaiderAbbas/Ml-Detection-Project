@@ -8,6 +8,8 @@ import { AuditPage } from "./pages/Audit";
 import { DashboardPage } from "./pages/Dashboard";
 import { DataSourcesPage } from "./pages/DataSources";
 import { DriftPage } from "./pages/Drift";
+import { DriftAnalysisPage } from "./pages/DriftAnalysis";
+import { DriftEventPage } from "./pages/DriftEvent";
 import { ExperimentsPage } from "./pages/Experiments";
 import { ImportDetailPage } from "./pages/ImportDetail";
 import { IncidentDetailPage } from "./pages/IncidentDetail";
@@ -41,6 +43,8 @@ export function App() {
         <Route path="incidents" element={<IncidentsPage />} />
         <Route path="incidents/:id" element={<IncidentDetailPage />} />
         <Route path="drift" element={<DriftPage />} />
+        <Route path="drift/analyses/:id" element={<DriftAnalysisPage />} />
+        <Route path="drift/events/:id" element={<DriftEventPage />} />
         <Route path="models" element={<ModelsPage />} />
         <Route path="models/:id" element={<ModelDetailPage />} />
         <Route path="investigations" element={<InvestigationsPage />} />

@@ -11,6 +11,7 @@ export default defineConfig({
   build: {
     outDir: "dist",
     sourcemap: false,
+    chunkSizeWarningLimit: 600, // the charts vendor chunk (Recharts + d3) is ~500 kB minified, ~150 kB gzipped
     rollupOptions: {
       output: {
         manualChunks(id: string) {

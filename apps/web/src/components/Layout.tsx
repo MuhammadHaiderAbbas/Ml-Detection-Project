@@ -11,7 +11,7 @@ export const NAV: { to: string; label: string; icon: IconName; phase?: string; a
   { to: "/traffic", label: "Live Traffic", icon: "traffic" },
   { to: "/alerts", label: "Alerts", icon: "alert" },
   { to: "/incidents", label: "Incidents", icon: "incident" },
-  { to: "/drift", label: "Drift Monitor", icon: "drift", phase: "Phase 5" },
+  { to: "/drift", label: "Drift Monitor", icon: "drift" },
   { to: "/models", label: "Model Management", icon: "model" },
   { to: "/investigations", label: "Investigations", icon: "search" },
   { to: "/reports", label: "Reports", icon: "report" },

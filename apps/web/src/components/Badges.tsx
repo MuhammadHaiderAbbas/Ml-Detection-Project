@@ -67,3 +67,29 @@ export function ModelStatusBadge({ status }: { status: string }) {
   const icons: Record<string, IconName> = { active: "check", approved: "audit", candidate: "clock", evaluating: "search", archived: "database", rejected: "x" };
   return <span className="badge"><Icon name={icons[status] ?? "circle"} size={12} />{status.charAt(0).toUpperCase() + status.slice(1)}</span>;
 }
+
+const DRIFT: Record<string, { icon: IconName; label: string; color?: string }> = {
+  none: { icon: "check", label: "No drift" },
+  moderate: { icon: "info", label: "Moderate", color: "var(--status-warning)" },
+  major: { icon: "alert", label: "Major", color: "var(--status-serious)" },
+  insufficient_data: { icon: "clock", label: "Insufficient data" },
+};
+
+export function DriftSeverityBadge({ severity }: { severity: string }) {
+  const d = DRIFT[severity] ?? { icon: "circle" as IconName, label: severity };
+  return (
+    <span className="badge" title="Drift severity from the documented thresholds; not evidence of an attack">
+      <span style={{ color: d.color, display: "inline-flex" }}><Icon name={d.icon} size={12} /></span>{d.label}
+    </span>
+  );
+}
+
+const VERDICT: Record<string, { icon: IconName; label: string }> = {
+  detected: { icon: "alert", label: "Detected" }, not_detected: { icon: "check", label: "Not detected" },
+  insufficient_data: { icon: "clock", label: "Insufficient data" }, not_assessable: { icon: "x", label: "Not assessable" },
+};
+
+export function VerdictBadge({ status }: { status: string }) {
+  const v = VERDICT[status] ?? { icon: "circle" as IconName, label: status };
+  return <span className="badge"><Icon name={v.icon} size={12} />{v.label}</span>;
+}

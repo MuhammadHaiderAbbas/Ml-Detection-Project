@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 
 from ..db.models import Alert, DatasetImport, Event, Incident, ModelVersion, Prediction, ScoringRun
 from .alerts import AlertFilters, list_alerts
+from .drift import monitoring_status as drift_status
 
 DEFINITIONS = {
     "events_processed": "Accepted event rows stored from completed imports (rejected rows excluded).",
@@ -21,6 +22,7 @@ DEFINITIONS = {
     "processing_latency": "Duration of the latest completed scoring run divided by the events it processed.",
     "ingestion_health": "Status of the most recent imports; failed imports are counted in the selected range.",
     "top_sources": "Sources of events with suspicious predictions (open and closed alerts).",
+    "drift_monitoring": "Open (not closed) drift events by type, and the verdicts of the latest completed drift analysis.",
 }
 
 
@@ -125,7 +127,7 @@ def summary(
         "ingestion": {"recent": [{"id": i.id, "dataset": f"{i.dataset_name}@{i.dataset_version}", "status": i.status,
                                   "provenance": i.provenance, "created_at": i.created_at} for i in imports],
                       "failed_in_range": failed_imports},
-        "drift_monitoring": {"status": "not_configured", "note": "Drift monitoring is implemented in Phase 5."},
+        "drift_monitoring": drift_status(db),
         "top_sources": top(Event.source),
         "top_destinations": top(Event.destination),
         "recent_alert_ids": [a.id for a in recent],

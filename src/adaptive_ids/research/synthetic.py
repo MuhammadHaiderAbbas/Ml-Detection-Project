@@ -73,22 +73,42 @@ def generate_synthetic_flows(
     class_weights: tuple[float, float, float] = (0.8, 0.12, 0.08),
     drift_after_fraction: float | None = None,
     drift_strength: float = 0.6,
+    drift_mode: str = "sudden",
+    gradual_steps: int = 5,
     inject_invalid_rows: bool = True,
     start: datetime = datetime(2026, 1, 5, 9, 0, tzinfo=timezone.utc),
 ) -> pd.DataFrame:
-    """Generate synthetic flows; optionally shift benign traffic after a point in time."""
+    """Generate synthetic flows; optionally shift benign traffic after a point in time.
+
+    ``drift_mode="sudden"`` applies the full shift from the drift point onward;
+    ``"gradual"`` ramps it up in ``gradual_steps`` equal steps over the rest of the data.
+    """
+    if drift_mode not in ("sudden", "gradual"):
+        raise ValueError("drift_mode must be 'sudden' or 'gradual'")
     rng = np.random.default_rng(seed)
     labels = rng.choice(CLASSES, size=n_rows, p=np.asarray(class_weights) / sum(class_weights))
     offsets = np.sort(rng.uniform(0, 3 * 24 * 3600, n_rows))
     drift_from = int(n_rows * drift_after_fraction) if drift_after_fraction is not None else n_rows
+    # level 0 = no drift; levels 1..k = increasing shift
+    level = np.zeros(n_rows, dtype=int)
+    if drift_from < n_rows:
+        if drift_mode == "sudden":
+            shifts = [0.0, drift_strength]
+            level[drift_from:] = 1
+        else:
+            shifts = [0.0] + [drift_strength * (k + 1) / gradual_steps for k in range(gradual_steps)]
+            pos = np.arange(n_rows - drift_from)
+            level[drift_from:] = 1 + np.minimum(gradual_steps - 1, pos * gradual_steps // max(1, n_rows - drift_from))
+    else:
+        shifts = [0.0, drift_strength]
     frame = pd.DataFrame(index=range(n_rows), columns=FEATURES, dtype=object)
     for cls in CLASSES:
-        for drifted in (False, True):
-            mask = (labels == cls) & ((np.arange(n_rows) >= drift_from) == drifted)
+        for lv, shift in enumerate(shifts):
+            mask = (labels == cls) & (level == lv)
             n = int(mask.sum())
             if not n:
                 continue
-            rows = _class_rows(rng, cls, n, drift_strength if (drifted and cls == "Benign") else 0.0)
+            rows = _class_rows(rng, cls, n, shift if (lv > 0 and cls == "Benign") else 0.0)
             for col in FEATURES:
                 frame.loc[mask, col] = rows[col]
     frame.insert(0, "Flow ID", [f"synth-{i:07d}" for i in range(n_rows)])

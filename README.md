@@ -5,6 +5,7 @@ project. This repository is being built in small, tested milestones.
 
 > **Current state**
 > - **Milestone 1 (reproducible ML baseline): in progress.** The ML engine and the reproduction tooling are implemented and tested. The original dissertation baseline has **not yet been reproduced**, because the original notebooks, data and model files aren't in this repository yet. See [`docs/milestone-1-status.md`](docs/milestone-1-status.md).
+> - **Phase 5 (drift monitoring): implemented.** Feature, prediction, performance and suspected concept drift, kept separate, with event review and controlled experiments. See [`docs/phase-5-drift.md`](docs/phase-5-drift.md).
 > - **Phase 4 (web dashboard): implemented.** React + TypeScript UI for all twelve sections. See [`docs/phase-4-frontend.md`](docs/phase-4-frontend.md).
 > - **Phase 3 (backend and persistence): implemented.** API, database, migrations, alerts and incidents. See [`docs/phase-3-backend.md`](docs/phase-3-backend.md). Until the baseline is reproduced, only the clearly labelled SYNTHETIC demo model runs through it.
 >
@@ -39,7 +40,15 @@ project. This repository is being built in small, tested milestones.
 - Light and dark themes, a phone-width layout and keyboard accessibility.
 - Every number comes from the API, and every synthetic record is labelled.
 
-Not built yet: drift monitoring (Phase 5) and SHAP explanations. See [`docs/architecture.md`](docs/architecture.md).
+**Drift monitoring (Phase 5)**
+
+- **Four signals, kept separate:** feature drift (PSI with Bonferroni-corrected KS tests), prediction drift (class mix, plus ADWIN on the suspicious rate), performance degradation and suspected concept drift (both need labels).
+- **Analyses:** configurable reference and current windows, versioned thresholds, and time-series and distribution views.
+- **Drift events:** reviewed through acknowledge → investigate → close, with a required closing note, investigation notes and Markdown/CSV reports.
+- **Controlled experiments:** `adaptive-ids drift-experiment` measures detection delay, false alarms and overhead on SYNTHETIC data.
+- **Never automatic:** drift never retrains or promotes a model.
+
+Not built yet: SHAP explanations and the candidate-comparison workflow (Phase 6). See [`docs/architecture.md`](docs/architecture.md).
 
 ## Quick start (Windows PowerShell)
 
@@ -89,6 +98,7 @@ Web dashboard, captured from the running app on 2026-10-11 with the SYNTHETIC de
 | [Dashboard](docs/screenshots/ui-01-dashboard.png) | [Dashboard (dark)](docs/screenshots/ui-02-dashboard-dark.png) |
 | [Alert investigation](docs/screenshots/ui-03-alert-investigation.png) | [Incident](docs/screenshots/ui-04-incident.png) |
 | [Model governance](docs/screenshots/ui-05-model.png) | [Phone width](docs/screenshots/ui-06-mobile.png) |
+| [Drift Monitor](docs/screenshots/ui-07-drift-monitor.png) | [Drift analysis](docs/screenshots/ui-08-drift-analysis.png) |
 
 Engine output captured on 2026-10-10 (images 2–4 use SYNTHETIC demo data; the scores show the pipeline works, not detection performance):
 
@@ -118,6 +128,7 @@ model → run → record discrepancies.
 | `adaptive-ids create-user NAME --role admin\|analyst` | Create an application user |
 | `adaptive-ids demo --admin NAME` | Load the SYNTHETIC end-to-end demonstration into the database |
 | `adaptive-ids serve` | Start the API (OpenAPI docs at `/docs`) |
+| `adaptive-ids drift-experiment` | Controlled drift experiment on SYNTHETIC data (delay, false alarms, overhead) |
 
 ## Layout
 

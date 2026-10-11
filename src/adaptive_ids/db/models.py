@@ -325,3 +325,75 @@ class AuditLog(Base):
 
 
 Index("ix_alerts_status_severity", Alert.status, Alert.severity)
+
+
+# --------------------------------------------------------------------------- drift
+
+
+class DriftAnalysis(Base):
+    """One comparison of a current data window against a reference window."""
+
+    __tablename__ = "drift_analyses"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(200))
+    model_version_id: Mapped[int | None] = mapped_column(ForeignKey("model_versions.id"), index=True)
+    reference_spec: Mapped[dict[str, Any]]
+    current_spec: Mapped[dict[str, Any]]
+    window_spec: Mapped[dict[str, Any]]
+    features: Mapped[list[Any]]
+    config: Mapped[dict[str, Any]]
+    status: Mapped[str] = mapped_column(String(20), index=True)
+    n_reference: Mapped[int | None] = mapped_column(Integer)
+    n_current: Mapped[int | None] = mapped_column(Integer)
+    summary: Mapped[dict[str, Any] | None] = mapped_column(JSON)
+    overall: Mapped[dict[str, Any] | None] = mapped_column(JSON)
+    timings: Mapped[dict[str, Any] | None] = mapped_column(JSON)
+    error: Mapped[str | None] = mapped_column(Text)
+    created_by_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"))
+    created_at: Mapped[datetime] = mapped_column(default=utcnow, index=True)
+    started_at: Mapped[datetime | None]
+    completed_at: Mapped[datetime | None]
+
+
+class DriftWindow(Base):
+    __tablename__ = "drift_windows"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    analysis_id: Mapped[int] = mapped_column(ForeignKey("drift_analyses.id", ondelete="CASCADE"), index=True)
+    window_index: Mapped[int] = mapped_column(Integer)
+    start: Mapped[datetime | None]
+    end: Mapped[datetime | None]
+    n_events: Mapped[int] = mapped_column(Integer)
+    max_feature_psi: Mapped[float | None] = mapped_column(Float)
+    drifted_features: Mapped[list[Any]] = mapped_column(default=list)
+    features: Mapped[dict[str, Any]]
+    prediction: Mapped[dict[str, Any] | None] = mapped_column(JSON)
+    performance: Mapped[dict[str, Any] | None] = mapped_column(JSON)
+    __table_args__ = (UniqueConstraint("analysis_id", "window_index"),)
+
+
+class DriftEvent(Base):
+    """A detected drift signal. Never triggers retraining or promotion by itself."""
+
+    __tablename__ = "drift_events"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    analysis_id: Mapped[int] = mapped_column(ForeignKey("drift_analyses.id", ondelete="CASCADE"), index=True)
+    drift_type: Mapped[str] = mapped_column(String(20), index=True)  # feature | prediction | performance | concept
+    signal: Mapped[str] = mapped_column(String(300))
+    severity: Mapped[str] = mapped_column(String(20))
+    rule: Mapped[str] = mapped_column(Text)
+    window_index: Mapped[int | None] = mapped_column(Integer)
+    detected_at: Mapped[datetime | None]
+    details: Mapped[dict[str, Any]] = mapped_column(default=dict)
+    status: Mapped[str] = mapped_column(String(20), index=True)  # new | acknowledged | investigating | closed
+    created_at: Mapped[datetime] = mapped_column(default=utcnow, index=True)
+    updated_at: Mapped[datetime] = mapped_column(default=utcnow)
+
+
+class DriftEventNote(Base):
+    __tablename__ = "drift_event_notes"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    event_id: Mapped[int] = mapped_column(ForeignKey("drift_events.id", ondelete="CASCADE"), index=True)
+    author_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    kind: Mapped[str] = mapped_column(String(20), default="note")  # note | status
+    body: Mapped[str] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(default=utcnow)

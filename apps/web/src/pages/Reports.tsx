@@ -23,8 +23,12 @@ export function ReportsPage() {
             <code> adaptive-ids run</code> to each run's <code>report.md</code>. See <Link to="/experiments">Experiments</Link>.</p>
         </section>
         <section className="card">
+          <h2>Drift reports (Markdown, CSV)</h2>
+          <p className="secondary">Verdicts, per-feature statistics, thresholds, events and limitations, plus per-window results as CSV. Export from any <Link to="/drift">drift analysis</Link>.</p>
+        </section>
+        <section className="card">
           <h2>Planned</h2>
-          <p className="secondary">Drift-event reports (Phase 5), model comparison reports (Phase 6) and PDF output are not available yet.</p>
+          <p className="secondary">Model comparison reports (Phase 6) and PDF output are not available yet.</p>
         </section>
       </div>
     </>

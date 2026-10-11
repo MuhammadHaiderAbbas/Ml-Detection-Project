@@ -112,7 +112,10 @@ export function DashboardPage() {
               value={s.last_approved_evaluation ? new Date(s.last_approved_evaluation.approved_at).toLocaleDateString() : "None"}
               sub={s.last_approved_evaluation?.experiment_id ?? undefined}
               to={s.last_approved_evaluation ? `/models/${s.last_approved_evaluation.model_id}` : "/models"} />
-            <Kpi label="Drift monitoring" value="Not configured" unavailable sub="Arrives in Phase 5" to="/drift" definition={s.drift_monitoring.note} />
+            <Kpi label="Drift monitoring" text unavailable={s.drift_monitoring.status === "not_configured"}
+              value={s.drift_monitoring.status === "not_configured" ? "No analyses yet" : `${Object.values(s.drift_monitoring.open_events).reduce((x, y) => x + y, 0)} open events`}
+              sub={s.drift_monitoring.status === "not_configured" ? "Run a drift analysis" : Object.entries(s.drift_monitoring.open_events).map(([k, v]) => `${v} ${k}`).join(" · ") || "No open drift events"}
+              to="/drift" definition={s.definitions.drift_monitoring ?? s.drift_monitoring.note} />
             <Kpi label="Ingestion health" value={s.ingestion.recent[0] ? s.ingestion.recent[0].status.replace(/_/g, " ") : "No imports"} unavailable
               sub={`${s.ingestion.failed_in_range} failed in range`} to="/data-sources" definition={s.definitions.ingestion_health} />
             <Kpi label="Processing latency" text unavailable={!s.processing_latency}

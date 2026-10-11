@@ -91,7 +91,7 @@ export interface DashboardSummary {
   last_approved_evaluation: { model_id: number; version_id: string; approved_at: string; experiment_id: string | null } | null;
   processing_latency: { scoring_run_id: number; ms_per_event: number; events: number; duration_ms: number } | null;
   ingestion: { recent: { id: number; dataset: string; status: string; provenance: string; created_at: string }[]; failed_in_range: number };
-  drift_monitoring: { status: string; note: string };
+  drift_monitoring: { status: string; note?: string; open_events: Record<string, number>; latest_analysis?: { id: number; name: string; completed_at: string } };
   top_sources: { value: string; alerts: number }[]; top_destinations: { value: string; alerts: number }[];
   recent_alert_ids: number[]; definitions: Record<string, string>;
 }
@@ -99,3 +99,41 @@ export interface TimelinePoint { bucket_start: string; events: number; suspiciou
 export interface Timeline { bucket: string; basis: string; points: TimelinePoint[]; events_without_timestamp: number; definitions: Record<string, string> }
 export interface SeverityRules { version: string; description: string; rules: { rule_id: string; classes: string[]; min_score?: number; severity: Severity }[]; default: { rule_id: string; severity: Severity } }
 export interface Health { status: string; version: string; database: string }
+
+// --- drift ---------------------------------------------------------------------
+export type DriftSeverity = "none" | "moderate" | "major" | "insufficient_data";
+export interface DriftVerdict { status: "detected" | "not_detected" | "insufficient_data" | "not_assessable"; severity?: DriftSeverity; events?: number; reason?: string }
+export interface DriftFeatureStat {
+  n_ref: number; n_cur: number; psi: number | null; ks_d: number | null; ks_p: number | null; ks_p_adj: number | null;
+  ref_mean?: number; cur_mean?: number; ref_median?: number; cur_median?: number; severity: DriftSeverity;
+  bins?: { edges: number[]; ref: number[]; cur: number[] };
+}
+export interface DriftSpecOut { import_id: number; since: string | null; until: string | null; dataset: string; provenance: string; schema_id: string }
+export interface DriftAnalysis {
+  id: number; name: string; model_version_id: number | null; reference_spec: DriftSpecOut; current_spec: DriftSpecOut;
+  window_spec: { mode: string; size?: number; bucket?: string }; features: string[]; config: Record<string, number | string>;
+  status: string; n_reference: number | null; n_current: number | null; error: string | null;
+  summary: null | { feature: DriftVerdict; prediction: DriftVerdict; performance: DriftVerdict; concept: DriftVerdict;
+    n_reference: number; n_current: number; n_windows: number; features_tested: number; features_drifted: string[]; interpretation: string };
+  timings: Record<string, number> | null; created_at: string; completed_at: string | null;
+}
+export interface DriftAnalysisDetail extends DriftAnalysis {
+  overall: null | {
+    features: Record<string, DriftFeatureStat>;
+    prediction: null | { psi: number | null; chi2_p: number | null; js_distance: number | null; severity: DriftSeverity; categories: string[]; ref_props?: number[]; cur_props?: number[]; suspicious_rate_ref?: number | null; suspicious_rate_cur?: number | null };
+    performance: { reference: { n_labelled: number; error_rate: number | null }; current: { n_labelled: number; error_rate: number | null }; severity: DriftSeverity; error_rate_change: number | null };
+    streaming: Record<string, { position: number; mean_before: number | null; mean_after: number | null; direction: string | null }[]>;
+  };
+}
+export interface DriftWindow {
+  window_index: number; start: string | null; end: string | null; n_events: number; max_feature_psi: number | null; drifted_features: string[];
+  features: Record<string, { psi: number | null; ks_d: number | null; ks_p_adj: number | null; severity: DriftSeverity; n_cur: number }>;
+  prediction: null | { psi: number | null; severity: DriftSeverity; suspicious_rate_cur: number | null; n_cur: number };
+  performance: null | { n_labelled: number; error_rate: number | null; severity: DriftSeverity };
+}
+export interface DriftEvent {
+  id: number; analysis_id: number; drift_type: "feature" | "prediction" | "performance" | "concept"; signal: string; severity: DriftSeverity;
+  rule: string; window_index: number | null; detected_at: string | null; details: Record<string, unknown>;
+  status: "new" | "acknowledged" | "investigating" | "closed"; created_at: string; updated_at: string;
+}
+export interface DriftEventDetail { event: DriftEvent; notes: { id: number; author: string | null; kind: string; body: string; created_at: string }[]; interpretation: string }

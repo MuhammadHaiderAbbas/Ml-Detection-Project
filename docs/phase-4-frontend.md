@@ -43,7 +43,7 @@ All twelve sidebar entries from spec §5 exist. Pages for later phases say so, r
 | Reports | The exports available today, and which reports are still planned | — |
 | Audit Logs | Admin-only, filterable | `/audit-logs` |
 | Settings | Account, time zone, severity rules (read-only), user management (admin) | `/users`, `/severity-rules` |
-| Drift Monitor | Placeholder until Phase 5; no numbers shown | — |
+| Drift Monitor | Analyses, verdicts, PSI-over-time and distribution charts, drift-event review (Phase 5, see `docs/phase-5-drift.md`) | `/drift/…` |
 
 The header shows API/database connection status (polled), the count of new alerts, and an account menu with a
 System/Light/Dark theme switch and sign-out.
@@ -69,5 +69,5 @@ System/Light/Dark theme switch and sign-out.
 
 - Polling (every 4–30 s, depending on the page) rather than push updates.
 - No SHAP explanations yet. The investigation view says so instead of estimating feature importance.
-- No PDF export. Drift pages are placeholders until Phase 5.
+- No PDF export.
 - The UI does not yet support importing from Zeek or NetFlow; it handles CSV only.
