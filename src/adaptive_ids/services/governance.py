@@ -276,6 +276,20 @@ def _fmt(v: Any, pct: bool = True) -> str:
     return f"{v * 100:.2f} %" if pct else f"{v:.4f}"
 
 
+def _pp(v: Any) -> str:
+    return "—" if v is None else f"{v * 100:+.2f} pp"
+
+
+def _gate_value(gid: str, v: Any) -> str:
+    if v is None:
+        return "—"
+    if gid.startswith("non_inferior_"):
+        return _pp(v)
+    if gid in ("labelled_events", "attack_events", "benign_events"):
+        return f"{int(v):,}"
+    return f"{v * 100:.2f} %"
+
+
 def report_markdown(db: Session, ev: ModelEvaluation) -> str:
     cand = db.get(ModelVersion, ev.model_version_id)
     base = db.get(ModelVersion, ev.baseline_model_version_id) if ev.baseline_model_version_id else None
@@ -303,21 +317,24 @@ def report_markdown(db: Session, ev: ModelEvaluation) -> str:
              ("precision", "Precision"), ("f1", "F1"), ("accuracy", "Accuracy")]
     lines += ["## Metrics (attack vs benign)", ""]
     if base:
-        lines += ["| Metric | Candidate | Baseline | Difference | 95 % CI of difference |", "|---|---|---|---|---|"]
+        conf = f"{float(ev.protocol.get('confidence', 0.95)):.0%}".replace("%", " %")
+        lines += [f"| Metric | Candidate | Baseline | Difference | {conf} CI of difference |", "|---|---|---|---|---|"]
         for k, label in names:
             diff = r["differences"].get(k, {})
             lines.append(f"| {label} | {_fmt(m['candidate'][k])} | {_fmt(m['baseline'][k])} | "
-                         f"{_fmt(diff.get('difference'))} | [{_fmt(diff.get('ci_low'))}, {_fmt(diff.get('ci_high'))}] |")
+                         f"{_pp(diff.get('difference'))} | [{_pp(diff.get('ci_low'))}, {_pp(diff.get('ci_high'))}] |")
     else:
         lines += ["| Metric | Candidate |", "|---|---|"]
         lines += [f"| {label} | {_fmt(m['candidate'][k])} |" for k, label in names]
     c = r.get("counts", {})
-    lines += ["", f"Compared events: {c.get('compared_events')} ({c.get('attack_events')} attack, "
-              f"{c.get('benign_events')} benign) of {c.get('labelled_events')} labelled.", ""]
+    lines += ["", f"Compared events: {c.get('compared_events', 0):,} ({c.get('attack_events', 0):,} attack, "
+              f"{c.get('benign_events', 0):,} benign) of {c.get('labelled_events', 0):,} labelled. "
+              "Differences are candidate - baseline in percentage points (pp).", ""]
     lines += ["## Gates", "", "| Gate | Kind | Result | Value | Threshold |", "|---|---|---|---|---|"]
     for g in ev.gates or []:
         res = "pass" if g["passed"] else ("fail" if g["passed"] is False else "n/a")
-        lines.append(f"| {g['detail']} | {g['kind']} | {res} | {g['value']} | {g['threshold']} |")
+        lines.append(f"| {g['detail']} | {g['kind']} | {res} | {_gate_value(g['id'], g['value'])} | "
+                     f"{_gate_value(g['id'], g['threshold'])} |")
     if r.get("mcnemar"):
         mc = r["mcnemar"]
         lines += ["", "## McNemar test (context only, not a gate)", "",

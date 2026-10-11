@@ -4,12 +4,13 @@ A research-driven network intrusion detection platform that extends an MSc
 project. This repository is being built in small, tested milestones.
 
 > **Current state**
-> - **Milestone 1 (reproducible ML baseline): in progress.** The ML engine and the reproduction tooling are implemented and tested. The original dissertation baseline has **not yet been reproduced**, because the original notebooks, data and model files aren't in this repository yet. See [`docs/milestone-1-status.md`](docs/milestone-1-status.md).
+> - **Milestone 1 (reproducible ML baseline): supervised baseline reproduced.** All 15 reported supervised metrics from the MSc notebook (Random Forest, XGBoost, LightGBM) reproduce exactly by retraining with the notebook's settings and library versions. The original `.pkl` files were not provided. The review found the notebook actually used **NSL-KDD KDDTest+, not CIC-IDS2018**, and kept NSL-KDD's difficulty column as a feature. On the dataset's official train/test split, accuracy is about 77–79 %. See [`docs/msc-notebook-review.md`](docs/msc-notebook-review.md) and [`docs/milestone-1-status.md`](docs/milestone-1-status.md).
+> - **Phase 6 (model registry and governance): implemented.** Candidates are evaluated against the active model on the same labelled data under a versioned non-inferiority protocol. Approval needs a passing evaluation or an audited, justified override. Activation and rollback first prove the artifact can be restored. See [`docs/phase-6-governance.md`](docs/phase-6-governance.md).
 > - **Phase 5 (drift monitoring): implemented.** Feature, prediction, performance and suspected concept drift, kept separate, with event review and controlled experiments. See [`docs/phase-5-drift.md`](docs/phase-5-drift.md).
 > - **Phase 4 (web dashboard): implemented.** React + TypeScript UI for all twelve sections. See [`docs/phase-4-frontend.md`](docs/phase-4-frontend.md).
-> - **Phase 3 (backend and persistence): implemented.** API, database, migrations, alerts and incidents. See [`docs/phase-3-backend.md`](docs/phase-3-backend.md). Until the baseline is reproduced, only the clearly labelled SYNTHETIC demo model runs through it.
+> - **Phase 3 (backend and persistence): implemented.** API, database, migrations, alerts and incidents. See [`docs/phase-3-backend.md`](docs/phase-3-backend.md).
 >
-> No original research results are claimed here.
+> Every result in this repository is labelled by provenance (reproduction, controlled experiment or synthetic demo). The dissertation's own numbers are quoted only as "reported".
 
 ## What works today
 
@@ -48,7 +49,14 @@ project. This repository is being built in small, tested milestones.
 - **Controlled experiments:** `adaptive-ids drift-experiment` measures detection delay, false alarms and overhead on SYNTHETIC data.
 - **Never automatic:** drift never retrains or promotes a model.
 
-Not built yet: SHAP explanations and the candidate-comparison workflow (Phase 6). See [`docs/architecture.md`](docs/architecture.md).
+**Model governance (Phase 6)**
+
+- **Candidate evaluation:** the candidate and the active baseline are scored on the same labelled import. Paired-bootstrap CIs of the differences are judged against non-inferiority margins (recall, F1, false-positive rate); McNemar is reported for context. The training file is refused.
+- **Gated approval:** `pass` approves; `fail` needs an override with a written justification (audited separately); insufficient evidence can't be overridden. Evaluations go stale when the protocol or the active model changes.
+- **Restorability:** approval, activation and rollback re-hash, re-load and replay 25 recorded predictions before acting.
+- **NSL-KDD support:** schema (difficulty excluded), `adaptive-ids prepare-nsl-kdd`, and `adaptive-ids msc-reproduce` for the notebook reproduction.
+
+Not built yet: SHAP explanations. See [`docs/architecture.md`](docs/architecture.md).
 
 ## Quick start (Windows PowerShell)
 
@@ -99,6 +107,8 @@ Web dashboard, captured from the running app on 2026-10-11 with the SYNTHETIC de
 | [Alert investigation](docs/screenshots/ui-03-alert-investigation.png) | [Incident](docs/screenshots/ui-04-incident.png) |
 | [Model governance](docs/screenshots/ui-05-model.png) | [Phone width](docs/screenshots/ui-06-mobile.png) |
 | [Drift Monitor](docs/screenshots/ui-07-drift-monitor.png) | [Drift analysis](docs/screenshots/ui-08-drift-analysis.png) |
+| [Candidate evaluation (NSL-KDD)](docs/screenshots/ui-09-candidate-evaluation.png) | [Approve with override](docs/screenshots/ui-10-approve-override.png) |
+| [Model governance and restorability](docs/screenshots/ui-11-model-governance.png) | [Candidate evaluation (dark)](docs/screenshots/ui-12-candidate-evaluation-dark.png) |
 
 Engine output captured on 2026-10-10 (images 2–4 use SYNTHETIC demo data; the scores show the pipeline works, not detection performance):
 

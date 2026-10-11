@@ -84,9 +84,11 @@ The "86%" mentioned in the transcripts appears to be the dissertation **grade**.
 
 At the user's request, Phase 3 (backend and persistence, `docs/phase-3-backend.md`), Phase 4
 (web dashboard, `docs/phase-4-frontend.md`) and Phase 5 (drift monitoring, `docs/phase-5-drift.md`) have been
-built on top of the engine. It contains no model improvements, so the §22 rule ("do not begin
-major model improvements until this milestone is complete") still holds: the only model that runs
-through it is the SYNTHETIC demo model.
+built on top of the engine, followed by Phase 6 (model registry and governance,
+`docs/phase-6-governance.md`). The §22 rule ("do not begin major model improvements until this
+milestone is complete") was respected: the baseline was reproduced first. The only real-data models
+in the platform are NSL-KDD controlled experiments, which use the leak-free official split and are
+labelled as such.
 
 ## 6. Not started (deliberately)
 

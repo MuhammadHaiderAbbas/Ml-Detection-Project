@@ -157,15 +157,17 @@ def compare_models(
                 "ci_high": _clean(np.quantile(d, hi_q)) if d.size else None,
                 "better_when": "higher" if DIRECTION[m] > 0 else "lower",
             }
-        margins = (("attack_recall", protocol.recall_margin), ("f1", protocol.f1_margin))
-        for m, margin in margins:
+        margins = (("attack_recall", "attack recall", protocol.recall_margin), ("f1", "F1", protocol.f1_margin))
+        for m, label, margin in margins:
             lo = differences[m]["ci_low"]
             gates.append(_gate(f"non_inferior_{m}", "performance", lo is not None and lo >= -margin, lo, -margin,
-                               f"lower {protocol.confidence:.0%} bound of candidate - baseline {m.replace('_', ' ')}"))
+                               f"{label} drops by at most {margin * 100:.1f} pp (lower {protocol.confidence:.0%} bound of "
+                               "candidate - baseline)"))
         hi = differences["false_positive_rate"]["ci_high"]
         gates.append(_gate("non_inferior_false_positive_rate", "performance",
                            hi is not None and hi <= protocol.fpr_margin, hi, protocol.fpr_margin,
-                           f"upper {protocol.confidence:.0%} bound of candidate - baseline false-positive rate"))
+                           f"false-positive rate rises by at most {protocol.fpr_margin * 100:.1f} pp (upper "
+                           f"{protocol.confidence:.0%} bound of candidate - baseline)"))
         cand_right, base_right = (c == t), (b == t)
         mcnemar = _mcnemar(int(np.sum(cand_right & ~base_right)), int(np.sum(~cand_right & base_right)))
         mcnemar["significant"] = mcnemar["p_value"] < protocol.mcnemar_alpha

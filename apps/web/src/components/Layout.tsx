@@ -73,8 +73,8 @@ function AccountMenu() {
   if (!user) return null;
   return (
     <div className="account" ref={ref}>
-      <button className="btn ghost" aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
-        <Icon name="user" size={16} /> {user.username}
+      <button className="btn ghost" aria-haspopup="menu" aria-expanded={open} aria-label={`Account: ${user.username}`} onClick={() => setOpen((o) => !o)}>
+        <Icon name="user" size={16} /> <span className="uname">{user.username}</span>
       </button>
       {open ? (
         <div className="account-menu" role="menu">

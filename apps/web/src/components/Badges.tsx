@@ -93,3 +93,23 @@ export function VerdictBadge({ status }: { status: string }) {
   const v = VERDICT[status] ?? { icon: "circle" as IconName, label: status };
   return <span className="badge"><Icon name={v.icon} size={12} />{v.label}</span>;
 }
+
+const EVAL: Record<string, { icon: IconName; label: string; color: string; title: string }> = {
+  pass: { icon: "check", label: "Passed", color: "var(--status-good)", title: "Every gate of the evaluation protocol passed" },
+  fail: { icon: "x", label: "Failed gates", color: "var(--status-serious)", title: "Valid evidence, but a performance gate failed; approval needs a justified override" },
+  insufficient_evidence: { icon: "info", label: "Insufficient evidence", color: "var(--status-warning)", title: "A validity gate failed; this evaluation cannot support an approval" },
+};
+
+/** Outcome of a candidate evaluation under the governance protocol. */
+export function EvaluationVerdictBadge({ verdict, status }: { verdict: string | null; status?: string }) {
+  if (!verdict) return <span className="badge"><Icon name="clock" size={12} />{status ? status.charAt(0).toUpperCase() + status.slice(1) : "Pending"}</span>;
+  const v = EVAL[verdict] ?? { icon: "circle" as IconName, label: verdict, color: "", title: "" };
+  return <span className="badge" title={v.title}><span style={{ color: v.color, display: "inline-flex" }}><Icon name={v.icon} size={12} /></span>{v.label}</span>;
+}
+
+/** Result of the latest restorability check for a model version. */
+export function RestoreBadge({ ok, partial }: { ok: boolean | null; partial?: boolean }) {
+  if (ok === null) return <span className="badge"><Icon name="circle" size={12} />Not checked</span>;
+  if (!ok) return <span className="badge"><span style={{ color: "var(--status-critical)", display: "inline-flex" }}><Icon name="x" size={12} /></span>Not restorable</span>;
+  return <span className="badge"><span style={{ color: "var(--status-good)", display: "inline-flex" }}><Icon name="check" size={12} /></span>{partial ? "Restorable (no sample)" : "Restorable"}</span>;
+}

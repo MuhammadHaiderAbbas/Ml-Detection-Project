@@ -17,6 +17,7 @@ import { IncidentsPage } from "./pages/Incidents";
 import { InvestigationsPage } from "./pages/Investigations";
 import { LoginPage } from "./pages/Login";
 import { ModelDetailPage } from "./pages/ModelDetail";
+import { EvaluationDetailPage } from "./pages/EvaluationDetail";
 import { ModelsPage } from "./pages/Models";
 import { NotFoundPage } from "./pages/NotFound";
 import { ReportsPage } from "./pages/Reports";
@@ -47,6 +48,7 @@ export function App() {
         <Route path="drift/events/:id" element={<DriftEventPage />} />
         <Route path="models" element={<ModelsPage />} />
         <Route path="models/:id" element={<ModelDetailPage />} />
+        <Route path="evaluations/:id" element={<EvaluationDetailPage />} />
         <Route path="investigations" element={<InvestigationsPage />} />
         <Route path="reports" element={<ReportsPage />} />
         <Route path="data-sources" element={<DataSourcesPage />} />

@@ -49,6 +49,35 @@ export interface ModelDetail extends ModelVersion {
   training_config: Record<string, unknown>; software_versions: Record<string, string | null>;
   evaluation: { experiment_id?: string; provenance?: string; result_sha256?: string; split_method?: string;
     dataset?: Record<string, unknown>; test?: Metrics | null; limitations?: string[] };
+  approval_evaluation_id: number | null; approval_override: boolean; restore_check: RestoreCheck | null;
+  has_reference_sample: boolean;
+}
+export interface RestoreCheck {
+  ok: boolean; partial: boolean; checked_at: string; mismatches: number | null; sample_size: number;
+  checks: { id: string; passed: boolean | null; detail: string }[];
+}
+
+export type Verdict = "pass" | "fail" | "insufficient_evidence";
+export interface Gate { id: string; kind: "validity" | "performance"; passed: boolean | null; value: number | null; threshold: number | null; detail: string }
+export type GovMetric = "attack_recall" | "false_positive_rate" | "precision" | "f1" | "accuracy";
+export type GovMetrics = Record<GovMetric, number | null> & { confusion: { tp: number; fp: number; tn: number; fn: number } };
+export interface Evaluation {
+  id: number; model_version_id: number; baseline_model_version_id: number | null; import_id: number;
+  protocol_version: string; status: string; verdict: Verdict | null; error: string | null;
+  data: { import_id: number; dataset: string; provenance: string; file_sha256: string | null; schema_id: string; labelled_events: number;
+    candidate: { version_id: string; provenance: string }; baseline: { version_id: string; provenance: string } | null; truth: string };
+  created_by_id: number | null; created_at: string; started_at: string | null; completed_at: string | null; duration_ms: number | null;
+}
+export interface EvaluationDetail extends Evaluation {
+  protocol: Record<string, number | string | null>;
+  gates: Gate[] | null;
+  results: {
+    verdict: Verdict; baseline_present: boolean; basis: string;
+    metrics: { candidate: GovMetrics; baseline?: GovMetrics };
+    differences: Partial<Record<GovMetric, { difference: number | null; ci_low: number | null; ci_high: number | null; better_when: "higher" | "lower" }>>;
+    mcnemar: { candidate_only_correct: number; baseline_only_correct: number; method: string; p_value: number; significant: boolean; alpha: number } | null;
+    counts: { labelled_events: number; compared_events: number; attack_events: number; benign_events: number; failed_prediction_rate: Record<string, number> };
+  } | null;
 }
 export interface ModelHistory { from_status: string | null; to_status: string; changed_by_id: number | null; changed_at: string; reason: string | null }
 export interface ExperimentRun { run_name: string; experiment_id: string | null; provenance: string | null; model_version: string | null; test_accuracy: number | null; registered: boolean }
