@@ -170,7 +170,7 @@ def summarize(db: Session, cache: ModelCache, import_id: int, model_version_id: 
     loaded = _model_and_preprocessing(mv, cache)
     if isinstance(loaded, str):
         raise Conflict(f"cannot explain: {loaded}")
-    rng = random.Random(seed)
+    rng = random.Random(seed)  # seeded for a reproducible sample, not for security  # nosec B311
     out_groups: dict[str, Any] = {}
     meta: dict[str, Any] = {}
     for key in ("alert_attack_label", "alert_benign_label", "missed_attack_label", "alerts"):
