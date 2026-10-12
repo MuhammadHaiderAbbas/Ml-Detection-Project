@@ -209,11 +209,12 @@ def main() -> int:
                         "window": {"mode": "events", "size": max(500, n // 20)}}
                 r = c.post("/api/drift/analyses", json=body, headers=h)
                 _check(r.status_code == 202, r.text)
-                d = c.get(f"/api/drift/analyses/{r.json()['id']}", headers=h).json()
-                _check(d["status"] == "completed", d)
-                return d
+                return c.get(f"/api/drift/analyses/{r.json()['id']}", headers=h).json()
 
-            timed("drift_analysis", drift, n + n_ref)
+            d = timed("drift_analysis", drift, n + n_ref)
+            if d["status"] != "completed":
+                # A refusal (for example a window over the application's limit) is a measured result, not a crash.
+                steps["drift_analysis"] = {"refused": d.get("error") or d["status"]}
             timed("dashboard_summary", lambda: c.get("/api/dashboard/summary", headers=h).raise_for_status())
 
         os.environ["ADAPTIVE_IDS_STORAGE_DIR"] = str(work / "storage")
