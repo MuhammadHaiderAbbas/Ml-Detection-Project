@@ -1,0 +1,230 @@
+{
+  "name": "nsl-kdd",
+  "version": "1.0.0",
+  "status": "verified",
+  "notes": "NSL-KDD (KDDTrain+/KDDTest+) as written by `adaptive-ids prepare-nsl-kdd`. Features: all 38 numeric traffic columns. The per-record difficulty level is excluded: it is annotation metadata, and the MSc notebook's use of it as a feature inflated its results (docs/msc-notebook-review.md). protocol_type, service and flag are kept as context only. num_outbound_cmds is constant in NSL-KDD but kept for completeness. row_order_time is a synthetic ordering timestamp (NSL-KDD has no time information); do not read it as real time.",
+  "label_column": "label",
+  "benign_label": "normal",
+  "timestamp_column": "row_order_time",
+  "event_id_column": "record_id",
+  "excluded_columns": [
+    "difficulty",
+    "protocol_type",
+    "service",
+    "flag"
+  ],
+  "context_columns": [
+    "protocol_type",
+    "service",
+    "flag"
+  ],
+  "missing_value_policy": "reject_row",
+  "infinite_value_policy": "reject_row",
+  "features": [
+    {
+      "name": "duration",
+      "dtype": "int",
+      "min": 0
+    },
+    {
+      "name": "src_bytes",
+      "dtype": "int",
+      "min": 0
+    },
+    {
+      "name": "dst_bytes",
+      "dtype": "int",
+      "min": 0
+    },
+    {
+      "name": "land",
+      "dtype": "int",
+      "min": 0
+    },
+    {
+      "name": "wrong_fragment",
+      "dtype": "int",
+      "min": 0
+    },
+    {
+      "name": "urgent",
+      "dtype": "int",
+      "min": 0
+    },
+    {
+      "name": "hot",
+      "dtype": "int",
+      "min": 0
+    },
+    {
+      "name": "num_failed_logins",
+      "dtype": "int",
+      "min": 0
+    },
+    {
+      "name": "logged_in",
+      "dtype": "int",
+      "min": 0
+    },
+    {
+      "name": "num_compromised",
+      "dtype": "int",
+      "min": 0
+    },
+    {
+      "name": "root_shell",
+      "dtype": "int",
+      "min": 0
+    },
+    {
+      "name": "su_attempted",
+      "dtype": "int",
+      "min": 0
+    },
+    {
+      "name": "num_root",
+      "dtype": "int",
+      "min": 0
+    },
+    {
+      "name": "num_file_creations",
+      "dtype": "int",
+      "min": 0
+    },
+    {
+      "name": "num_shells",
+      "dtype": "int",
+      "min": 0
+    },
+    {
+      "name": "num_access_files",
+      "dtype": "int",
+      "min": 0
+    },
+    {
+      "name": "num_outbound_cmds",
+      "dtype": "int",
+      "min": 0
+    },
+    {
+      "name": "is_host_login",
+      "dtype": "int",
+      "min": 0
+    },
+    {
+      "name": "is_guest_login",
+      "dtype": "int",
+      "min": 0
+    },
+    {
+      "name": "count",
+      "dtype": "int",
+      "min": 0
+    },
+    {
+      "name": "srv_count",
+      "dtype": "int",
+      "min": 0
+    },
+    {
+      "name": "serror_rate",
+      "dtype": "float",
+      "min": 0,
+      "max": 1
+    },
+    {
+      "name": "srv_serror_rate",
+      "dtype": "float",
+      "min": 0,
+      "max": 1
+    },
+    {
+      "name": "rerror_rate",
+      "dtype": "float",
+      "min": 0,
+      "max": 1
+    },
+    {
+      "name": "srv_rerror_rate",
+      "dtype": "float",
+      "min": 0,
+      "max": 1
+    },
+    {
+      "name": "same_srv_rate",
+      "dtype": "float",
+      "min": 0,
+      "max": 1
+    },
+    {
+      "name": "diff_srv_rate",
+      "dtype": "float",
+      "min": 0,
+      "max": 1
+    },
+    {
+      "name": "srv_diff_host_rate",
+      "dtype": "float",
+      "min": 0,
+      "max": 1
+    },
+    {
+      "name": "dst_host_count",
+      "dtype": "int",
+      "min": 0
+    },
+    {
+      "name": "dst_host_srv_count",
+      "dtype": "int",
+      "min": 0
+    },
+    {
+      "name": "dst_host_same_srv_rate",
+      "dtype": "float",
+      "min": 0,
+      "max": 1
+    },
+    {
+      "name": "dst_host_diff_srv_rate",
+      "dtype": "float",
+      "min": 0,
+      "max": 1
+    },
+    {
+      "name": "dst_host_same_src_port_rate",
+      "dtype": "float",
+      "min": 0,
+      "max": 1
+    },
+    {
+      "name": "dst_host_srv_diff_host_rate",
+      "dtype": "float",
+      "min": 0,
+      "max": 1
+    },
+    {
+      "name": "dst_host_serror_rate",
+      "dtype": "float",
+      "min": 0,
+      "max": 1
+    },
+    {
+      "name": "dst_host_srv_serror_rate",
+      "dtype": "float",
+      "min": 0,
+      "max": 1
+    },
+    {
+      "name": "dst_host_rerror_rate",
+      "dtype": "float",
+      "min": 0,
+      "max": 1
+    },
+    {
+      "name": "dst_host_srv_rerror_rate",
+      "dtype": "float",
+      "min": 0,
+      "max": 1
+    }
+  ]
+}

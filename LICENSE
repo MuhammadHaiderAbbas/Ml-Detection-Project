@@ -1,0 +1,27 @@
+Copyright (c) 2026 Muhammad Haider Abbas. All rights reserved.
+
+This repository and its contents (source code, documentation, configuration, tests,
+screenshots and other materials) are the property of the copyright holder.
+
+No licence is granted to use, copy, modify, merge, publish, distribute, sublicense,
+sell or create derivative works from any part of this repository, except:
+
+  1. Viewing the repository, and making the copies that hosting it on GitHub requires
+     (for example a fork made through GitHub's interface), as permitted by the GitHub
+     Terms of Service while the repository is public.
+  2. Running the software locally for the sole purpose of evaluating it (for example
+     by a reviewer, assessor or prospective partner), without redistribution and
+     without commercial use.
+
+Any other use requires the copyright holder's prior written permission.
+
+Third-party components keep their own licences. The packages installed from
+requirements.lock.txt and apps/web/package-lock.json are licensed by their authors
+(see THIRD_PARTY_NOTICES.md). Public datasets referred to in the documentation, such
+as NSL-KDD, are not included in this repository and are subject to their own terms.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR ITS USE.

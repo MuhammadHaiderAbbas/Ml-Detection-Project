@@ -1,0 +1,25 @@
+{
+  "experiment_id": "nsl-kdd-rf-official-train",
+  "objective": "Train the MSc notebook's Random Forest settings on NSL-KDD KDDTrain+ only (difficulty column excluded, no preprocessing fitted outside the training rows) so the model can be evaluated in the platform on KDDTest+, the dataset's published test set. Controlled experiment, not the dissertation's protocol (see docs/msc-notebook-review.md).",
+  "provenance": "controlled_experiment",
+  "dataset": {
+    "path": "data/processed/nsl-kdd/KDDTrain+.csv",
+    "name": "nsl-kdd-train",
+    "version": "KDDTrain+ (raw sha256 1b86d2f957b33082081bba410fe129b475efebcc13c9014c3f447c8271aadf95), prepared by adaptive-ids prepare-nsl-kdd",
+    "column_mapping": {},
+    "duplicate_policy": "keep"
+  },
+  "schema_path": "configs/schemas/nsl-kdd.json",
+  "split": {"method": "stratified_random", "test_fraction": 0.2, "val_fraction": 0.0, "seed": 42},
+  "preprocessing": {"imputation": "none", "scaling": "none", "version": "1.0.0"},
+  "model": {
+    "mode": "train",
+    "estimator": "RandomForestClassifier",
+    "params": {"n_estimators": 200, "max_depth": 20, "min_samples_split": 5, "class_weight": "balanced", "n_jobs": -1, "random_state": 42}
+  },
+  "decision": {},
+  "evaluation": {"benign_label": "normal", "benchmark": {"batch_size": 1000, "repeats": 3}},
+  "reported_results": {},
+  "output_dir": "experiments/runs",
+  "save_predictions": false
+}

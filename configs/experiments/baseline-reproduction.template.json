@@ -1,0 +1,35 @@
+{
+  "experiment_id": "msc-baseline-reproduction-001",
+  "objective": "Reproduce the original MSc dissertation model's test-set results using the original trusted model artifact and the original held-out test data, without retraining.",
+  "provenance": "baseline_reproduction",
+  "dataset": {
+    "path": "REPLACE: path to the ORIGINAL held-out test CSV (or the full CSV plus a split column)",
+    "name": "REPLACE: e.g. cse-cic-ids2018",
+    "version": "REPLACE: e.g. 02-14-2018 processed, as used in the dissertation",
+    "expected_sha256": "REPLACE: output of `adaptive-ids hash <file>` on the backed-up original file",
+    "column_mapping": {},
+    "duplicate_policy": "keep"
+  },
+  "schema_path": "REPLACE: a copy of configs/schemas/cse-cic-ids2018.candidate.json edited to the dissertation's exact feature list",
+  "split": {"method": "all_test"},
+  "preprocessing": {"imputation": "none", "scaling": "none", "version": "1.0.0"},
+  "model": {
+    "mode": "trusted_artifact",
+    "manifest": "models/trusted_artifacts.json",
+    "artifact_id": "REPLACE: id from the trusted manifest"
+  },
+  "decision": {},
+  "evaluation": {
+    "benign_label": "Benign",
+    "binary_collapse": false,
+    "label_mapping": {},
+    "benchmark": {"batch_size": 1000, "repeats": 5}
+  },
+  "reported_results": {
+    "source": "REPLACE: dissertation section/table where these numbers were reported",
+    "metrics": {}
+  },
+  "output_dir": "experiments/runs",
+  "save_predictions": true,
+  "notes": "If the original model was trained on scaled/encoded inputs outside a sklearn Pipeline, the original fitted scaler must also be recovered — do NOT refit it on test data. Record the gap in docs/milestone-1-status.md instead."
+}

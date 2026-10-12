@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "adaptive-ids"
+version = "1.0.0"
+description = "Adaptive IDS — ML-based network anomaly detection with concept drift"
+readme = "README.md"
+license = {file = "LICENSE"}
+authors = [{name = "Muhammad Haider Abbas"}]
+classifiers = ["License :: Other/Proprietary License", "Private :: Do Not Upload"]
+requires-python = ">=3.10"
+# Ranges here; exact tested pins live in requirements.lock.txt. Align these with the
+# original MSc environment once its requirements are inventoried (see docs/milestone-1-status.md).
+dependencies = [
+    "numpy>=1.24,<2.0",
+    "pandas>=2.0,<2.3",
+    "scikit-learn>=1.3,<1.6",
+    "scipy>=1.10,<1.14",
+    "joblib>=1.3,<1.5",
+    "fastapi>=0.143,<0.144",
+    "uvicorn>=0.54,<0.55",
+    "sqlalchemy>=2.0.30,<2.1",
+    "alembic>=1.13,<1.15",
+    "pydantic>=2.14,<2.15",
+    "python-multipart>=0.0.32,<0.1",
+    "river>=0.21,<0.22",
+    "shap>=0.49,<0.50",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=9.0.3,<10", "httpx>=0.27,<0.29"]
+postgres = ["psycopg[binary]>=3.2,<3.3"]
+
+[project.scripts]
+adaptive-ids = "adaptive_ids.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"

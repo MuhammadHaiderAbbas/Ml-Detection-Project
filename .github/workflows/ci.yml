@@ -1,0 +1,138 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python-version: ["3.10"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install pinned dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.lock.txt
+          pip install -e . --no-deps
+      - name: Run tests (SQLite)
+        run: python -m pytest
+
+  test-postgres:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: adaptive_ids
+          POSTGRES_PASSWORD: ci_only_password
+          POSTGRES_DB: adaptive_ids_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U adaptive_ids" --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      TEST_DATABASE_URL: postgresql+psycopg://adaptive_ids:ci_only_password@localhost:5432/adaptive_ids_test
+      ADAPTIVE_IDS_DATABASE_URL: postgresql+psycopg://adaptive_ids:ci_only_password@localhost:5432/adaptive_ids_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - name: Install pinned dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.lock.txt
+          pip install -e . --no-deps
+      - name: PostgreSQL client tools (backup and restore tests)
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q postgresql-client-16
+          pg_dump --version
+      - name: Migrations apply cleanly and match the models
+        run: |
+          alembic upgrade head
+          alembic check
+          alembic downgrade base
+      - name: API tests (PostgreSQL)
+        run: python -m pytest tests/test_api.py tests/test_drift_api.py tests/test_governance.py tests/test_permissions.py tests/test_accounts.py tests/test_retention.py tests/test_http_hardening.py tests/test_backup.py tests/test_explanations.py
+
+  web:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Unit tests
+        run: npm test
+      - name: Build
+        run: npm run build
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
+
+  security:
+    # Blocking since Phase 7: known-vulnerable dependencies and static-analysis findings fail the build.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - name: Install scanners
+        run: python -m pip install pip-audit bandit
+      - name: Audit pinned Python dependencies (pip-audit)
+        run: pip-audit -r requirements.lock.txt --no-deps --disable-pip
+      - name: Static analysis (bandit)
+        run: bandit -q -r src
+
+  fresh-setup:
+    # Spec check 12: a fresh machine can follow the documented quick start.
+    runs-on: ubuntu-latest
+    env:
+      ADAPTIVE_IDS_DATABASE_URL: sqlite:///./var/adaptive_ids.db
+      ADAPTIVE_IDS_NEW_USER_PASSWORD: ci-fresh-setup-pass-1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - name: Install (README quick start)
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.lock.txt
+          pip install -e . --no-deps
+          cp .env.example .env
+      - name: Database, first admin and the SYNTHETIC demo
+        run: |
+          adaptive-ids db-upgrade
+          adaptive-ids create-user admin --role admin
+          adaptive-ids demo --admin admin
+      - name: Serve and check health and sign-in
+        run: |
+          adaptive-ids serve --port 8765 &
+          for i in $(seq 1 30); do curl -sf http://127.0.0.1:8765/api/health && break; sleep 1; done
+          curl -sf http://127.0.0.1:8765/api/health | grep '"database":"ok"'
+          curl -sf -X POST http://127.0.0.1:8765/api/auth/login -H 'Content-Type: application/json' \
+            -d '{"username":"admin","password":"ci-fresh-setup-pass-1"}' | grep -q access_token
+          curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8765/api/alerts | grep -q 401
+      - name: Backup and verify
+        run: |
+          adaptive-ids data-backup var/backups
+          adaptive-ids data-backup --verify "$(ls -d var/backups/*/)"
+      - name: Retention dry run
+        run: adaptive-ids retention

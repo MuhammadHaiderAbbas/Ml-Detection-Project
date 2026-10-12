@@ -1,0 +1,25 @@
+{
+  "experiment_id": "synthetic-demo-rf",
+  "objective": "Exercise the end-to-end pipeline (import, validation, chronological split, training, evaluation, reporting) on SYNTHETIC data. Not research evidence.",
+  "provenance": "synthetic_demo",
+  "dataset": {
+    "path": "data/sample/flows_SYNTHETIC_demo.csv",
+    "name": "synthetic-flows",
+    "version": "seed7-n5000",
+    "column_mapping": {},
+    "duplicate_policy": "keep"
+  },
+  "schema_path": "configs/schemas/synthetic-demo.json",
+  "split": {"method": "chronological", "val_fraction": 0.15, "test_fraction": 0.25},
+  "preprocessing": {"imputation": "none", "scaling": "none", "version": "1.0.0"},
+  "model": {
+    "mode": "train",
+    "estimator": "RandomForestClassifier",
+    "params": {"n_estimators": 100, "random_state": 42, "n_jobs": -1, "class_weight": "balanced"}
+  },
+  "decision": {},
+  "evaluation": {"benign_label": "Benign", "benchmark": {"batch_size": 1000, "repeats": 5}},
+  "reported_results": {},
+  "output_dir": "experiments/runs",
+  "save_predictions": true
+}

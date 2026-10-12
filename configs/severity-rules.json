@@ -1,0 +1,10 @@
+{
+  "version": "1.0.0",
+  "description": "Triage priority for alerts created from model predictions. Rules are evaluated top to bottom; the first match wins. Severity is a PRIORITY FOR REVIEW derived from an uncalibrated model score and the predicted class. It is not a verified incident severity. Analysts record verified outcomes on incidents.",
+  "default": {"rule_id": "default-low", "severity": "low"},
+  "rules": [
+    {"rule_id": "dos-ddos-high-score", "classes": ["*DoS*", "*DDoS*", "*DDOS*"], "min_score": 0.9, "severity": "high"},
+    {"rule_id": "any-attack-very-high-score", "classes": ["*"], "min_score": 0.97, "severity": "high"},
+    {"rule_id": "any-attack-high-score", "classes": ["*"], "min_score": 0.8, "severity": "medium"}
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "_doc": "Data retention policy (Phase 7). null = keep forever. Run `adaptive-ids retention` to see what would be removed and `adaptive-ids retention --apply` to remove it. Imports that are evidence (used by a model evaluation, or with alerts linked to an incident) are never removed automatically. See docs/phase-7-security.md.",
+  "version": "1.0.0",
+  "imports_days": null,
+  "upload_files_days": 30,
+  "audit_days": null,
+  "sessions_days": 30
+}

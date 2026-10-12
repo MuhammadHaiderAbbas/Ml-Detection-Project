@@ -1,0 +1,70 @@
+{
+  "measured_at": "2026-10-12T01:58:41+00:00",
+  "app_version": "1.0.0",
+  "machine": {
+    "os": "Linux-6.18.44-fc-v114-x86_64-with-glibc2.39",
+    "python": "3.10.20",
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "logical_cpus": 4,
+    "usable_cpus": 4,
+    "memory_gb": 15.7
+  },
+  "database": "sqlite",
+  "dataset": "SYNTHETIC replay (100,000 events)",
+  "provenance": "synthetic_demo",
+  "model_run": "bench-synthetic-20261012T015749Z",
+  "steps": {
+    "import": {
+      "seconds": 10.417,
+      "events": 99994,
+      "events_per_second": 9599,
+      "file_mb": 13.1
+    },
+    "evaluate_candidate": {
+      "seconds": 0.731,
+      "events": 19994,
+      "verdict": "pass"
+    },
+    "approve_with_restore_check": {
+      "seconds": 0.11
+    },
+    "activate": {
+      "seconds": 0.128
+    },
+    "score": {
+      "seconds": 26.142,
+      "events": 99994,
+      "events_per_second": 3825,
+      "alerts_created": 19989
+    },
+    "alert_explanation_first_view": {
+      "count": 20,
+      "median_ms": 100.8,
+      "max_ms": 277.6
+    },
+    "alert_explanation_stored": {
+      "ms": 9.0
+    },
+    "drift_analysis": {
+      "seconds": 7.627,
+      "events": 119988,
+      "events_per_second": 15731
+    },
+    "dashboard_summary": {
+      "seconds": 0.149
+    },
+    "backup": {
+      "seconds": 0.684
+    }
+  },
+  "peak_process_memory_mb": 638.0,
+  "storage": {
+    "database_mb": 94.7,
+    "uploads_mb": 15.7,
+    "backup_mb": 110.9
+  },
+  "notes": [
+    "One process; the API's background work runs inside the request in the test client, so each step's time is the full server-side work for that step.",
+    "Peak memory is the whole benchmark process (application, test client and data generation)."
+  ]
+}
