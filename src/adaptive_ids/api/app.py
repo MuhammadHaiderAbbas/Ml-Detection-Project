@@ -14,6 +14,7 @@ from fastapi.responses import JSONResponse
 from .. import __version__
 from ..db import make_engine, make_session_factory
 from ..services.errors import ServiceError, TooManyRequests
+from .hardening import BodySizeLimit, SecurityHeaders
 from ..services.imports import CancelRegistry
 from ..services.scoring import ModelCache
 from ..services.severity import SeverityRules
@@ -41,6 +42,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.cancels = CancelRegistry()
     app.state.model_cache = ModelCache()
 
+    app.add_middleware(BodySizeLimit, upload_limit=settings.max_upload_mb * 1024 * 1024 + 256 * 1024)
     app.add_middleware(CORSMiddleware, allow_origins=list(settings.cors_origins), allow_credentials=False,
                        allow_methods=["GET", "POST", "PATCH", "DELETE"], allow_headers=["Authorization", "Content-Type"])
 
@@ -66,6 +68,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         app.include_router(r.router, prefix="/api")
     if settings.web_dist_dir is not None:
         _mount_web(app, settings.web_dist_dir)
+    app.add_middleware(SecurityHeaders, hsts=settings.hsts)  # outermost: also covers CORS and error responses
     return app
 
 

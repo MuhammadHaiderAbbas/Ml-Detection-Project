@@ -44,6 +44,7 @@ class Settings:
     login_ip_max_failures: int = 20  # per client address, within login_window_minutes
     login_window_minutes: int = 15
     web_dist_dir: Path | None = None
+    hsts: bool = False  # send Strict-Transport-Security; only when served over HTTPS
     cors_origins: tuple[str, ...] = field(default_factory=lambda: ("http://localhost:5173",))
 
     @classmethod
@@ -68,5 +69,6 @@ class Settings:
             login_ip_max_failures=_int("ADAPTIVE_IDS_LOGIN_IP_MAX_FAILURES", cls.login_ip_max_failures),
             login_window_minutes=_int("ADAPTIVE_IDS_LOGIN_WINDOW_MINUTES", cls.login_window_minutes),
             web_dist_dir=Path(env("ADAPTIVE_IDS_WEB_DIST")) if env("ADAPTIVE_IDS_WEB_DIST") else None,
+            hsts=env("ADAPTIVE_IDS_HSTS", "").lower() in ("1", "true", "yes"),
             cors_origins=tuple(o.strip() for o in origins.split(",") if o.strip()) if origins else ("http://localhost:5173",),
         )

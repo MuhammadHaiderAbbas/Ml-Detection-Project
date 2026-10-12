@@ -76,7 +76,7 @@ class TrustedArtifactManifest:
     def load(cls, path: str | Path) -> "TrustedArtifactManifest":
         path = Path(path)
         if not path.is_file():
-            raise ArtifactTrustError(f"trusted-artifact manifest not found: {path}")
+            raise ArtifactTrustError(f"trusted-artifact manifest not found: {Path(path).name}")
         with open(path, encoding="utf-8") as fh:
             data = json.load(fh)
         try:
@@ -119,7 +119,7 @@ def load_verified_artifact(
     if fmt not in SUPPORTED_FORMATS:
         raise ArtifactTrustError(f"{label}: unsupported format {fmt!r}")
     if not path.is_file():
-        raise ArtifactTrustError(f"artifact file not found: {path}")
+        raise ArtifactTrustError(f"artifact file not found: {path.name}")
     actual = sha256_file(path)
     if actual.lower() != expected_sha256.lower():
         raise ArtifactTrustError(

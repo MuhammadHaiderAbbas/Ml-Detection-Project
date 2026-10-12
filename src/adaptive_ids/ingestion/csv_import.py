@@ -147,7 +147,7 @@ def preview_csv(
     """Return the header, the first rows (as text) and a column compatibility check."""
     path = Path(path)
     if not path.is_file():
-        raise DatasetNotFoundError(f"dataset file not found: {path}")
+        raise DatasetNotFoundError(f"dataset file not found: {Path(path).name}")
     mapping = column_mapping or {}
     columns = _read_header(path, mapping, strip_header_whitespace)
     rows = pd.read_csv(path, nrows=n_rows, dtype=str, keep_default_na=False, header=0, names=columns)
@@ -257,7 +257,7 @@ def import_csv(
         return exc_type(message, record)
 
     if not path.is_file():
-        raise fail(DatasetNotFoundError, f"dataset file not found: {path} (no substitute dataset is used)")
+        raise fail(DatasetNotFoundError, f"dataset file not found: {Path(path).name} (no substitute dataset is used)")
     record.file_bytes = path.stat().st_size
     if record.file_bytes > limits.max_file_bytes:
         raise fail(ImportLimitError, f"file is {record.file_bytes} bytes; limit is {limits.max_file_bytes}")

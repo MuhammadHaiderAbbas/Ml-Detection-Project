@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 
 from ...db.models import User
 from ...services import alerts as svc
+from ...textsafety import csv_cell
 from ..deps import allow, client_ip, get_db
 from ..schemas import (
     AlertDetail,
@@ -54,9 +55,7 @@ def alert_groups(f: svc.AlertFilters = Depends(filters), limit: int = Query(50, 
     return Page(items=items, total=total, limit=limit, offset=offset)
 
 
-def _cell(v) -> str:
-    s = "" if v is None else str(v)
-    return "'" + s if s[:1] in ("=", "+", "-", "@", "\t", "\r") else s  # spreadsheet formula-injection guard
+_cell = csv_cell  # spreadsheet formula-injection guard
 
 
 @router.get("/alerts/export.csv")

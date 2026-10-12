@@ -33,6 +33,7 @@ from ..db.models import (
 from ..db.session import session_scope
 from ..drift import DriftConfig, DriftConfigError, DriftFrames, analyze
 from ..settings import Settings
+from ..textsafety import csv_cell
 from . import audit
 from .errors import Conflict, InvalidRequest, NotFound
 from .imports import get_schema
@@ -343,11 +344,11 @@ def windows_csv(db: Session, analysis_id: int) -> str:
     w.writerow(["window_index", "start", "end", "n_events", "signal_type", "signal", "psi", "ks_d", "p_adj", "severity", "error_rate"])
     for win in windows(db, a.id):
         for f, v in win.features.items():
-            w.writerow([win.window_index, win.start, win.end, win.n_events, "feature", f, v.get("psi"), v.get("ks_d"), v.get("ks_p_adj"), v.get("severity"), ""])
+            w.writerow([csv_cell(c) for c in [win.window_index, win.start, win.end, win.n_events, "feature", f, v.get("psi"), v.get("ks_d"), v.get("ks_p_adj"), v.get("severity"), ""]])
         if win.prediction:
-            w.writerow([win.window_index, win.start, win.end, win.n_events, "prediction", "predicted_class_distribution",
-                        win.prediction.get("psi"), "", win.prediction.get("chi2_p"), win.prediction.get("severity"), ""])
+            w.writerow([csv_cell(c) for c in [win.window_index, win.start, win.end, win.n_events, "prediction", "predicted_class_distribution",
+                        win.prediction.get("psi"), "", win.prediction.get("chi2_p"), win.prediction.get("severity"), ""]])
         if win.performance and win.performance.get("error_rate") is not None:
-            w.writerow([win.window_index, win.start, win.end, win.n_events, "performance", "error_rate", "", "", "",
-                        win.performance.get("severity"), win.performance.get("error_rate")])
+            w.writerow([csv_cell(c) for c in [win.window_index, win.start, win.end, win.n_events, "performance", "error_rate", "", "", "",
+                        win.performance.get("severity"), win.performance.get("error_rate")]])
     return buf.getvalue()
