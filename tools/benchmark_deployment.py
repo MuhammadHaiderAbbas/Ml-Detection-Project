@@ -78,6 +78,7 @@ def main() -> int:
     ap.add_argument("--provenance", default="controlled_experiment")
     ap.add_argument("--database-url")
     ap.add_argument("--explanations", type=int, default=20, help="alert explanations to time")
+    ap.add_argument("--max-import-rows", type=int, help="raise the import row limit (default: the application's)")
     ap.add_argument("--out")
     a = ap.parse_args()
     # Paths given on the command line are relative to where the tool was started; the application's
@@ -128,7 +129,8 @@ def main() -> int:
         os.environ["ADAPTIVE_IDS_DATABASE_URL"] = url
         cli(["db-upgrade"])
         settings = Settings(database_url=url, storage_dir=work / "storage", runs_dir=runs_dir,
-                            schemas_dir=REPO / "configs/schemas", max_upload_mb=2000)
+                            schemas_dir=REPO / "configs/schemas", max_upload_mb=2000,
+                            **({"max_import_rows": a.max_import_rows} if a.max_import_rows else {}))
         with session_scope(make_session_factory(make_engine(url))) as db:
             auth.create_user(db, "bench", PASSWORD, "admin")
 

@@ -36,6 +36,13 @@ Read the **[technical case study](docs/case-study.md)** for the full story. In s
 - **Explanations find a concrete model weakness.** Of the 52 normal test records with fragment errors, all
   52 are flagged as attacks, because fragment errors never occur in normal training data. That is 22 % of
   all false positives. ([Explanations](docs/model-explanations.md))
+- **Tested over time on CSE-CIC-IDS2018.** Models only ever predict later days they have never seen.
+  - **Static model:** one trained on the first day catches almost nothing afterwards.
+  - **Adaptation:** helps when an attack type returns (web attacks: 0.2 % to 56 % recall at 0 % FPR).
+  - **The gate:** blocked three updates that would have raised false positives.
+  - **New attacks:** no strategy detects a new attack type on its first day.
+
+  ([Evaluation](docs/cic-ids2018-evaluation.md))
 - **It runs on modest hardware.** On a 4-core machine: 2,400–3,800 events per second batch scoring, under
   1.4 GB of memory, and about 1 GB of storage per million events.
   ([Benchmark](docs/phase-9-commercial-validation.md))
@@ -127,6 +134,7 @@ Engine output captured on 2026-10-10 (images 2–4 use SYNTHETIC demo data; the 
 | Backend, dashboard, drift, governance | [Phase 3](docs/phase-3-backend.md), [Phase 4](docs/phase-4-frontend.md), [Phase 5](docs/phase-5-drift.md), [Phase 6](docs/phase-6-governance.md) |
 | Security, threat model, operations runbook | [`docs/phase-7-security.md`](docs/phase-7-security.md), [`SECURITY.md`](SECURITY.md) |
 | Model explanations | [`docs/model-explanations.md`](docs/model-explanations.md) |
+| Chronological evaluation on CSE-CIC-IDS2018 | [`docs/cic-ids2018-evaluation.md`](docs/cic-ids2018-evaluation.md) |
 | Demo recording and script | [`docs/demo-script.md`](docs/demo-script.md) |
 | Deployment requirements, interviews, pilot | [`docs/phase-9-commercial-validation.md`](docs/phase-9-commercial-validation.md) |
 | Release checklist and public-release audit | [`docs/release-checklist.md`](docs/release-checklist.md) |
@@ -153,6 +161,8 @@ Engine output captured on 2026-10-10 (images 2–4 use SYNTHETIC demo data; the 
 | `adaptive-ids retention [--apply]` | Report (or delete) data past the retention policy; evidence is kept |
 | `adaptive-ids data-backup DIR` / `--verify` | Hash-manifest backup of the database, uploads, models and configs |
 | `adaptive-ids data-restore DIR [--force]` | Verified restore with post-restore model checks |
+| `adaptive-ids cic-ids2018-study DIR [--drop-feature F]` | Static vs retrain-always vs governed models on later CSE-CIC-IDS2018 days |
+| `adaptive-ids cic-ids2018-sample SRC DEST` | Seeded per-class sample of one CSE-CIC-IDS2018 day, in its own CSV format |
 | `python tools/benchmark_deployment.py` | Measure throughput, memory and storage on this machine |
 
 ## Layout

@@ -1,0 +1,1957 @@
+{
+  "experiment": "cic-ids2018-chronological",
+  "provenance": "controlled_experiment",
+  "dataset": "CSE-CIC-IDS2018, processed CICFlowMeter CSVs (public)",
+  "started_at": "2026-10-12T04:11:10+00:00",
+  "settings": {
+    "benign_cap_per_day": 60000,
+    "attack_cap_per_class_per_day": 20000,
+    "holdout_fraction_for_gate": 0.3,
+    "max_train_rows": 400000,
+    "model": "RandomForestClassifier(n_estimators=100), binary attack vs benign",
+    "seed": 0,
+    "features": [
+      "Dst Port",
+      "Protocol",
+      "Flow Duration",
+      "Tot Fwd Pkts",
+      "Tot Bwd Pkts",
+      "TotLen Fwd Pkts",
+      "TotLen Bwd Pkts",
+      "Fwd Pkt Len Max",
+      "Fwd Pkt Len Min",
+      "Fwd Pkt Len Mean",
+      "Fwd Pkt Len Std",
+      "Bwd Pkt Len Max",
+      "Bwd Pkt Len Min",
+      "Bwd Pkt Len Mean",
+      "Bwd Pkt Len Std",
+      "Flow Byts/s",
+      "Flow Pkts/s",
+      "Flow IAT Mean",
+      "Flow IAT Std",
+      "Flow IAT Max",
+      "Flow IAT Min",
+      "Fwd IAT Tot",
+      "Fwd IAT Mean",
+      "Fwd IAT Std",
+      "Fwd IAT Max",
+      "Fwd IAT Min",
+      "Bwd IAT Tot",
+      "Bwd IAT Mean",
+      "Bwd IAT Std",
+      "Bwd IAT Max",
+      "Bwd IAT Min",
+      "Fwd PSH Flags",
+      "Bwd PSH Flags",
+      "Fwd URG Flags",
+      "Bwd URG Flags",
+      "Fwd Header Len",
+      "Bwd Header Len",
+      "Fwd Pkts/s",
+      "Bwd Pkts/s",
+      "Pkt Len Min",
+      "Pkt Len Max",
+      "Pkt Len Mean",
+      "Pkt Len Std",
+      "Pkt Len Var",
+      "FIN Flag Cnt",
+      "SYN Flag Cnt",
+      "RST Flag Cnt",
+      "PSH Flag Cnt",
+      "ACK Flag Cnt",
+      "URG Flag Cnt",
+      "CWE Flag Count",
+      "ECE Flag Cnt",
+      "Down/Up Ratio",
+      "Pkt Size Avg",
+      "Fwd Seg Size Avg",
+      "Bwd Seg Size Avg",
+      "Fwd Byts/b Avg",
+      "Fwd Pkts/b Avg",
+      "Fwd Blk Rate Avg",
+      "Bwd Byts/b Avg",
+      "Bwd Pkts/b Avg",
+      "Bwd Blk Rate Avg",
+      "Subflow Fwd Pkts",
+      "Subflow Fwd Byts",
+      "Subflow Bwd Pkts",
+      "Subflow Bwd Byts",
+      "Init Fwd Win Byts",
+      "Init Bwd Win Byts",
+      "Fwd Act Data Pkts",
+      "Fwd Seg Size Min",
+      "Active Mean",
+      "Active Std",
+      "Active Max",
+      "Active Min",
+      "Idle Mean",
+      "Idle Std",
+      "Idle Max",
+      "Idle Min"
+    ],
+    "dropped_features": [],
+    "protocol": {
+      "version": "1.0.0",
+      "min_labelled_events": 200,
+      "min_events_per_class": 30,
+      "max_failed_prediction_rate": 0.01,
+      "recall_margin": 0.01,
+      "fpr_margin": 0.005,
+      "f1_margin": 0.01,
+      "min_attack_recall": null,
+      "max_false_positive_rate": null,
+      "bootstrap_iterations": 1000,
+      "confidence": 0.95,
+      "seed": 20261011,
+      "mcnemar_alpha": 0.05,
+      "reference_sample_size": 25
+    },
+    "drift_config": {
+      "version": "1.0.0",
+      "psi_bins": 10,
+      "psi_moderate": 0.1,
+      "psi_major": 0.25,
+      "alpha": 0.01,
+      "min_window_events": 200,
+      "perf_min_labels": 100,
+      "perf_moderate": 0.02,
+      "perf_major": 0.05,
+      "adwin_delta": 0.002,
+      "max_adwin_events": 10
+    }
+  },
+  "data": {
+    "files": {
+      "Wednesday-14-02-2018.csv": "acff8bc61376ee031d80878ee6099e0b1a87a1bd711d8068298421418c9f8147",
+      "Thursday-15-02-2018.csv": "fa2947a8256d81ee9103ae16139d62d0e17aa23e696ee80d9e76fb51c01c9c4b",
+      "Friday-16-02-2018.csv": "1a4919faa0c49c7af97230b0c2d076eba23ee6dd81103a3801d51ac316355d8b",
+      "Wednesday-21-02-2018.csv": "a5f4a1c2689e0aa6566c03a58466de9c407c0be0cbd3cc69306544026611be04",
+      "Thursday-22-02-2018.csv": "da33c927018274f9d49b145baa00e4ce0526c25b3b890b34c489e247b5e24544",
+      "Friday-23-02-2018.csv": "d0a7f5059d9823b6e9b392b759e306481a3502d190dea7a1b5502ae079ea069b",
+      "Wednesday-28-02-2018.csv": "f15e2a12304446058a0186c8ad67de2bd15735a9ba5c70c9a1f4c4242ab06771",
+      "Thursday-01-03-2018.csv": "b0534c5d7d8b41e03df71c6966c995d116a8ed28e61f377c8b14cdf5d28f4edf",
+      "Friday-02-03-2018.csv": "d96f38e7496aba83475031e6fb8c6fdf1abf6aa1b71325a917798f3c7de93de1"
+    },
+    "profiles": [
+      {
+        "file": "Wednesday-14-02-2018.csv",
+        "day": "2018-02-14",
+        "rows_in_file": 1048575,
+        "repeated_header_rows": 0,
+        "rows_with_infinite_values": 3824,
+        "rows_with_missing_values": 0,
+        "rows_with_bad_timestamp": 0,
+        "rows_with_timestamp_on_another_day": 5,
+        "rows_kept": 1044746,
+        "possibly_truncated_at_excel_row_limit": true,
+        "exact_duplicate_rows": 225625,
+        "labels": {
+          "Benign": 663803,
+          "FTP-BruteForce": 193354,
+          "SSH-Bruteforce": 187589
+        },
+        "first_timestamp": "2018-02-14 01:00:00",
+        "last_timestamp": "2018-02-14 12:59:59",
+        "sampled": {
+          "rows": 100000,
+          "labels": {
+            "Benign": 60000,
+            "SSH-Bruteforce": 20000,
+            "FTP-BruteForce": 20000
+          }
+        }
+      },
+      {
+        "file": "Thursday-15-02-2018.csv",
+        "day": "2018-02-15",
+        "rows_in_file": 1048575,
+        "repeated_header_rows": 0,
+        "rows_with_infinite_values": 8027,
+        "rows_with_missing_values": 0,
+        "rows_with_bad_timestamp": 0,
+        "rows_with_timestamp_on_another_day": 0,
+        "rows_kept": 1040548,
+        "possibly_truncated_at_excel_row_limit": true,
+        "exact_duplicate_rows": 2416,
+        "labels": {
+          "Benign": 988050,
+          "DoS attacks-GoldenEye": 41508,
+          "DoS attacks-Slowloris": 10990
+        },
+        "first_timestamp": "2018-02-15 01:00:00",
+        "last_timestamp": "2018-02-15 12:59:59",
+        "sampled": {
+          "rows": 90990,
+          "labels": {
+            "Benign": 60000,
+            "DoS attacks-GoldenEye": 20000,
+            "DoS attacks-Slowloris": 10990
+          }
+        }
+      },
+      {
+        "file": "Friday-16-02-2018.csv",
+        "day": "2018-02-16",
+        "rows_in_file": 1048575,
+        "repeated_header_rows": 1,
+        "rows_with_infinite_values": 0,
+        "rows_with_missing_values": 0,
+        "rows_with_bad_timestamp": 0,
+        "rows_with_timestamp_on_another_day": 0,
+        "rows_kept": 1048574,
+        "possibly_truncated_at_excel_row_limit": true,
+        "exact_duplicate_rows": 147586,
+        "labels": {
+          "DoS attacks-Hulk": 461912,
+          "Benign": 446772,
+          "DoS attacks-SlowHTTPTest": 139890
+        },
+        "first_timestamp": "2018-02-16 01:00:32",
+        "last_timestamp": "2018-02-16 12:58:24",
+        "sampled": {
+          "rows": 100000,
+          "labels": {
+            "Benign": 60000,
+            "DoS attacks-Hulk": 20000,
+            "DoS attacks-SlowHTTPTest": 20000
+          }
+        }
+      },
+      {
+        "file": "Wednesday-21-02-2018.csv",
+        "day": "2018-02-21",
+        "rows_in_file": 1048575,
+        "repeated_header_rows": 0,
+        "rows_with_infinite_values": 0,
+        "rows_with_missing_values": 0,
+        "rows_with_bad_timestamp": 0,
+        "rows_with_timestamp_on_another_day": 0,
+        "rows_kept": 1048575,
+        "possibly_truncated_at_excel_row_limit": true,
+        "exact_duplicate_rows": 17557,
+        "labels": {
+          "DDOS attack-HOIC": 686012,
+          "Benign": 360833,
+          "DDOS attack-LOIC-UDP": 1730
+        },
+        "first_timestamp": "2018-02-21 01:55:46",
+        "last_timestamp": "2018-02-21 10:43:21",
+        "sampled": {
+          "rows": 81730,
+          "labels": {
+            "Benign": 60000,
+            "DDOS attack-HOIC": 20000,
+            "DDOS attack-LOIC-UDP": 1730
+          }
+        }
+      },
+      {
+        "file": "Thursday-22-02-2018.csv",
+        "day": "2018-02-22",
+        "rows_in_file": 1048575,
+        "repeated_header_rows": 0,
+        "rows_with_infinite_values": 5610,
+        "rows_with_missing_values": 0,
+        "rows_with_bad_timestamp": 0,
+        "rows_with_timestamp_on_another_day": 9,
+        "rows_kept": 1042956,
+        "possibly_truncated_at_excel_row_limit": true,
+        "exact_duplicate_rows": 3272,
+        "labels": {
+          "Benign": 1042594,
+          "Brute Force -Web": 249,
+          "Brute Force -XSS": 79,
+          "SQL Injection": 34
+        },
+        "first_timestamp": "2018-02-22 01:00:00",
+        "last_timestamp": "2018-02-22 12:59:59",
+        "sampled": {
+          "rows": 60362,
+          "labels": {
+            "Benign": 60000,
+            "Brute Force -Web": 249,
+            "Brute Force -XSS": 79,
+            "SQL Injection": 34
+          }
+        }
+      },
+      {
+        "file": "Friday-23-02-2018.csv",
+        "day": "2018-02-23",
+        "rows_in_file": 1048575,
+        "repeated_header_rows": 0,
+        "rows_with_infinite_values": 5708,
+        "rows_with_missing_values": 0,
+        "rows_with_bad_timestamp": 0,
+        "rows_with_timestamp_on_another_day": 0,
+        "rows_kept": 1042867,
+        "possibly_truncated_at_excel_row_limit": true,
+        "exact_duplicate_rows": 2608,
+        "labels": {
+          "Benign": 1042301,
+          "Brute Force -Web": 362,
+          "Brute Force -XSS": 151,
+          "SQL Injection": 53
+        },
+        "first_timestamp": "2018-02-23 01:00:00",
+        "last_timestamp": "2018-02-23 12:59:59",
+        "sampled": {
+          "rows": 60566,
+          "labels": {
+            "Benign": 60000,
+            "Brute Force -Web": 362,
+            "Brute Force -XSS": 151,
+            "SQL Injection": 53
+          }
+        }
+      },
+      {
+        "file": "Wednesday-28-02-2018.csv",
+        "day": "2018-02-28",
+        "rows_in_file": 613104,
+        "repeated_header_rows": 33,
+        "rows_with_infinite_values": 6169,
+        "rows_with_missing_values": 0,
+        "rows_with_bad_timestamp": 0,
+        "rows_with_timestamp_on_another_day": 0,
+        "rows_kept": 606902,
+        "possibly_truncated_at_excel_row_limit": false,
+        "exact_duplicate_rows": 4706,
+        "labels": {
+          "Benign": 538666,
+          "Infilteration": 68236
+        },
+        "first_timestamp": "2018-02-28 01:00:00",
+        "last_timestamp": "2018-02-28 12:59:59",
+        "sampled": {
+          "rows": 80000,
+          "labels": {
+            "Benign": 60000,
+            "Infilteration": 20000
+          }
+        }
+      },
+      {
+        "file": "Thursday-01-03-2018.csv",
+        "day": "2018-03-01",
+        "rows_in_file": 331125,
+        "repeated_header_rows": 25,
+        "rows_with_infinite_values": 2919,
+        "rows_with_missing_values": 0,
+        "rows_with_bad_timestamp": 0,
+        "rows_with_timestamp_on_another_day": 0,
+        "rows_kept": 328181,
+        "possibly_truncated_at_excel_row_limit": false,
+        "exact_duplicate_rows": 71,
+        "labels": {
+          "Benign": 235778,
+          "Infilteration": 92403
+        },
+        "first_timestamp": "2018-03-01 01:00:00",
+        "last_timestamp": "2018-03-01 12:59:59",
+        "sampled": {
+          "rows": 80000,
+          "labels": {
+            "Benign": 60000,
+            "Infilteration": 20000
+          }
+        }
+      },
+      {
+        "file": "Friday-02-03-2018.csv",
+        "day": "2018-03-02",
+        "rows_in_file": 1048575,
+        "repeated_header_rows": 0,
+        "rows_with_infinite_values": 4050,
+        "rows_with_missing_values": 0,
+        "rows_with_bad_timestamp": 0,
+        "rows_with_timestamp_on_another_day": 0,
+        "rows_kept": 1044525,
+        "possibly_truncated_at_excel_row_limit": true,
+        "exact_duplicate_rows": 5453,
+        "labels": {
+          "Benign": 758334,
+          "Bot": 286191
+        },
+        "first_timestamp": "2018-03-02 01:00:00",
+        "last_timestamp": "2018-03-02 12:59:59",
+        "sampled": {
+          "rows": 80000,
+          "labels": {
+            "Benign": 60000,
+            "Bot": 20000
+          }
+        }
+      }
+    ],
+    "not_included": "Tuesday 20-02-2018 (4 GB; the only processed file with IP and flow-ID columns) is not included in this study."
+  },
+  "per_day": [
+    {
+      "day": "2018-02-15",
+      "test_events": 90990,
+      "attack_events": 30990,
+      "attack_types": [
+        "DoS attacks-GoldenEye",
+        "DoS attacks-Slowloris"
+      ],
+      "novel_attack_types": [
+        "DoS attacks-GoldenEye",
+        "DoS attacks-Slowloris"
+      ],
+      "metrics": {
+        "static": {
+          "precision": null,
+          "recall": 0.0,
+          "f1": null,
+          "false_positive_rate": 0.0,
+          "confusion": {
+            "tp": 0,
+            "fp": 0,
+            "tn": 60000,
+            "fn": 30990
+          }
+        },
+        "retrain_always": {
+          "precision": null,
+          "recall": 0.0,
+          "f1": null,
+          "false_positive_rate": 0.0,
+          "confusion": {
+            "tp": 0,
+            "fp": 0,
+            "tn": 60000,
+            "fn": 30990
+          }
+        },
+        "governed": {
+          "precision": null,
+          "recall": 0.0,
+          "f1": null,
+          "false_positive_rate": 0.0,
+          "confusion": {
+            "tp": 0,
+            "fp": 0,
+            "tn": 60000,
+            "fn": 30990
+          }
+        }
+      },
+      "governed_model_trained_through": "2018-02-14",
+      "by_attack_type": {
+        "DoS attacks-GoldenEye": {
+          "events": 20000,
+          "seen_in_training_before": false,
+          "recall_static": 0.0,
+          "recall_retrain_always": 0.0,
+          "recall_governed": 0.0
+        },
+        "DoS attacks-Slowloris": {
+          "events": 10990,
+          "seen_in_training_before": false,
+          "recall_static": 0.0,
+          "recall_retrain_always": 0.0,
+          "recall_governed": 0.0
+        }
+      },
+      "paired_differences": {
+        "retrain_always_vs_static": {
+          "differences": {
+            "attack_recall": {
+              "difference": 0.0,
+              "ci_low": 0.0,
+              "ci_high": 0.0,
+              "better_when": "higher"
+            },
+            "false_positive_rate": {
+              "difference": 0.0,
+              "ci_low": 0.0,
+              "ci_high": 0.0,
+              "better_when": "lower"
+            },
+            "precision": {
+              "difference": null,
+              "ci_low": null,
+              "ci_high": null,
+              "better_when": "higher"
+            },
+            "f1": {
+              "difference": 0.0,
+              "ci_low": 0.0,
+              "ci_high": 0.0,
+              "better_when": "higher"
+            },
+            "accuracy": {
+              "difference": 0.0,
+              "ci_low": 0.0,
+              "ci_high": 0.0,
+              "better_when": "higher"
+            }
+          },
+          "verdict_under_protocol": "pass"
+        },
+        "governed_vs_static": {
+          "differences": {
+            "attack_recall": {
+              "difference": 0.0,
+              "ci_low": 0.0,
+              "ci_high": 0.0,
+              "better_when": "higher"
+            },
+            "false_positive_rate": {
+              "difference": 0.0,
+              "ci_low": 0.0,
+              "ci_high": 0.0,
+              "better_when": "lower"
+            },
+            "precision": {
+              "difference": null,
+              "ci_low": null,
+              "ci_high": null,
+              "better_when": "higher"
+            },
+            "f1": {
+              "difference": 0.0,
+              "ci_low": 0.0,
+              "ci_high": 0.0,
+              "better_when": "higher"
+            },
+            "accuracy": {
+              "difference": 0.0,
+              "ci_low": 0.0,
+              "ci_high": 0.0,
+              "better_when": "higher"
+            }
+          },
+          "verdict_under_protocol": "pass"
+        }
+      },
+      "benign_feature_drift": {
+        "major": 0,
+        "moderate": 0,
+        "none": 78,
+        "features": 78,
+        "top_psi": [
+          {
+            "feature": "Fwd IAT Max",
+            "psi": 0.048
+          },
+          {
+            "feature": "Flow IAT Min",
+            "psi": 0.04
+          },
+          {
+            "feature": "Bwd IAT Min",
+            "psi": 0.039
+          },
+          {
+            "feature": "Bwd Header Len",
+            "psi": 0.038
+          },
+          {
+            "feature": "TotLen Bwd Pkts",
+            "psi": 0.038
+          }
+        ]
+      },
+      "predict_seconds_per_model": 0.087
+    },
+    {
+      "day": "2018-02-16",
+      "test_events": 100000,
+      "attack_events": 40000,
+      "attack_types": [
+        "DoS attacks-Hulk",
+        "DoS attacks-SlowHTTPTest"
+      ],
+      "novel_attack_types": [
+        "DoS attacks-Hulk",
+        "DoS attacks-SlowHTTPTest"
+      ],
+      "metrics": {
+        "static": {
+          "precision": 0.999950002499875,
+          "recall": 0.5,
+          "f1": 0.6666555557407376,
+          "false_positive_rate": 1.6666666666666667e-05,
+          "confusion": {
+            "tp": 20000,
+            "fp": 1,
+            "tn": 59999,
+            "fn": 20000
+          }
+        },
+        "retrain_always": {
+          "precision": 0.9964201672257548,
+          "recall": 0.995075,
+          "f1": 0.9957471293122858,
+          "false_positive_rate": 0.0023833333333333332,
+          "confusion": {
+            "tp": 39803,
+            "fp": 143,
+            "tn": 59857,
+            "fn": 197
+          }
+        },
+        "governed": {
+          "precision": 0.9996232859510774,
+          "recall": 0.995075,
+          "f1": 0.99734395750332,
+          "false_positive_rate": 0.00025,
+          "confusion": {
+            "tp": 39803,
+            "fp": 15,
+            "tn": 59985,
+            "fn": 197
+          }
+        }
+      },
+      "governed_model_trained_through": "2018-02-15",
+      "by_attack_type": {
+        "DoS attacks-Hulk": {
+          "events": 20000,
+          "seen_in_training_before": false,
+          "recall_static": 0.0,
+          "recall_retrain_always": 0.99015,
+          "recall_governed": 0.99015
+        },
+        "DoS attacks-SlowHTTPTest": {
+          "events": 20000,
+          "seen_in_training_before": false,
+          "recall_static": 1.0,
+          "recall_retrain_always": 1.0,
+          "recall_governed": 1.0
+        }
+      },
+      "paired_differences": {
+        "retrain_always_vs_static": {
+          "differences": {
+            "attack_recall": {
+              "difference": 0.495075,
+              "ci_low": 0.490013,
+              "ci_high": 0.500374,
+              "better_when": "higher"
+            },
+            "false_positive_rate": {
+              "difference": 0.002367,
+              "ci_low": 0.001995,
+              "ci_high": 0.002792,
+              "better_when": "lower"
+            },
+            "precision": {
+              "difference": -0.00353,
+              "ci_low": -0.004172,
+              "ci_high": -0.002967,
+              "better_when": "higher"
+            },
+            "f1": {
+              "difference": 0.329092,
+              "ci_low": 0.324708,
+              "ci_high": 0.333639,
+              "better_when": "higher"
+            },
+            "accuracy": {
+              "difference": 0.19661,
+              "ci_low": 0.194089,
+              "ci_high": 0.19904,
+              "better_when": "higher"
+            }
+          },
+          "verdict_under_protocol": "pass"
+        },
+        "governed_vs_static": {
+          "differences": {
+            "attack_recall": {
+              "difference": 0.495075,
+              "ci_low": 0.490266,
+              "ci_high": 0.49995,
+              "better_when": "higher"
+            },
+            "false_positive_rate": {
+              "difference": 0.000233,
+              "ci_low": 0.000132,
+              "ci_high": 0.000366,
+              "better_when": "lower"
+            },
+            "precision": {
+              "difference": -0.000327,
+              "ci_low": -0.000529,
+              "ci_high": -0.000151,
+              "better_when": "higher"
+            },
+            "f1": {
+              "difference": 0.330688,
+              "ci_low": 0.32642,
+              "ci_high": 0.335013,
+              "better_when": "higher"
+            },
+            "accuracy": {
+              "difference": 0.19789,
+              "ci_low": 0.195289,
+              "ci_high": 0.200401,
+              "better_when": "higher"
+            }
+          },
+          "verdict_under_protocol": "pass"
+        }
+      },
+      "benign_feature_drift": {
+        "major": 64,
+        "moderate": 2,
+        "none": 12,
+        "features": 78,
+        "top_psi": [
+          {
+            "feature": "Fwd Seg Size Min",
+            "psi": 11.086
+          },
+          {
+            "feature": "Init Fwd Win Byts",
+            "psi": 9.311
+          },
+          {
+            "feature": "Fwd Pkt Len Max",
+            "psi": 9.116
+          },
+          {
+            "feature": "Dst Port",
+            "psi": 7.79
+          },
+          {
+            "feature": "Tot Fwd Pkts",
+            "psi": 7.399
+          }
+        ]
+      },
+      "predict_seconds_per_model": 0.099
+    },
+    {
+      "day": "2018-02-21",
+      "test_events": 81730,
+      "attack_events": 21730,
+      "attack_types": [
+        "DDOS attack-HOIC",
+        "DDOS attack-LOIC-UDP"
+      ],
+      "novel_attack_types": [
+        "DDOS attack-HOIC",
+        "DDOS attack-LOIC-UDP"
+      ],
+      "metrics": {
+        "static": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": null,
+          "false_positive_rate": 1.6666666666666667e-05,
+          "confusion": {
+            "tp": 0,
+            "fp": 1,
+            "tn": 59999,
+            "fn": 21730
+          }
+        },
+        "retrain_always": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": null,
+          "false_positive_rate": 1.6666666666666667e-05,
+          "confusion": {
+            "tp": 0,
+            "fp": 1,
+            "tn": 59999,
+            "fn": 21730
+          }
+        },
+        "governed": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": null,
+          "false_positive_rate": 3.3333333333333335e-05,
+          "confusion": {
+            "tp": 0,
+            "fp": 2,
+            "tn": 59998,
+            "fn": 21730
+          }
+        }
+      },
+      "governed_model_trained_through": "2018-02-16",
+      "by_attack_type": {
+        "DDOS attack-HOIC": {
+          "events": 20000,
+          "seen_in_training_before": false,
+          "recall_static": 0.0,
+          "recall_retrain_always": 0.0,
+          "recall_governed": 0.0
+        },
+        "DDOS attack-LOIC-UDP": {
+          "events": 1730,
+          "seen_in_training_before": false,
+          "recall_static": 0.0,
+          "recall_retrain_always": 0.0,
+          "recall_governed": 0.0
+        }
+      },
+      "paired_differences": {
+        "retrain_always_vs_static": {
+          "differences": {
+            "attack_recall": {
+              "difference": 0.0,
+              "ci_low": 0.0,
+              "ci_high": 0.0,
+              "better_when": "higher"
+            },
+            "false_positive_rate": {
+              "difference": 0.0,
+              "ci_low": 0.0,
+              "ci_high": 0.0,
+              "better_when": "lower"
+            },
+            "precision": {
+              "difference": 0.0,
+              "ci_low": 0.0,
+              "ci_high": 0.0,
+              "better_when": "higher"
+            },
+            "f1": {
+              "difference": 0.0,
+              "ci_low": 0.0,
+              "ci_high": 0.0,
+              "better_when": "higher"
+            },
+            "accuracy": {
+              "difference": 0.0,
+              "ci_low": 0.0,
+              "ci_high": 0.0,
+              "better_when": "higher"
+            }
+          },
+          "verdict_under_protocol": "pass"
+        },
+        "governed_vs_static": {
+          "differences": {
+            "attack_recall": {
+              "difference": 0.0,
+              "ci_low": 0.0,
+              "ci_high": 0.0,
+              "better_when": "higher"
+            },
+            "false_positive_rate": {
+              "difference": 1.7e-05,
+              "ci_low": 0.0,
+              "ci_high": 5.1e-05,
+              "better_when": "lower"
+            },
+            "precision": {
+              "difference": 0.0,
+              "ci_low": 0.0,
+              "ci_high": 0.0,
+              "better_when": "higher"
+            },
+            "f1": {
+              "difference": 0.0,
+              "ci_low": 0.0,
+              "ci_high": 0.0,
+              "better_when": "higher"
+            },
+            "accuracy": {
+              "difference": -1.2e-05,
+              "ci_low": -3.7e-05,
+              "ci_high": 0.0,
+              "better_when": "higher"
+            }
+          },
+          "verdict_under_protocol": "pass"
+        }
+      },
+      "benign_feature_drift": {
+        "major": 65,
+        "moderate": 2,
+        "none": 11,
+        "features": 78,
+        "top_psi": [
+          {
+            "feature": "Init Fwd Win Byts",
+            "psi": 9.135
+          },
+          {
+            "feature": "Fwd Pkt Len Max",
+            "psi": 9.05
+          },
+          {
+            "feature": "Tot Fwd Pkts",
+            "psi": 8.511
+          },
+          {
+            "feature": "Subflow Fwd Pkts",
+            "psi": 8.511
+          },
+          {
+            "feature": "Tot Bwd Pkts",
+            "psi": 8.255
+          }
+        ]
+      },
+      "predict_seconds_per_model": 0.079
+    },
+    {
+      "day": "2018-02-22",
+      "test_events": 60362,
+      "attack_events": 362,
+      "attack_types": [
+        "Brute Force -Web",
+        "Brute Force -XSS",
+        "SQL Injection"
+      ],
+      "novel_attack_types": [
+        "Brute Force -Web",
+        "Brute Force -XSS",
+        "SQL Injection"
+      ],
+      "metrics": {
+        "static": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": null,
+          "false_positive_rate": 1.6666666666666667e-05,
+          "confusion": {
+            "tp": 0,
+            "fp": 1,
+            "tn": 59999,
+            "fn": 362
+          }
+        },
+        "retrain_always": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": null,
+          "false_positive_rate": 0.00021666666666666666,
+          "confusion": {
+            "tp": 0,
+            "fp": 13,
+            "tn": 59987,
+            "fn": 362
+          }
+        },
+        "governed": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": null,
+          "false_positive_rate": 0.00028333333333333335,
+          "confusion": {
+            "tp": 0,
+            "fp": 17,
+            "tn": 59983,
+            "fn": 362
+          }
+        }
+      },
+      "governed_model_trained_through": "2018-02-21",
+      "by_attack_type": {
+        "Brute Force -Web": {
+          "events": 249,
+          "seen_in_training_before": false,
+          "recall_static": 0.0,
+          "recall_retrain_always": 0.0,
+          "recall_governed": 0.0
+        },
+        "Brute Force -XSS": {
+          "events": 79,
+          "seen_in_training_before": false,
+          "recall_static": 0.0,
+          "recall_retrain_always": 0.0,
+          "recall_governed": 0.0
+        },
+        "SQL Injection": {
+          "events": 34,
+          "seen_in_training_before": false,
+          "recall_static": 0.0,
+          "recall_retrain_always": 0.0,
+          "recall_governed": 0.0
+        }
+      },
+      "paired_differences": {
+        "retrain_always_vs_static": {
+          "differences": {
+            "attack_recall": {
+              "difference": 0.0,
+              "ci_low": 0.0,
+              "ci_high": 0.0,
+              "better_when": "higher"
+            },
+            "false_positive_rate": {
+              "difference": 0.0002,
+              "ci_low": 0.0001,
+              "ci_high": 0.000317,
+              "better_when": "lower"
+            },
+            "precision": {
+              "difference": 0.0,
+              "ci_low": 0.0,
+              "ci_high": 0.0,
+              "better_when": "higher"
+            },
+            "f1": {
+              "difference": 0.0,
+              "ci_low": 0.0,
+              "ci_high": 0.0,
+              "better_when": "higher"
+            },
+            "accuracy": {
+              "difference": -0.000199,
+              "ci_low": -0.000315,
+              "ci_high": -9.9e-05,
+              "better_when": "higher"
+            }
+          },
+          "verdict_under_protocol": "pass"
+        },
+        "governed_vs_static": {
+          "differences": {
+            "attack_recall": {
+              "difference": 0.0,
+              "ci_low": 0.0,
+              "ci_high": 0.0,
+              "better_when": "higher"
+            },
+            "false_positive_rate": {
+              "difference": 0.000267,
+              "ci_low": 0.00015,
+              "ci_high": 0.0004,
+              "better_when": "lower"
+            },
+            "precision": {
+              "difference": 0.0,
+              "ci_low": 0.0,
+              "ci_high": 0.0,
+              "better_when": "higher"
+            },
+            "f1": {
+              "difference": 0.0,
+              "ci_low": 0.0,
+              "ci_high": 0.0,
+              "better_when": "higher"
+            },
+            "accuracy": {
+              "difference": -0.000265,
+              "ci_low": -0.000398,
+              "ci_high": -0.000149,
+              "better_when": "higher"
+            }
+          },
+          "verdict_under_protocol": "pass"
+        }
+      },
+      "benign_feature_drift": {
+        "major": 0,
+        "moderate": 2,
+        "none": 76,
+        "features": 78,
+        "top_psi": [
+          {
+            "feature": "Bwd Pkt Len Max",
+            "psi": 0.144
+          },
+          {
+            "feature": "Pkt Len Max",
+            "psi": 0.139
+          },
+          {
+            "feature": "Init Fwd Win Byts",
+            "psi": 0.076
+          },
+          {
+            "feature": "Fwd Pkt Len Max",
+            "psi": 0.076
+          },
+          {
+            "feature": "Flow Duration",
+            "psi": 0.057
+          }
+        ]
+      },
+      "predict_seconds_per_model": 0.092
+    },
+    {
+      "day": "2018-02-23",
+      "test_events": 60566,
+      "attack_events": 566,
+      "attack_types": [
+        "Brute Force -Web",
+        "Brute Force -XSS",
+        "SQL Injection"
+      ],
+      "novel_attack_types": [],
+      "metrics": {
+        "static": {
+          "precision": 1.0,
+          "recall": 0.0017667844522968198,
+          "f1": 0.003527336860670194,
+          "false_positive_rate": 0.0,
+          "confusion": {
+            "tp": 1,
+            "fp": 0,
+            "tn": 60000,
+            "fn": 565
+          }
+        },
+        "retrain_always": {
+          "precision": 0.9690140845070423,
+          "recall": 0.607773851590106,
+          "f1": 0.747014115092291,
+          "false_positive_rate": 0.00018333333333333334,
+          "confusion": {
+            "tp": 344,
+            "fp": 11,
+            "tn": 59989,
+            "fn": 222
+          }
+        },
+        "governed": {
+          "precision": 0.9606060606060606,
+          "recall": 0.5600706713780919,
+          "f1": 0.7075892857142858,
+          "false_positive_rate": 0.00021666666666666666,
+          "confusion": {
+            "tp": 317,
+            "fp": 13,
+            "tn": 59987,
+            "fn": 249
+          }
+        }
+      },
+      "governed_model_trained_through": "2018-02-22",
+      "by_attack_type": {
+        "Brute Force -Web": {
+          "events": 362,
+          "seen_in_training_before": true,
+          "recall_static": 0.0027624309392265192,
+          "recall_retrain_always": 0.47513812154696133,
+          "recall_governed": 0.43646408839779005
+        },
+        "Brute Force -XSS": {
+          "events": 151,
+          "seen_in_training_before": true,
+          "recall_static": 0.0,
+          "recall_retrain_always": 0.8940397350993378,
+          "recall_governed": 0.8344370860927153
+        },
+        "SQL Injection": {
+          "events": 53,
+          "seen_in_training_before": true,
+          "recall_static": 0.0,
+          "recall_retrain_always": 0.6981132075471698,
+          "recall_governed": 0.6226415094339622
+        }
+      },
+      "paired_differences": {
+        "retrain_always_vs_static": {
+          "differences": {
+            "attack_recall": {
+              "difference": 0.606007,
+              "ci_low": 0.566363,
+              "ci_high": 0.643168,
+              "better_when": "higher"
+            },
+            "false_positive_rate": {
+              "difference": 0.000183,
+              "ci_low": 8.3e-05,
+              "ci_high": 0.000284,
+              "better_when": "lower"
+            },
+            "precision": {
+              "difference": -0.030986,
+              "ci_low": -0.049264,
+              "ci_high": -0.014262,
+              "better_when": "higher"
+            },
+            "f1": {
+              "difference": 0.743487,
+              "ci_low": 0.710733,
+              "ci_high": 0.773204,
+              "better_when": "higher"
+            },
+            "accuracy": {
+              "difference": 0.005482,
+              "ci_low": 0.004837,
+              "ci_high": 0.006109,
+              "better_when": "higher"
+            }
+          },
+          "verdict_under_protocol": "pass"
+        },
+        "governed_vs_static": {
+          "differences": {
+            "attack_recall": {
+              "difference": 0.558304,
+              "ci_low": 0.515425,
+              "ci_high": 0.597288,
+              "better_when": "higher"
+            },
+            "false_positive_rate": {
+              "difference": 0.000217,
+              "ci_low": 0.0001,
+              "ci_high": 0.000333,
+              "better_when": "lower"
+            },
+            "precision": {
+              "difference": -0.039394,
+              "ci_low": -0.060423,
+              "ci_high": -0.018954,
+              "better_when": "higher"
+            },
+            "f1": {
+              "difference": 0.704062,
+              "ci_low": 0.666981,
+              "ci_high": 0.736735,
+              "better_when": "higher"
+            },
+            "accuracy": {
+              "difference": 0.005003,
+              "ci_low": 0.004392,
+              "ci_high": 0.005581,
+              "better_when": "higher"
+            }
+          },
+          "verdict_under_protocol": "pass"
+        }
+      },
+      "benign_feature_drift": {
+        "major": 0,
+        "moderate": 3,
+        "none": 75,
+        "features": 78,
+        "top_psi": [
+          {
+            "feature": "Bwd Pkt Len Max",
+            "psi": 0.198
+          },
+          {
+            "feature": "Pkt Len Max",
+            "psi": 0.197
+          },
+          {
+            "feature": "Fwd Pkt Len Max",
+            "psi": 0.109
+          },
+          {
+            "feature": "Init Fwd Win Byts",
+            "psi": 0.084
+          },
+          {
+            "feature": "TotLen Bwd Pkts",
+            "psi": 0.08
+          }
+        ]
+      },
+      "predict_seconds_per_model": 0.089
+    },
+    {
+      "day": "2018-02-28",
+      "test_events": 80000,
+      "attack_events": 20000,
+      "attack_types": [
+        "Infilteration"
+      ],
+      "novel_attack_types": [
+        "Infilteration"
+      ],
+      "metrics": {
+        "static": {
+          "precision": 0.22727272727272727,
+          "recall": 0.00025,
+          "f1": 0.0004994506043352313,
+          "false_positive_rate": 0.00028333333333333335,
+          "confusion": {
+            "tp": 5,
+            "fp": 17,
+            "tn": 59983,
+            "fn": 19995
+          }
+        },
+        "retrain_always": {
+          "precision": 0.18269230769230768,
+          "recall": 0.00095,
+          "f1": 0.0018901711102268202,
+          "false_positive_rate": 0.0014166666666666668,
+          "confusion": {
+            "tp": 19,
+            "fp": 85,
+            "tn": 59915,
+            "fn": 19981
+          }
+        },
+        "governed": {
+          "precision": 0.15625,
+          "recall": 0.00075,
+          "f1": 0.0014928343949044585,
+          "false_positive_rate": 0.00135,
+          "confusion": {
+            "tp": 15,
+            "fp": 81,
+            "tn": 59919,
+            "fn": 19985
+          }
+        }
+      },
+      "governed_model_trained_through": "2018-02-23",
+      "by_attack_type": {
+        "Infilteration": {
+          "events": 20000,
+          "seen_in_training_before": false,
+          "recall_static": 0.00025,
+          "recall_retrain_always": 0.00095,
+          "recall_governed": 0.00075
+        }
+      },
+      "paired_differences": {
+        "retrain_always_vs_static": {
+          "differences": {
+            "attack_recall": {
+              "difference": 0.0007,
+              "ci_low": 0.00035,
+              "ci_high": 0.001097,
+              "better_when": "higher"
+            },
+            "false_positive_rate": {
+              "difference": 0.001133,
+              "ci_low": 0.000867,
+              "ci_high": 0.0014,
+              "better_when": "lower"
+            },
+            "precision": {
+              "difference": -0.04458,
+              "ci_low": -0.210587,
+              "ci_high": 0.097323,
+              "better_when": "higher"
+            },
+            "f1": {
+              "difference": 0.001391,
+              "ci_low": 0.000696,
+              "ci_high": 0.00218,
+              "better_when": "higher"
+            },
+            "accuracy": {
+              "difference": -0.000675,
+              "ci_low": -0.0009,
+              "ci_high": -0.000437,
+              "better_when": "higher"
+            }
+          },
+          "verdict_under_protocol": "pass"
+        },
+        "governed_vs_static": {
+          "differences": {
+            "attack_recall": {
+              "difference": 0.0005,
+              "ci_low": 0.000201,
+              "ci_high": 0.00081,
+              "better_when": "higher"
+            },
+            "false_positive_rate": {
+              "difference": 0.001067,
+              "ci_low": 0.000783,
+              "ci_high": 0.001333,
+              "better_when": "lower"
+            },
+            "precision": {
+              "difference": -0.071023,
+              "ci_low": -0.235169,
+              "ci_high": 0.063087,
+              "better_when": "higher"
+            },
+            "f1": {
+              "difference": 0.000993,
+              "ci_low": 0.000398,
+              "ci_high": 0.001611,
+              "better_when": "higher"
+            },
+            "accuracy": {
+              "difference": -0.000675,
+              "ci_low": -0.000888,
+              "ci_high": -0.00045,
+              "better_when": "higher"
+            }
+          },
+          "verdict_under_protocol": "pass"
+        }
+      },
+      "benign_feature_drift": {
+        "major": 3,
+        "moderate": 18,
+        "none": 57,
+        "features": 78,
+        "top_psi": [
+          {
+            "feature": "Dst Port",
+            "psi": 0.356
+          },
+          {
+            "feature": "Fwd Seg Size Min",
+            "psi": 0.324
+          },
+          {
+            "feature": "Flow IAT Min",
+            "psi": 0.309
+          },
+          {
+            "feature": "RST Flag Cnt",
+            "psi": 0.242
+          },
+          {
+            "feature": "ECE Flag Cnt",
+            "psi": 0.242
+          }
+        ]
+      },
+      "predict_seconds_per_model": 0.117
+    },
+    {
+      "day": "2018-03-01",
+      "test_events": 80000,
+      "attack_events": 20000,
+      "attack_types": [
+        "Infilteration"
+      ],
+      "novel_attack_types": [],
+      "metrics": {
+        "static": {
+          "precision": 0.37209302325581395,
+          "recall": 0.0008,
+          "f1": 0.0015965673801327145,
+          "false_positive_rate": 0.00045,
+          "confusion": {
+            "tp": 16,
+            "fp": 27,
+            "tn": 59973,
+            "fn": 19984
+          }
+        },
+        "retrain_always": {
+          "precision": 0.31107828655834563,
+          "recall": 0.1053,
+          "f1": 0.15734030631303697,
+          "false_positive_rate": 0.07773333333333333,
+          "confusion": {
+            "tp": 2106,
+            "fp": 4664,
+            "tn": 55336,
+            "fn": 17894
+          }
+        },
+        "governed": {
+          "precision": 0.20270270270270271,
+          "recall": 0.00075,
+          "f1": 0.001494470459300588,
+          "false_positive_rate": 0.0009833333333333332,
+          "confusion": {
+            "tp": 15,
+            "fp": 59,
+            "tn": 59941,
+            "fn": 19985
+          }
+        }
+      },
+      "governed_model_trained_through": "2018-02-23",
+      "by_attack_type": {
+        "Infilteration": {
+          "events": 20000,
+          "seen_in_training_before": true,
+          "recall_static": 0.0008,
+          "recall_retrain_always": 0.1053,
+          "recall_governed": 0.00075
+        }
+      },
+      "paired_differences": {
+        "retrain_always_vs_static": {
+          "differences": {
+            "attack_recall": {
+              "difference": 0.1045,
+              "ci_low": 0.100513,
+              "ci_high": 0.108639,
+              "better_when": "higher"
+            },
+            "false_positive_rate": {
+              "difference": 0.077283,
+              "ci_low": 0.075124,
+              "ci_high": 0.079411,
+              "better_when": "lower"
+            },
+            "precision": {
+              "difference": -0.061015,
+              "ci_low": -0.225558,
+              "ci_high": 0.07291,
+              "better_when": "higher"
+            },
+            "f1": {
+              "difference": 0.155744,
+              "ci_low": 0.149945,
+              "ci_high": 0.161511,
+              "better_when": "higher"
+            },
+            "accuracy": {
+              "difference": -0.031837,
+              "ci_low": -0.033825,
+              "ci_high": -0.029812,
+              "better_when": "higher"
+            }
+          },
+          "verdict_under_protocol": "fail"
+        },
+        "governed_vs_static": {
+          "differences": {
+            "attack_recall": {
+              "difference": -5e-05,
+              "ci_low": -0.000544,
+              "ci_high": 0.000401,
+              "better_when": "higher"
+            },
+            "false_positive_rate": {
+              "difference": 0.000533,
+              "ci_low": 0.000332,
+              "ci_high": 0.000753,
+              "better_when": "lower"
+            },
+            "precision": {
+              "difference": -0.16939,
+              "ci_low": -0.312423,
+              "ci_high": -0.022133,
+              "better_when": "higher"
+            },
+            "f1": {
+              "difference": -0.000102,
+              "ci_low": -0.001086,
+              "ci_high": 0.000797,
+              "better_when": "higher"
+            },
+            "accuracy": {
+              "difference": -0.000413,
+              "ci_low": -0.000613,
+              "ci_high": -0.000213,
+              "better_when": "higher"
+            }
+          },
+          "verdict_under_protocol": "pass"
+        }
+      },
+      "benign_feature_drift": {
+        "major": 3,
+        "moderate": 15,
+        "none": 60,
+        "features": 78,
+        "top_psi": [
+          {
+            "feature": "Bwd Pkt Len Mean",
+            "psi": 0.276
+          },
+          {
+            "feature": "Bwd Seg Size Avg",
+            "psi": 0.276
+          },
+          {
+            "feature": "Dst Port",
+            "psi": 0.267
+          },
+          {
+            "feature": "Flow IAT Min",
+            "psi": 0.243
+          },
+          {
+            "feature": "RST Flag Cnt",
+            "psi": 0.207
+          }
+        ]
+      },
+      "predict_seconds_per_model": 0.239
+    },
+    {
+      "day": "2018-03-02",
+      "test_events": 80000,
+      "attack_events": 20000,
+      "attack_types": [
+        "Bot"
+      ],
+      "novel_attack_types": [
+        "Bot"
+      ],
+      "metrics": {
+        "static": {
+          "precision": null,
+          "recall": 0.0,
+          "f1": null,
+          "false_positive_rate": 0.0,
+          "confusion": {
+            "tp": 0,
+            "fp": 0,
+            "tn": 60000,
+            "fn": 20000
+          }
+        },
+        "retrain_always": {
+          "precision": 0.49110878661087864,
+          "recall": 0.04695,
+          "f1": 0.0857064622124863,
+          "false_positive_rate": 0.016216666666666667,
+          "confusion": {
+            "tp": 939,
+            "fp": 973,
+            "tn": 59027,
+            "fn": 19061
+          }
+        },
+        "governed": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": null,
+          "false_positive_rate": 0.0002666666666666667,
+          "confusion": {
+            "tp": 0,
+            "fp": 16,
+            "tn": 59984,
+            "fn": 20000
+          }
+        }
+      },
+      "governed_model_trained_through": "2018-02-23",
+      "by_attack_type": {
+        "Bot": {
+          "events": 20000,
+          "seen_in_training_before": false,
+          "recall_static": 0.0,
+          "recall_retrain_always": 0.04695,
+          "recall_governed": 0.0
+        }
+      },
+      "paired_differences": {
+        "retrain_always_vs_static": {
+          "differences": {
+            "attack_recall": {
+              "difference": 0.04695,
+              "ci_low": 0.04397,
+              "ci_high": 0.049784,
+              "better_when": "higher"
+            },
+            "false_positive_rate": {
+              "difference": 0.016217,
+              "ci_low": 0.015212,
+              "ci_high": 0.017244,
+              "better_when": "lower"
+            },
+            "precision": {
+              "difference": null,
+              "ci_low": null,
+              "ci_high": null,
+              "better_when": "higher"
+            },
+            "f1": {
+              "difference": 0.085706,
+              "ci_low": 0.080399,
+              "ci_high": 0.090627,
+              "better_when": "higher"
+            },
+            "accuracy": {
+              "difference": -0.000425,
+              "ci_low": -0.00155,
+              "ci_high": 0.000663,
+              "better_when": "higher"
+            }
+          },
+          "verdict_under_protocol": "fail"
+        },
+        "governed_vs_static": {
+          "differences": {
+            "attack_recall": {
+              "difference": 0.0,
+              "ci_low": 0.0,
+              "ci_high": 0.0,
+              "better_when": "higher"
+            },
+            "false_positive_rate": {
+              "difference": 0.000267,
+              "ci_low": 0.000133,
+              "ci_high": 0.0004,
+              "better_when": "lower"
+            },
+            "precision": {
+              "difference": null,
+              "ci_low": null,
+              "ci_high": null,
+              "better_when": "higher"
+            },
+            "f1": {
+              "difference": 0.0,
+              "ci_low": 0.0,
+              "ci_high": 0.0,
+              "better_when": "higher"
+            },
+            "accuracy": {
+              "difference": -0.0002,
+              "ci_low": -0.0003,
+              "ci_high": -0.0001,
+              "better_when": "higher"
+            }
+          },
+          "verdict_under_protocol": "pass"
+        }
+      },
+      "benign_feature_drift": {
+        "major": 2,
+        "moderate": 2,
+        "none": 74,
+        "features": 78,
+        "top_psi": [
+          {
+            "feature": "Bwd Pkt Len Mean",
+            "psi": 0.427
+          },
+          {
+            "feature": "Bwd Seg Size Avg",
+            "psi": 0.427
+          },
+          {
+            "feature": "RST Flag Cnt",
+            "psi": 0.14
+          },
+          {
+            "feature": "ECE Flag Cnt",
+            "psi": 0.14
+          },
+          {
+            "feature": "Bwd Pkt Len Max",
+            "psi": 0.099
+          }
+        ]
+      },
+      "predict_seconds_per_model": 0.219
+    }
+  ],
+  "governance_log": [
+    {
+      "after_day": "2018-02-15",
+      "holdout_events": 27169,
+      "verdict": "pass",
+      "failed_gates": [],
+      "promoted": true,
+      "candidate_train_rows": 163821,
+      "fit_seconds": 5.46
+    },
+    {
+      "after_day": "2018-02-16",
+      "holdout_events": 29926,
+      "verdict": "pass",
+      "failed_gates": [],
+      "promoted": true,
+      "candidate_train_rows": 261064,
+      "fit_seconds": 10.1
+    },
+    {
+      "after_day": "2018-02-21",
+      "holdout_events": 24423,
+      "verdict": "pass",
+      "failed_gates": [],
+      "promoted": true,
+      "candidate_train_rows": 348297,
+      "fit_seconds": 13.21
+    },
+    {
+      "after_day": "2018-02-22",
+      "holdout_events": 17937,
+      "verdict": "pass",
+      "failed_gates": [],
+      "promoted": true,
+      "candidate_train_rows": 400000,
+      "fit_seconds": 17.04
+    },
+    {
+      "after_day": "2018-02-23",
+      "holdout_events": 18009,
+      "verdict": "pass",
+      "failed_gates": [],
+      "promoted": true,
+      "candidate_train_rows": 400000,
+      "fit_seconds": 19.23
+    },
+    {
+      "after_day": "2018-02-28",
+      "holdout_events": 23895,
+      "verdict": "fail",
+      "failed_gates": [
+        "non_inferior_false_positive_rate"
+      ],
+      "promoted": false,
+      "candidate_train_rows": 400000,
+      "fit_seconds": 29.94
+    },
+    {
+      "after_day": "2018-03-01",
+      "holdout_events": 23895,
+      "verdict": "fail",
+      "failed_gates": [
+        "non_inferior_false_positive_rate"
+      ],
+      "promoted": false,
+      "candidate_train_rows": 400000,
+      "fit_seconds": 33.12
+    },
+    {
+      "after_day": "2018-03-02",
+      "holdout_events": 23895,
+      "verdict": "fail",
+      "failed_gates": [
+        "non_inferior_false_positive_rate"
+      ],
+      "promoted": false,
+      "candidate_train_rows": 400000,
+      "fit_seconds": 33.67
+    }
+  ],
+  "training_log": [
+    {
+      "after_day": "2018-02-14",
+      "strategy": "static",
+      "train_rows": 100000,
+      "fit_seconds": 1.69
+    },
+    {
+      "after_day": "2018-02-14",
+      "strategy": "retrain_always",
+      "train_rows": 100000,
+      "fit_seconds": 1.61
+    },
+    {
+      "after_day": "2018-02-15",
+      "strategy": "retrain_always",
+      "train_rows": 190990,
+      "fit_seconds": 6.71
+    },
+    {
+      "after_day": "2018-02-16",
+      "strategy": "retrain_always",
+      "train_rows": 290990,
+      "fit_seconds": 11.0
+    },
+    {
+      "after_day": "2018-02-21",
+      "strategy": "retrain_always",
+      "train_rows": 372720,
+      "fit_seconds": 13.46
+    },
+    {
+      "after_day": "2018-02-22",
+      "strategy": "retrain_always",
+      "train_rows": 400000,
+      "fit_seconds": 17.11
+    },
+    {
+      "after_day": "2018-02-23",
+      "strategy": "retrain_always",
+      "train_rows": 400000,
+      "fit_seconds": 18.71
+    },
+    {
+      "after_day": "2018-02-28",
+      "strategy": "retrain_always",
+      "train_rows": 400000,
+      "fit_seconds": 31.54
+    },
+    {
+      "after_day": "2018-03-01",
+      "strategy": "retrain_always",
+      "train_rows": 400000,
+      "fit_seconds": 34.2
+    }
+  ],
+  "static_error_stream_adwin": {
+    "delta": 0.002,
+    "per_day": [
+      {
+        "day": "2018-02-15",
+        "first_alarm_events_after_day_start": 32703,
+        "alarms": 53,
+        "direction_of_first": "increase",
+        "static_error_rate": 0.3406
+      },
+      {
+        "day": "2018-02-16",
+        "first_alarm_events_after_day_start": 113,
+        "alarms": 147,
+        "direction_of_first": "increase",
+        "static_error_rate": 0.2
+      },
+      {
+        "day": "2018-02-21",
+        "first_alarm_events_after_day_start": null,
+        "alarms": 0,
+        "direction_of_first": null,
+        "static_error_rate": 0.2659
+      },
+      {
+        "day": "2018-02-22",
+        "first_alarm_events_after_day_start": null,
+        "alarms": 0,
+        "direction_of_first": null,
+        "static_error_rate": 0.006
+      },
+      {
+        "day": "2018-02-23",
+        "first_alarm_events_after_day_start": null,
+        "alarms": 0,
+        "direction_of_first": null,
+        "static_error_rate": 0.0093
+      },
+      {
+        "day": "2018-02-28",
+        "first_alarm_events_after_day_start": null,
+        "alarms": 0,
+        "direction_of_first": null,
+        "static_error_rate": 0.2501
+      },
+      {
+        "day": "2018-03-01",
+        "first_alarm_events_after_day_start": null,
+        "alarms": 0,
+        "direction_of_first": null,
+        "static_error_rate": 0.2501
+      },
+      {
+        "day": "2018-03-02",
+        "first_alarm_events_after_day_start": null,
+        "alarms": 0,
+        "direction_of_first": null,
+        "static_error_rate": 0.25
+      }
+    ]
+  },
+  "runtime": {
+    "total_seconds": 802.9,
+    "peak_memory_mb": 4818.1
+  },
+  "environment": {
+    "adaptive_ids_version": "1.0.0",
+    "code_commit": "276ab2eae7c8b0a4ab1c0d820c7d60e8d052ea3b",
+    "python": "3.10.20",
+    "implementation": "CPython",
+    "platform": "Linux-6.18.44-fc-v114-x86_64-with-glibc2.39",
+    "machine": "x86_64",
+    "processor": "x86_64",
+    "cpu_count": 4,
+    "total_ram_gb": 15.7,
+    "gpu": {
+      "available": false,
+      "detail": "nvidia-smi not found"
+    },
+    "packages": {
+      "numpy": "1.26.4",
+      "pandas": "2.2.3",
+      "scikit-learn": "1.5.2",
+      "scipy": "1.13.1",
+      "joblib": "1.4.2",
+      "xgboost": null,
+      "lightgbm": null,
+      "imbalanced-learn": null,
+      "shap": "0.49.1",
+      "river": "0.21.2"
+    }
+  }
+}

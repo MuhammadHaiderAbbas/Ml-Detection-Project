@@ -167,10 +167,27 @@ All measured on a 4-core, 16 GB machine ([benchmark](phase-9-commercial-validati
 
 A small site's daily flow volume scores in minutes on commodity hardware.
 
+### Over time on CSE-CIC-IDS2018
+
+Models were tested on later capture days they had never seen, in calendar order
+([full write-up](cic-ids2018-evaluation.md)):
+
+- **Static model.** One trained on the first day detects almost nothing afterwards, because each day brings
+  new attack types.
+- **New attacks.** No strategy caught a new attack type on the day it first appeared. That remains the open
+  problem.
+- **Adaptation helps when attacks return.** When web attacks returned a day later, the governed model's recall
+  rose from 0.2 % to 56 % at 0 % FPR.
+- **The gate blocks costly updates.** It refused three retrained models that would have raised false
+  positives; one would have added 7.7 points of FPR for 10 points of infiltration recall.
+- **Data checks.** The published files have defects worth knowing about:
+  - seven day files stop at Excel's row limit;
+  - one attack class is largely byte-identical copies of another.
+
 ## 5. Limitations
 
-- **Datasets:** NSL-KDD is old and synthetic in origin. No CIC-IDS2018 result exists yet, and no claim is
-  made about modern traffic.
+- **Datasets:** NSL-KDD is old and synthetic in origin. CSE-CIC-IDS2018 is newer but also a lab capture, with
+  known defects. Neither supports claims about a particular real network.
 - **Detection performance:** on attack types not seen in training it is modest (about 60 % recall at a
   2–4 % false-positive rate). The platform makes this visible rather than hiding it.
 - **Input:** batch import of flow files only, with no live capture.
@@ -183,7 +200,8 @@ A small site's daily flow volume scores in minutes on commodity hardware.
 
 1. Run the [interviews and an authorised pilot](phase-9-commercial-validation.md) before building anything
    commercial.
-2. Add CIC-IDS2018 (or UNSW-NB15) with a time-based split, and repeat the governance comparison.
+2. Add a method for attack types never seen in training (for example an anomaly detector alongside the
+   classifier), since the CSE-CIC-IDS2018 study shows supervised adaptation can't catch those on day one.
 3. Use the explanation summaries to drive training-data fixes, for example benign fragmentation, and
    measure the effect through the same evaluation gates.
 4. Add live flow ingestion (Zeek or NetFlow) only if the pilot shows that batch import is the bottleneck.
