@@ -165,6 +165,22 @@ def _cmd_prepare_nsl_kdd(a: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_retention(a: argparse.Namespace) -> int:
+    import json as _json
+
+    from .db import make_engine, make_session_factory, session_scope
+    from .services import retention
+
+    settings = _settings()
+    policy = retention.RetentionPolicy.load(a.policy or settings.retention_policy_path)
+    with session_scope(make_session_factory(make_engine(settings.database_url))) as db:
+        res = retention.apply(db, policy) if a.apply else retention.plan(db, policy)
+    print(_json.dumps(res, indent=2, default=str))
+    if not a.apply:
+        print("Dry run: nothing was deleted. Re-run with --apply to delete the items above.")
+    return 0
+
+
 def _cmd_demo(a: argparse.Namespace) -> int:
     from .demo import run_demo
 
@@ -244,6 +260,11 @@ def main(argv: list[str] | None = None) -> int:
     s.add_argument("src", help="KDDTrain+.txt or KDDTest+.txt")
     s.add_argument("dest", help="output CSV path (keep it under data/, which is git-ignored)")
     s.set_defaults(fn=_cmd_prepare_nsl_kdd)
+
+    s = sub.add_parser("retention", help="report (or with --apply, delete) data past the retention policy")
+    s.add_argument("--apply", action="store_true", help="delete; without it this is a dry run")
+    s.add_argument("--policy", help="policy file (default ADAPTIVE_IDS_RETENTION_POLICY or configs/retention.json)")
+    s.set_defaults(fn=_cmd_retention)
 
     s = sub.add_parser("demo", help="load the repeatable, clearly labelled SYNTHETIC demonstration into the database")
     s.add_argument("--admin", required=True, help="existing admin username recorded as the actor")
