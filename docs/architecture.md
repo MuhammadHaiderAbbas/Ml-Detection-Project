@@ -39,6 +39,8 @@ experiments.run_experiment ──► result.json + report.md (provenance-labelle
 | `adaptive_ids.explainability` | SHAP for supported models | §11 | Phase 2–4 |
 | `adaptive_ids.services.registry` | Model lifecycle: register from run, gated approve, activate, rollback | §14 | Implemented (Phases 3 and 6) |
 | `adaptive_ids.governance`, `services.governance` | Versioned evaluation protocol; paired candidate-vs-baseline comparison; restorability checks; comparison reports | §11, §14 | Implemented (Phase 6) |
+| `adaptive_ids.permissions`, `api.deps.allow`, `api.hardening` | Role → permission map, per-route enforcement, security headers, body-size limits | §17 | Implemented (Phase 7) |
+| `adaptive_ids.services.retention`, `services.backup` | Configurable retention with evidence protection; verified backup and restore | §17 | Implemented (Phase 7) |
 | `adaptive_ids.research.msc_reproduction` | Re-implementation of the MSc notebook's supervised protocol with controlled variants | §22 | Implemented (Milestone 1) |
 | `adaptive_ids.db` + `migrations/` | SQLAlchemy models, Alembic migrations (PostgreSQL target) | §4 | Implemented (Phase 3) |
 | `adaptive_ids.services` | Imports, scoring, alerts, incidents, dashboard, auth, audit | §6, §7, §12, §13, §17 | Implemented (Phase 3) |

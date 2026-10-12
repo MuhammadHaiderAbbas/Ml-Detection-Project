@@ -125,7 +125,10 @@ def _cmd_create_user(a: argparse.Namespace) -> int:
 def _cmd_serve(a: argparse.Namespace) -> int:
     import uvicorn
 
-    uvicorn.run("adaptive_ids.api.app:create_app", factory=True, host=a.host, port=a.port, reload=a.reload)
+    # Client addresses (audit log, sign-in throttling) come from X-Forwarded-For only when the request
+    # arrives from a trusted proxy address; the default trusts nothing but this machine.
+    uvicorn.run("adaptive_ids.api.app:create_app", factory=True, host=a.host, port=a.port, reload=a.reload,
+                proxy_headers=True, forwarded_allow_ips=a.forwarded_allow_ips, server_header=False)
     return 0
 
 
@@ -270,6 +273,8 @@ def main(argv: list[str] | None = None) -> int:
     s.add_argument("--host", default="127.0.0.1")
     s.add_argument("--port", type=int, default=8000)
     s.add_argument("--reload", action="store_true")
+    s.add_argument("--forwarded-allow-ips", default="127.0.0.1",
+                   help="reverse-proxy address(es) whose X-Forwarded-For header is trusted (comma-separated)")
     s.set_defaults(fn=_cmd_serve)
 
     s = sub.add_parser("drift-experiment", help="controlled drift experiment on SYNTHETIC data (detection delay, false alarms, overhead)")

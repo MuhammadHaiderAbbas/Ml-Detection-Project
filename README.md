@@ -5,6 +5,7 @@ project. This repository is being built in small, tested milestones.
 
 > **Current state**
 > - **Milestone 1 (reproducible ML baseline): supervised baseline reproduced.** All 15 reported supervised metrics from the MSc notebook (Random Forest, XGBoost, LightGBM) reproduce exactly by retraining with the notebook's settings and library versions. The original `.pkl` files were not provided. The review found the notebook actually used **NSL-KDD KDDTest+, not CIC-IDS2018**, and kept NSL-KDD's difficulty column as a feature. On the dataset's official train/test split, accuracy is about 77–79 %. See [`docs/msc-notebook-review.md`](docs/msc-notebook-review.md) and [`docs/milestone-1-status.md`](docs/milestone-1-status.md).
+> - **Phase 7 (security and testing): implemented.** Read-only viewer role and a per-route permission model, sign-in throttling, idle sessions, password management, security headers and size limits, configurable data retention, verified backup and restore, and blocking dependency and static-analysis scans. It is mapped to the spec's §17 controls and §20 acceptance checks in [`docs/phase-7-security.md`](docs/phase-7-security.md).
 > - **Phase 6 (model registry and governance): implemented.** Candidates are evaluated against the active model on the same labelled data under a versioned non-inferiority protocol. Approval needs a passing evaluation or an audited, justified override. Activation and rollback first prove the artifact can be restored. See [`docs/phase-6-governance.md`](docs/phase-6-governance.md).
 > - **Phase 5 (drift monitoring): implemented.** Feature, prediction, performance and suspected concept drift, kept separate, with event review and controlled experiments. See [`docs/phase-5-drift.md`](docs/phase-5-drift.md).
 > - **Phase 4 (web dashboard): implemented.** React + TypeScript UI for all twelve sections. See [`docs/phase-4-frontend.md`](docs/phase-4-frontend.md).
@@ -55,6 +56,14 @@ project. This repository is being built in small, tested milestones.
 - **Gated approval:** `pass` approves; `fail` needs an override with a written justification (audited separately); insufficient evidence can't be overridden. Evaluations go stale when the protocol or the active model changes.
 - **Restorability:** approval, activation and rollback re-hash, re-load and replay 25 recorded predictions before acting.
 - **NSL-KDD support:** schema (difficulty excluded), `adaptive-ids prepare-nsl-kdd`, and `adaptive-ids msc-reproduce` for the notebook reproduction.
+
+**Security and operations (Phase 7)**
+
+- **Roles:** admin, analyst and a read-only viewer. Every API route declares one named permission, and a test fails if a route is added without one.
+- **Accounts:** scrypt passwords with a policy, sign-in throttling (HTTP 429), 60-minute idle sessions, password change and reset, role changes. All are audited, and every change signs the user out.
+- **HTTP:** strict Content Security Policy and security headers, request-size limits, spreadsheet-formula escaping in exports, and generic error responses.
+- **Data:** `adaptive-ids retention` (dry run or `--apply`; evidence is kept), and `adaptive-ids data-backup` / `data-restore` with SHA-256 manifests and post-restore model checks.
+- **CI:** blocking `pip-audit` and `bandit`, `npm audit`, PostgreSQL tests, and a fresh-setup job that follows this README.
 
 Not built yet: SHAP explanations. See [`docs/architecture.md`](docs/architecture.md).
 
@@ -109,6 +118,8 @@ Web dashboard, captured from the running app on 2026-10-11 with the SYNTHETIC de
 | [Drift Monitor](docs/screenshots/ui-07-drift-monitor.png) | [Drift analysis](docs/screenshots/ui-08-drift-analysis.png) |
 | [Candidate evaluation (NSL-KDD)](docs/screenshots/ui-09-candidate-evaluation.png) | [Approve with override](docs/screenshots/ui-10-approve-override.png) |
 | [Model governance and restorability](docs/screenshots/ui-11-model-governance.png) | [Candidate evaluation (dark)](docs/screenshots/ui-12-candidate-evaluation-dark.png) |
+| [Read-only viewer](docs/screenshots/ui-13-viewer-read-only.png) | [Account security and user admin](docs/screenshots/ui-14-account-security.png) |
+| [Sign-in throttling](docs/screenshots/ui-15-login-throttled.png) | |
 
 Engine output captured on 2026-10-10 (images 2–4 use SYNTHETIC demo data; the scores show the pipeline works, not detection performance):
 

@@ -90,3 +90,15 @@ def test_alert_export_escapes_untrusted_values(env):
         a.predicted_class = "=cmd|' /C calc'!A0"
     text = env.client.get("/api/alerts/export.csv", headers=analyst).text
     assert "'=cmd|" in text and ",=cmd|" not in text
+
+
+def test_logs_never_contain_passwords_or_tokens(env, caplog):
+    import logging
+
+    caplog.set_level(logging.DEBUG)
+    env.client.post("/api/auth/login", json={"username": "analyst", "password": "definitely-wrong-pw-1"})
+    r = env.client.post("/api/auth/login", json={"username": "analyst", "password": ANALYST_PW})
+    token = r.json()["access_token"]
+    env.client.get("/api/auth/me", headers={"Authorization": f"Bearer {token}"})
+    logged = caplog.text
+    assert ANALYST_PW not in logged and "definitely-wrong-pw-1" not in logged and token not in logged
