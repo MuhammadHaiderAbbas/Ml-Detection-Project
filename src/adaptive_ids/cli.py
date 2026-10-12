@@ -181,6 +181,36 @@ def _cmd_retention(a: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_data_backup(a: argparse.Namespace) -> int:
+    import json as _json
+
+    from .services import backup
+
+    if a.verify:
+        res = backup.verify(a.path)
+        print(_json.dumps(res, indent=2))
+        return 0 if res["ok"] else 1
+    out = backup.create(_settings(), a.path)
+    print(f"Backup written to {out} ({backup.verify(out)['files']} files, hashes in manifest.json).")
+    print("It contains the same sensitive data as the live system: keep it encrypted and access-controlled.")
+    return 0
+
+
+def _cmd_data_restore(a: argparse.Namespace) -> int:
+    import json as _json
+
+    from .services import backup
+
+    res = backup.restore(_settings(), a.path, force=a.force)
+    print(_json.dumps(res, indent=2))
+    bad = [m for m in res["models"] if not m["ok"]]
+    print("Restore complete. Run `adaptive-ids db-upgrade` if this backup came from an older version.")
+    if bad:
+        print(f"WARNING: {len(bad)} model artifact(s) could not be verified; do not activate them until fixed.")
+        return 1
+    return 0
+
+
 def _cmd_demo(a: argparse.Namespace) -> int:
     from .demo import run_demo
 
@@ -265,6 +295,16 @@ def main(argv: list[str] | None = None) -> int:
     s.add_argument("--apply", action="store_true", help="delete; without it this is a dry run")
     s.add_argument("--policy", help="policy file (default ADAPTIVE_IDS_RETENTION_POLICY or configs/retention.json)")
     s.set_defaults(fn=_cmd_retention)
+
+    s = sub.add_parser("data-backup", help="back up the database, uploads, runs/models and configs with a hash manifest")
+    s.add_argument("path", help="destination folder (or, with --verify, a backup folder to check)")
+    s.add_argument("--verify", action="store_true", help="re-check an existing backup against its manifest")
+    s.set_defaults(fn=_cmd_data_backup)
+
+    s = sub.add_parser("data-restore", help="restore a verified backup into the configured database and folders")
+    s.add_argument("path", help="backup folder written by data-backup")
+    s.add_argument("--force", action="store_true", help="replace existing data")
+    s.set_defaults(fn=_cmd_data_restore)
 
     s = sub.add_parser("demo", help="load the repeatable, clearly labelled SYNTHETIC demonstration into the database")
     s.add_argument("--admin", required=True, help="existing admin username recorded as the actor")

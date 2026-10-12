@@ -50,13 +50,18 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.lock.txt
           pip install -e . --no-deps
+      - name: PostgreSQL client tools (backup and restore tests)
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q postgresql-client-16
+          pg_dump --version
       - name: Migrations apply cleanly and match the models
         run: |
           alembic upgrade head
           alembic check
           alembic downgrade base
       - name: API tests (PostgreSQL)
-        run: python -m pytest tests/test_api.py tests/test_drift_api.py tests/test_governance.py tests/test_permissions.py tests/test_accounts.py tests/test_retention.py tests/test_http_hardening.py
+        run: python -m pytest tests/test_api.py tests/test_drift_api.py tests/test_governance.py tests/test_permissions.py tests/test_accounts.py tests/test_retention.py tests/test_http_hardening.py tests/test_backup.py
 
   web:
     runs-on: ubuntu-latest
