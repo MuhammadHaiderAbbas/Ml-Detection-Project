@@ -28,7 +28,6 @@ import argparse
 import json
 import os
 import platform
-import resource
 import secrets
 import shutil
 import sys
@@ -70,7 +69,28 @@ def _machine() -> dict:
             "logical_cpus": os.cpu_count(), "usable_cpus": usable, "memory_gb": mem_gb}
 
 
-def _peak_rss_mb() -> float:
+def _peak_rss_mb() -> float | None:
+    """Peak resident memory of this process, in MB."""
+    if sys.platform == "win32":
+        import ctypes
+        from ctypes import wintypes
+
+        class Counters(ctypes.Structure):
+            _fields_ = [("cb", wintypes.DWORD), ("PageFaultCount", wintypes.DWORD),
+                        ("PeakWorkingSetSize", ctypes.c_size_t), ("WorkingSetSize", ctypes.c_size_t),
+                        ("QuotaPeakPagedPoolUsage", ctypes.c_size_t), ("QuotaPagedPoolUsage", ctypes.c_size_t),
+                        ("QuotaPeakNonPagedPoolUsage", ctypes.c_size_t), ("QuotaNonPagedPoolUsage", ctypes.c_size_t),
+                        ("PagefileUsage", ctypes.c_size_t), ("PeakPagefileUsage", ctypes.c_size_t)]
+
+        c = Counters()
+        c.cb = ctypes.sizeof(c)
+        get_info = ctypes.windll.psapi.GetProcessMemoryInfo
+        get_info.argtypes = [wintypes.HANDLE, ctypes.POINTER(Counters), wintypes.DWORD]
+        if not get_info(ctypes.windll.kernel32.GetCurrentProcess(), ctypes.byref(c), c.cb):
+            return None
+        return round(c.PeakWorkingSetSize / 1024 / 1024, 1)
+    import resource  # Unix only
+
     peak = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
     return round(peak / 1024 / (1024 if sys.platform == "darwin" else 1), 1)
 
