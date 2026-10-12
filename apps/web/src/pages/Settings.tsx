@@ -38,7 +38,7 @@ function Users() {
       <form className="filters" style={{ marginTop: 14 }} onSubmit={submit}>
         <label className="field">Username<input value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value })} autoComplete="off" /></label>
         <label className="field">Initial password (min 12)<input type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} autoComplete="new-password" /></label>
-        <label className="field">Role<select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })}><option value="analyst">Analyst</option><option value="admin">Admin</option></select></label>
+        <label className="field">Role<select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })}><option value="analyst">Analyst</option><option value="viewer">Viewer (read-only)</option><option value="admin">Admin</option></select></label>
         <button className="btn primary">Create user</button>
       </form>
       {toggle ? (
@@ -53,7 +53,7 @@ function Users() {
 }
 
 export function SettingsPage() {
-  const { user } = useAuth();
+  const { user, can } = useAuth();
   const rules = useApi(() => api.get<SeverityRules>("/severity-rules"), []);
   return (
     <>
@@ -80,7 +80,7 @@ export function SettingsPage() {
             </>
           ) : <Loading />}
         </section>
-        {user?.role === "admin" ? <Users /> : null}
+        {can("users.manage") ? <Users /> : null}
       </div>
     </>
   );

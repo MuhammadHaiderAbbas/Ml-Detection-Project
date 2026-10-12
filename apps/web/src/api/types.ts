@@ -1,7 +1,9 @@
 // Mirrors the FastAPI response models in src/adaptive_ids/api/schemas.py.
 
-export type Role = "admin" | "analyst";
+export type Role = "admin" | "analyst" | "viewer";
 export interface User { id: number; username: string; role: Role; is_active: boolean; created_at: string; last_login_at: string | null }
+/** The signed-in user, with the permissions the server grants their role (see src/adaptive_ids/permissions.py). */
+export interface Me extends User { permissions: string[] }
 export interface Page<T> { items: T[]; total: number; limit: number; offset: number }
 
 export type AlertStatus = "new" | "investigating" | "resolved" | "false_positive";

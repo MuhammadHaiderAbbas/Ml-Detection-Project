@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from ...db.models import Event, Prediction, ScoringRun, User
 from ...services import scoring as svc
 from ...services.errors import NotFound
-from ..deps import client_ip, current_user, get_db
+from ..deps import allow, client_ip, get_db
 from ..schemas import EventOut, EventWithPredictions, Page, PredictionOut, ScoreRequest, ScoringRunOut, TrafficRow
 
 router = APIRouter(tags=["scoring", "events"])
@@ -15,7 +15,7 @@ router = APIRouter(tags=["scoring", "events"])
 
 @router.post("/imports/{import_id}/score", response_model=ScoringRunOut, status_code=202)
 def score(import_id: int, body: ScoreRequest, request: Request, background: BackgroundTasks,
-          user: User = Depends(current_user), db: Session = Depends(get_db)):
+          user: User = Depends(allow("scoring.run")), db: Session = Depends(get_db)):
     st = request.app.state
     run = svc.start_scoring(db, import_id, body.model_version_id, st.settings, user, client_ip(request))
     db.commit()
@@ -24,7 +24,7 @@ def score(import_id: int, body: ScoreRequest, request: Request, background: Back
 
 
 @router.get("/scoring-runs", response_model=list[ScoringRunOut])
-def scoring_runs(import_id: int | None = None, _: User = Depends(current_user), db: Session = Depends(get_db)):
+def scoring_runs(import_id: int | None = None, _: User = Depends(allow("data.read")), db: Session = Depends(get_db)):
     q = select(ScoringRun)
     if import_id is not None:
         q = q.where(ScoringRun.import_id == import_id)
@@ -32,7 +32,7 @@ def scoring_runs(import_id: int | None = None, _: User = Depends(current_user), 
 
 
 @router.get("/scoring-runs/{run_id}", response_model=ScoringRunOut)
-def scoring_run(run_id: int, _: User = Depends(current_user), db: Session = Depends(get_db)):
+def scoring_run(run_id: int, _: User = Depends(allow("data.read")), db: Session = Depends(get_db)):
     run = db.get(ScoringRun, run_id)
     if run is None:
         raise NotFound("scoring run not found")
@@ -42,7 +42,7 @@ def scoring_run(run_id: int, _: User = Depends(current_user), db: Session = Depe
 @router.get("/events", response_model=Page[EventOut])
 def events(import_id: int | None = None, source: str | None = None, destination: str | None = None,
            suspicious_only: bool = False, limit: int = Query(50, ge=1, le=500), offset: int = Query(0, ge=0),
-           _: User = Depends(current_user), db: Session = Depends(get_db)):
+           _: User = Depends(allow("data.read")), db: Session = Depends(get_db)):
     q = select(Event)
     if import_id is not None:
         q = q.where(Event.import_id == import_id)
@@ -60,7 +60,7 @@ def events(import_id: int | None = None, source: str | None = None, destination:
 @router.get("/traffic", response_model=Page[TrafficRow])
 def traffic(import_id: int | None = None, model_version_id: int | None = None, suspicious_only: bool = False,
             limit: int = Query(50, ge=1, le=500), offset: int = Query(0, ge=0),
-            _: User = Depends(current_user), db: Session = Depends(get_db)):
+            _: User = Depends(allow("data.read")), db: Session = Depends(get_db)):
     """Recorded events in event-time order with the latest prediction (optionally from one model version)."""
     latest = select(Prediction.event_id, func.max(Prediction.id).label("pid"))
     if model_version_id is not None:
@@ -80,7 +80,7 @@ def traffic(import_id: int | None = None, model_version_id: int | None = None, s
 
 
 @router.get("/events/{event_id}", response_model=EventWithPredictions)
-def event(event_id: int, _: User = Depends(current_user), db: Session = Depends(get_db)):
+def event(event_id: int, _: User = Depends(allow("data.read")), db: Session = Depends(get_db)):
     e = db.get(Event, event_id)
     if e is None:
         raise NotFound("event not found")

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { api, downloadFile } from "../api/client";
+import { Can, ReadOnlyNote } from "../components/Can";
 import type { Disposition, IncidentDetail } from "../api/types";
 import { useApi } from "../api/useApi";
 import { DispositionBadge, PlainBadge } from "../components/Badges";
@@ -35,7 +36,7 @@ export function IncidentDetailPage() {
     <>
       <PageHeader title={`Incident #${inc.id}: ${inc.title}`}
         actions={<>
-          <button className="btn" onClick={() => void downloadFile(`/incidents/${inc.id}/export.md`, `incident-${inc.id}.md`)}><Icon name="download" size={16} />Export summary</button>
+          <Can perm="data.export"><button className="btn" onClick={() => void downloadFile(`/incidents/${inc.id}/export.md`, `incident-${inc.id}.md`)}><Icon name="download" size={16} />Export summary</button></Can>
           <Link className="btn" to="/incidents">Back</Link>
         </>} />
       {msg ? <Banner kind="success">{msg}</Banner> : null}
@@ -53,7 +54,7 @@ export function IncidentDetailPage() {
             <dt>Sources</dt><dd className="mono">{data.sources.join(", ") || "—"}</dd>
             <dt>Destinations</dt><dd className="mono">{data.destinations.join(", ") || "—"}</dd>
           </dl>
-          <div className="row" style={{ marginTop: 14 }}>
+          <Can perm="incidents.write" fallback={<ReadOnlyNote what="change incidents" />}><div className="row" style={{ marginTop: 14 }}>
             <label className="field">Owner
               <select value={inc.owner_id ?? ""} onChange={(e) => void act(() => api.patch(`/incidents/${inc.id}`, { owner_id: e.target.value ? Number(e.target.value) : null }), "Owner updated.")}>
                 <option value="">Unassigned</option>
@@ -72,7 +73,7 @@ export function IncidentDetailPage() {
             {inc.status !== "closed" ? <button className="btn" onClick={() => setClosing(true)} disabled={inc.disposition === "undetermined"}
               title={inc.disposition === "undetermined" ? "Record a disposition before closing" : undefined}>Close incident</button>
               : <button className="btn" onClick={() => void act(() => api.patch(`/incidents/${inc.id}`, { status: "investigating" }), "Incident re-opened.")}>Re-open</button>}
-          </div>
+          </div></Can>
           {inc.summary ? <><h3 style={{ marginTop: 16 }}>Summary</h3><p style={{ whiteSpace: "pre-wrap" }}>{inc.summary}</p></> : null}
         </section>
 
@@ -85,7 +86,7 @@ export function IncidentDetailPage() {
               ))}
             </ul>
           ) : <p className="muted">Nothing recorded yet.</p>}
-          <form style={{ marginTop: 12 }} onSubmit={(e) => { e.preventDefault(); if (note.trim()) void act(() => api.post(`/incidents/${inc.id}/notes`, { body: note, kind }), "Added.").then(() => setNote("")); }}>
+          <Can perm="incidents.write"><form style={{ marginTop: 12 }} onSubmit={(e) => { e.preventDefault(); if (note.trim()) void act(() => api.post(`/incidents/${inc.id}/notes`, { body: note, kind }), "Added.").then(() => setNote("")); }}>
             <div className="row">
               <label className="field">Type
                 <select value={kind} onChange={(e) => setKind(e.target.value as "note" | "evidence")}><option value="note">Note</option><option value="evidence">Evidence reference</option></select>
@@ -93,7 +94,7 @@ export function IncidentDetailPage() {
             </div>
             <label className="field" style={{ marginTop: 8 }}>Text<textarea value={note} onChange={(e) => setNote(e.target.value)} maxLength={10000} /></label>
             <button className="btn" style={{ marginTop: 8 }} disabled={!note.trim()}>Add</button>
-          </form>
+          </form></Can>
         </section>
       </div>
 

@@ -10,7 +10,7 @@ import { Banner, Empty, ErrorState, Loading, Time } from "../components/States";
 import { formatPct, shortHash } from "../lib/format";
 
 export function ModelsPage() {
-  const { user } = useAuth();
+  const { can } = useAuth();
   const navigate = useNavigate();
   const models = useApi(() => api.get<ModelVersion[]>("/models"), []);
   const runs = useApi(() => api.get<ExperimentRun[]>("/experiment-runs"), []);
@@ -53,7 +53,7 @@ export function ModelsPage() {
                 <tr key={r.run_name}>
                   <td className="mono">{r.run_name}</td><td>{r.experiment_id}</td><td>{r.provenance ? <ProvenanceBadge provenance={r.provenance} /> : "—"}</td>
                   <td className="num">{formatPct(r.test_accuracy)}</td>
-                  <td>{r.registered ? <span className="muted">Registered</span> : user?.role === "admin"
+                  <td>{r.registered ? <span className="muted">Registered</span> : can("models.manage")
                     ? <button className="btn small" onClick={() => void register(r.run_name)}>Register as candidate</button> : <span className="muted">Admin can register</span>}</td>
                 </tr>
               ))}</tbody>

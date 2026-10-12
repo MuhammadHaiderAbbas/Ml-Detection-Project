@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { Can, ReadOnlyNote } from "../components/Can";
 import { api } from "../api/client";
 import type { ImportRecord, Page, Preview, SchemaInfo } from "../api/types";
 import { useApi } from "../api/useApi";
@@ -119,7 +120,7 @@ export function DataSourcesPage() {
   return (
     <>
       <PageHeader title="Data Sources" description="Imported datasets with their file hash, schema, validation summary and processing status. Live telemetry (Zeek, NetFlow) is a later integration." />
-      <UploadForm />
+      <Can perm="data.import" fallback={<div className="card"><ReadOnlyNote what="import data" /></div>}><UploadForm /></Can>
       <section className="card" aria-labelledby="imp-h">
         <div className="card-header"><h2 id="imp-h">Imports</h2></div>
         {list.error ? <ErrorState error={list.error} onRetry={list.reload} /> : list.data ? (list.data.items.length ? (

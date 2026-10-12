@@ -77,7 +77,7 @@ class User(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(String(64), unique=True)
     password_hash: Mapped[str] = mapped_column(String(255))
-    role: Mapped[str] = mapped_column(String(16))  # admin | analyst
+    role: Mapped[str] = mapped_column(String(16))  # admin | analyst | viewer (see permissions.py)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(default=utcnow)
     last_login_at: Mapped[datetime | None]

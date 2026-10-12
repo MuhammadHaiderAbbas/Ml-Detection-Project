@@ -3,6 +3,7 @@ import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { DriftSeverityBadge, VerdictBadge } from "../components/Badges";
 import { DriftAnalysisPage } from "../pages/DriftAnalysis";
+import { AuthProvider } from "../auth/AuthContext";
 
 afterEach(() => vi.restoreAllMocks());
 
@@ -33,7 +34,7 @@ describe("drift", () => {
       const body = path.endsWith("/windows") ? [] : path.startsWith("/api/drift/events") ? { items: [], total: 0, limit: 200, offset: 0 } : analysis;
       return new Response(JSON.stringify(body), { status: 200 });
     });
-    render(<MemoryRouter initialEntries={["/drift/analyses/3"]}><Routes><Route path="/drift/analyses/:id" element={<DriftAnalysisPage />} /></Routes></MemoryRouter>);
+    render(<AuthProvider><MemoryRouter initialEntries={["/drift/analyses/3"]}><Routes><Route path="/drift/analyses/:id" element={<DriftAnalysisPage />} /></Routes></MemoryRouter></AuthProvider>);
     expect(await screen.findByText("No-label check")).toBeInTheDocument();
     expect(screen.getAllByText("Not assessable")).toHaveLength(3);
     expect(screen.getByText("needs labelled events in both samples")).toBeInTheDocument();

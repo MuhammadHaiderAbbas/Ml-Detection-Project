@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { api } from "../api/client";
+import { Can } from "../components/Can";
 import type { Incident, IncidentDetail, Page } from "../api/types";
 import { useApi } from "../api/useApi";
 import { DispositionBadge, PlainBadge } from "../components/Badges";
@@ -51,7 +52,7 @@ export function IncidentsPage() {
   return (
     <>
       <PageHeader title="Incidents" description="Groups of related alerts with evidence and the analyst's decision. Only an incident's disposition records a confirmed attack."
-        actions={!creating ? <button className="btn primary" onClick={() => f.set({ create: "1" })}>New incident</button> : null} />
+        actions={!creating ? <Can perm="incidents.write"><button className="btn primary" onClick={() => f.set({ create: "1" })}>New incident</button></Can> : null} />
       {creating ? <div style={{ marginBottom: 16 }}><CreateIncident alertIds={alertIds} onCancel={() => f.set({ create: null, alerts: null })} /></div> : null}
       <div className="card">
         <div className="filters">

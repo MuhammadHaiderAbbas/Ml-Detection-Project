@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 
 from ...db.models import User
 from ...services import alerts as svc
-from ..deps import client_ip, current_user, get_db
+from ..deps import allow, client_ip, get_db
 from ..schemas import (
     AlertDetail,
     AlertGroupOut,
@@ -42,14 +42,14 @@ def filters(
 
 @router.get("/alerts", response_model=Page[AlertOut])
 def list_alerts(f: svc.AlertFilters = Depends(filters), limit: int = Query(50, ge=1, le=500),
-                offset: int = Query(0, ge=0), _: User = Depends(current_user), db: Session = Depends(get_db)):
+                offset: int = Query(0, ge=0), _: User = Depends(allow("alerts.read")), db: Session = Depends(get_db)):
     items, total = svc.list_alerts(db, f, limit, offset)
     return Page(items=items, total=total, limit=limit, offset=offset)
 
 
 @router.get("/alerts/groups", response_model=Page[AlertGroupOut])
 def alert_groups(f: svc.AlertFilters = Depends(filters), limit: int = Query(50, ge=1, le=500),
-                 offset: int = Query(0, ge=0), _: User = Depends(current_user), db: Session = Depends(get_db)):
+                 offset: int = Query(0, ge=0), _: User = Depends(allow("alerts.read")), db: Session = Depends(get_db)):
     items, total = svc.groups(db, f, limit, offset)
     return Page(items=items, total=total, limit=limit, offset=offset)
 
@@ -60,7 +60,7 @@ def _cell(v) -> str:
 
 
 @router.get("/alerts/export.csv")
-def export(request: Request, f: svc.AlertFilters = Depends(filters), user: User = Depends(current_user),
+def export(request: Request, f: svc.AlertFilters = Depends(filters), user: User = Depends(allow("data.export")),
            db: Session = Depends(get_db)):
     items, total = svc.list_alerts(db, f, limit=100_000, offset=0)
     from ...services import audit
@@ -80,7 +80,7 @@ def export(request: Request, f: svc.AlertFilters = Depends(filters), user: User 
 
 
 @router.get("/alerts/{alert_id}", response_model=AlertDetail)
-def alert_detail(alert_id: int, _: User = Depends(current_user), db: Session = Depends(get_db)):
+def alert_detail(alert_id: int, _: User = Depends(allow("alerts.read")), db: Session = Depends(get_db)):
     d = svc.detail(db, alert_id)
     return AlertDetail(
         alert=AlertOut.model_validate(d["alert"]), assignee=d["assignee"], event=EventOut.model_validate(d["event"]),
@@ -94,18 +94,18 @@ def alert_detail(alert_id: int, _: User = Depends(current_user), db: Session = D
 
 
 @router.post("/alerts/{alert_id}/status", response_model=AlertOut)
-def change_status(alert_id: int, body: StatusChange, request: Request, user: User = Depends(current_user),
+def change_status(alert_id: int, body: StatusChange, request: Request, user: User = Depends(allow("alerts.write")),
                   db: Session = Depends(get_db)):
     return svc.transition(db, alert_id, body.status, user, body.note, client_ip(request))
 
 
 @router.post("/alerts/{alert_id}/assign", response_model=AlertOut)
-def assign(alert_id: int, body: AssignBody, request: Request, user: User = Depends(current_user),
+def assign(alert_id: int, body: AssignBody, request: Request, user: User = Depends(allow("alerts.write")),
            db: Session = Depends(get_db)):
     return svc.assign(db, alert_id, body.assignee_id, user, client_ip(request))
 
 
 @router.post("/alerts/{alert_id}/notes", response_model=AlertNoteOut, status_code=201)
-def add_note(alert_id: int, body: NoteBody, user: User = Depends(current_user), db: Session = Depends(get_db)):
+def add_note(alert_id: int, body: NoteBody, user: User = Depends(allow("alerts.write")), db: Session = Depends(get_db)):
     n = svc.add_note(db, alert_id, body.body, user)
     return AlertNoteOut(id=n.id, author=user.username, body=n.body, created_at=n.created_at)

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { api } from "../api/client";
+import { Can, ReadOnlyNote } from "../components/Can";
 import type { DriftEventDetail } from "../api/types";
 import { useApi } from "../api/useApi";
 import { DriftSeverityBadge, PlainBadge } from "../components/Badges";
@@ -56,14 +57,14 @@ export function DriftEventPage() {
         <section className="card" aria-labelledby="rev-h">
           <div className="card-header"><h2 id="rev-h">Review</h2><span className="hint">analyst actions</span></div>
           <dl className="kv"><dt>Status</dt><dd><PlainBadge>{humanize(e.status)}</PlainBadge></dd></dl>
-          <div className="row" style={{ marginTop: 12 }}>{NEXT[e.status].map((t) => <button key={t.to} className="btn" onClick={() => setPending(t)}>{t.label}</button>)}</div>
+          <Can perm="drift.write" fallback={<ReadOnlyNote what="review drift events" />}><div className="row" style={{ marginTop: 12 }}>{NEXT[e.status].map((t) => <button key={t.to} className="btn" onClick={() => setPending(t)}>{t.label}</button>)}</div></Can>
           <ul className="timeline" style={{ marginTop: 16 }}>
             {data.notes.map((n) => <li key={n.id}><div className="when"><Time iso={n.created_at} /> · {n.author} · {n.kind === "status" ? "status change" : "note"}</div><span style={{ whiteSpace: "pre-wrap" }}>{n.body}</span></li>)}
           </ul>
-          <form onSubmit={(x) => { x.preventDefault(); if (note.trim()) void api.post(`/drift/events/${e.id}/notes`, { body: note }).then(() => { setNote(""); setMsg("Note added."); reload(); }); }}>
+          <Can perm="drift.write"><form onSubmit={(x) => { x.preventDefault(); if (note.trim()) void api.post(`/drift/events/${e.id}/notes`, { body: note }).then(() => { setNote(""); setMsg("Note added."); reload(); }); }}>
             <label className="field">Investigation note<textarea value={note} onChange={(x) => setNote(x.target.value)} maxLength={10000} /></label>
             <button className="btn" style={{ marginTop: 8 }} disabled={!note.trim()}>Add note</button>
-          </form>
+          </form></Can>
         </section>
       </div>
       {pending ? (

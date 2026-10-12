@@ -7,8 +7,8 @@ from sqlalchemy.orm import Session
 from ...db.models import User
 from ...services import auth as svc
 from ...services.errors import NotAuthenticated
-from ..deps import bearer_token, client_ip, current_user, get_db, require
-from ..schemas import LoginRequest, LoginResponse, UserActive, UserCreate, UserOut
+from ..deps import allow, bearer_token, client_ip, current_user, get_db
+from ..schemas import LoginRequest, LoginResponse, MeOut, UserActive, UserCreate, UserOut
 
 router = APIRouter(tags=["auth"])
 
@@ -22,7 +22,7 @@ def login(body: LoginRequest, request: Request, db: Session = Depends(get_db)):
     except NotAuthenticated:
         db.commit()  # keep the failed-login audit record
         raise
-    return LoginResponse(access_token=token, expires_in_hours=settings.session_hours, user=UserOut.model_validate(user))
+    return LoginResponse(access_token=token, expires_in_hours=settings.session_hours, user=MeOut.of(user))
 
 
 @router.post("/auth/logout", status_code=204)
@@ -30,22 +30,22 @@ def logout(request: Request, user: User = Depends(current_user), db: Session = D
     svc.logout(db, bearer_token(request) or "", user, client_ip(request))
 
 
-@router.get("/auth/me", response_model=UserOut)
+@router.get("/auth/me", response_model=MeOut)
 def me(user: User = Depends(current_user)):
-    return user
+    return MeOut.of(user)
 
 
 @router.get("/users", response_model=list[UserOut])
-def list_users(_: User = Depends(current_user), db: Session = Depends(get_db)):
+def list_users(_: User = Depends(allow("users.read")), db: Session = Depends(get_db)):
     return list(db.scalars(select(User).order_by(User.username)))
 
 
 @router.post("/users", response_model=UserOut, status_code=201)
-def create_user(body: UserCreate, request: Request, admin: User = Depends(require("admin")), db: Session = Depends(get_db)):
+def create_user(body: UserCreate, request: Request, admin: User = Depends(allow("users.manage")), db: Session = Depends(get_db)):
     return svc.create_user(db, body.username, body.password, body.role, actor=admin)
 
 
 @router.patch("/users/{user_id}", response_model=UserOut)
-def set_active(user_id: int, body: UserActive, request: Request, admin: User = Depends(require("admin")),
+def set_active(user_id: int, body: UserActive, request: Request, admin: User = Depends(allow("users.manage")),
                db: Session = Depends(get_db)):
     return svc.set_active(db, user_id, body.is_active, actor=admin)

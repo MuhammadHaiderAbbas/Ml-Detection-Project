@@ -38,17 +38,29 @@ class UserOut(ORM):
     last_login_at: datetime | None = None
 
 
+class MeOut(UserOut):
+    """The signed-in user plus the permissions their role grants (the UI uses these to hide controls)."""
+
+    permissions: list[str]
+
+    @classmethod
+    def of(cls, user: Any) -> "MeOut":
+        from ..permissions import permissions_for
+
+        return cls(**UserOut.model_validate(user).model_dump(), permissions=permissions_for(user.role))
+
+
 class LoginResponse(BaseModel):
     access_token: str
     token_type: Literal["bearer"] = "bearer"
     expires_in_hours: int
-    user: UserOut
+    user: MeOut
 
 
 class UserCreate(BaseModel):
     username: str = Field(min_length=3, max_length=64)
     password: str = Field(min_length=12, max_length=256)
-    role: Literal["admin", "analyst"]
+    role: Literal["admin", "analyst", "viewer"]
 
 
 class UserActive(BaseModel):

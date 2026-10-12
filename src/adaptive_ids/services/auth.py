@@ -8,11 +8,11 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from ..db.models import SessionToken, User, utcnow
+from ..permissions import ROLES
 from ..security import DUMMY_HASH, hash_password, hash_token, new_session_token, verify_password
 from . import audit
 from .errors import Conflict, InvalidRequest, NotAuthenticated, NotFound, PermissionDenied
 
-ROLES = ("admin", "analyst")
 
 
 def create_user(db: Session, username: str, password: str, role: str, *, actor: User | None = None) -> User:
@@ -64,11 +64,6 @@ def logout(db: Session, token: str, user: User, client_ip: str | None) -> None:
     if sess and sess.revoked_at is None:
         sess.revoked_at = utcnow()
     audit.record(db, "auth.logout", actor=user, client_ip=client_ip)
-
-
-def require_role(user: User, *roles: str) -> None:
-    if user.role not in roles:
-        raise PermissionDenied(f"this action requires role: {' or '.join(roles)}")
 
 
 def set_active(db: Session, user_id: int, active: bool, *, actor: User) -> User:

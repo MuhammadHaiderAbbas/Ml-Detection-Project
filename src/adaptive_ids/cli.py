@@ -217,7 +217,7 @@ def main(argv: list[str] | None = None) -> int:
 
     s = sub.add_parser("create-user", help="create an application user (password prompted)")
     s.add_argument("username")
-    s.add_argument("--role", choices=["admin", "analyst"], default="analyst")
+    s.add_argument("--role", choices=["admin", "analyst", "viewer"], default="analyst")
     s.set_defaults(fn=_cmd_create_user)
 
     s = sub.add_parser("serve", help="run the API server")

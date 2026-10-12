@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { api, downloadFile } from "../api/client";
+import { Can } from "../components/Can";
 import type { DriftAnalysisDetail, DriftEvent, DriftWindow, Page } from "../api/types";
 import { useApi } from "../api/useApi";
 import { DriftSeverityBadge, ProvenanceBadge, VerdictBadge } from "../components/Badges";
@@ -46,10 +47,10 @@ export function DriftAnalysisPage() {
     <>
       <PageHeader title={d.name} description={<>Drift analysis #{d.id}. {s?.interpretation}</>}
         actions={<>
-          {done ? <>
+          {done ? <Can perm="data.export">
             <button className="btn" onClick={() => void downloadFile(`/drift/analyses/${d.id}/report.md`, `drift-report-${d.id}.md`)}><Icon name="download" size={16} />Report</button>
             <button className="btn" onClick={() => void downloadFile(`/drift/analyses/${d.id}/windows.csv`, `drift-windows-${d.id}.csv`)}><Icon name="download" size={16} />Windows CSV</button>
-          </> : null}
+          </Can> : null}
           <Link className="btn" to="/drift">Back</Link>
         </>} />
       {demo ? <Banner kind="demo"><strong>Synthetic demo data.</strong> This analysis compares generated datasets; it says nothing about real traffic.</Banner> : null}

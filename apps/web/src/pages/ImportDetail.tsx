@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { api } from "../api/client";
 import type { ImportRecord, ModelVersion, Page, RejectedRow, ScoringRun } from "../api/types";
 import { useApi } from "../api/useApi";
+import { useAuth } from "../auth/AuthContext";
 import { PlainBadge, ProvenanceBadge } from "../components/Badges";
 import { ConfirmDialog } from "../components/ConfirmDialog";
 import { PageHeader } from "../components/PageHeader";
@@ -17,6 +18,7 @@ export function ImportDetailPage() {
   const active = useApi(() => api.get<ModelVersion | null>("/models/active"), []);
   const [offset, setOffset] = useState(0);
   const rejected = useApi(() => api.get<Page<RejectedRow>>(`/imports/${id}/rejected-rows`, { limit: 50, offset }), [id, offset, rec.data?.status]);
+  const { can } = useAuth();
   const [confirm, setConfirm] = useState<"score" | "cancel" | null>(null);
   const [msg, setMsg] = useState<string>();
   if (rec.error) return <ErrorState error={rec.error} onRetry={rec.reload} />;
@@ -28,8 +30,8 @@ export function ImportDetailPage() {
     <>
       <PageHeader title={`Import #${r.id}: ${r.dataset_name}@${r.dataset_version}`} description={r.original_filename}
         actions={<>
-          {["queued", "running"].includes(r.status) ? <button className="btn danger" onClick={() => setConfirm("cancel")}>Cancel import</button> : null}
-          {r.status === "completed" ? <button className="btn primary" disabled={!active.data || scoredByActive} onClick={() => setConfirm("score")}
+          {["queued", "running"].includes(r.status) && can("data.import") ? <button className="btn danger" onClick={() => setConfirm("cancel")}>Cancel import</button> : null}
+          {r.status === "completed" && can("scoring.run") ? <button className="btn primary" disabled={!active.data || scoredByActive} onClick={() => setConfirm("score")}
             title={!active.data ? "No active model" : scoredByActive ? "Already scored by the active model" : undefined}>Score with active model</button> : null}
           <Link className="btn" to="/data-sources">Back</Link>
         </>} />

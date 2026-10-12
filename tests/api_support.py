@@ -26,6 +26,7 @@ from adaptive_ids.settings import Settings
 REPO = Path(__file__).resolve().parents[1]
 ADMIN_PW = "admin-password-123"
 ANALYST_PW = "analyst-password-123"
+VIEWER_PW = "viewer-password-123"
 
 
 def alembic(url: str, action: str) -> None:
@@ -98,6 +99,7 @@ def env(tmp_path, demo_runs):
     with session_scope(factory) as db:
         auth.create_user(db, "admin", ADMIN_PW, "admin")
         auth.create_user(db, "analyst", ANALYST_PW, "analyst")
+        auth.create_user(db, "viewer", VIEWER_PW, "viewer")
     app = create_app(settings)
     with TestClient(app) as client:
         yield Env(client, settings, factory, demo_runs)

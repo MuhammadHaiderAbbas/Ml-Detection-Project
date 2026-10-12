@@ -1,6 +1,7 @@
 import { Fragment } from "react";
 import { Link, useParams } from "react-router-dom";
 import { api, downloadFile } from "../api/client";
+import { Can } from "../components/Can";
 import type { EvaluationDetail, Gate, GovMetric, GovMetrics } from "../api/types";
 import { useApi } from "../api/useApi";
 import { EvaluationVerdictBadge, ProvenanceBadge } from "../components/Badges";
@@ -79,7 +80,7 @@ export function EvaluationDetailPage() {
       <PageHeader title={`Candidate evaluation #${ev.id}`}
         description={<><code>{d.candidate.version_id}</code> vs {d.baseline ? <code>{d.baseline.version_id}</code> : "no baseline"} · protocol v{ev.protocol_version}</>}
         actions={<>
-          {done ? <button className="btn" onClick={() => void downloadFile(`/evaluations/${ev.id}/report.md`, `evaluation-${ev.id}.md`)}><Icon name="download" size={16} />Report</button> : null}
+          {done ? <Can perm="data.export"><button className="btn" onClick={() => void downloadFile(`/evaluations/${ev.id}/report.md`, `evaluation-${ev.id}.md`)}><Icon name="download" size={16} />Report</button></Can> : null}
           <Link className="btn" to={`/models/${ev.model_version_id}`}>Back to model</Link>
         </>} />
       {synthetic ? <Banner kind="demo"><strong>Synthetic demo.</strong> Generated data or a synthetic model is involved; these numbers show the workflow, not real detection performance.</Banner> : null}

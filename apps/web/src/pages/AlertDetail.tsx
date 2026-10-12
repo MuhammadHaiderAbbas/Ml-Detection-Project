@@ -1,5 +1,6 @@
 import { Fragment, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { Can, ReadOnlyNote } from "../components/Can";
 import { api } from "../api/client";
 import type { AlertDetail, AlertStatus, Incident, Page } from "../api/types";
 import { useApi } from "../api/useApi";
@@ -56,15 +57,15 @@ export function AlertDetailPage() {
             <dt>Incident</dt><dd>{data.incident_id ? <Link to={`/incidents/${data.incident_id}`}>#{data.incident_id}</Link> : (
               <span className="row">
                 <span className="muted">Not linked</span>
-                <select aria-label="Link to an open incident" value="" onChange={(ev) => void run(() => api.post(`/incidents/${ev.target.value}/alerts`, { alert_ids: [a.id] }), "Alert linked to the incident.")}>
+                <Can perm="incidents.write"><select aria-label="Link to an open incident" value="" onChange={(ev) => void run(() => api.post(`/incidents/${ev.target.value}/alerts`, { alert_ids: [a.id] }), "Alert linked to the incident.")}>
                   <option value="" disabled>Link to incident…</option>
                   {openIncidents.data?.items.map((i) => <option key={i.id} value={i.id}>#{i.id} {i.title}</option>)}
                 </select>
-                <Link className="btn small" to={`/incidents?create=1&alerts=${a.id}`}>New incident</Link>
+                <Link className="btn small" to={`/incidents?create=1&alerts=${a.id}`}>New incident</Link></Can>
               </span>)}</dd>
             <dt>Created</dt><dd><Time iso={a.created_at} /></dd>
           </dl>
-          <div className="row" style={{ marginTop: 14 }}>
+          <Can perm="alerts.write" fallback={<ReadOnlyNote what="change, assign or annotate alerts" />}><div className="row" style={{ marginTop: 14 }}>
             {NEXT[a.status].map((t) => <button key={t.to} className="btn" onClick={() => setPending(t)}>{t.label}</button>)}
             <label className="field" style={{ minWidth: 180 }}>
               <span className="sr-only">Assign to</span>
@@ -74,7 +75,7 @@ export function AlertDetailPage() {
                 {[...users.entries()].map(([uid, name]) => <option key={uid} value={uid}>{name}{uid === user?.id ? " (me)" : ""}</option>)}
               </select>
             </label>
-          </div>
+          </div></Can>
         </section>
 
         <section className="card" aria-labelledby="pred-h">
@@ -121,10 +122,10 @@ export function AlertDetailPage() {
           {data.notes.length ? (
             <ul className="timeline">{data.notes.map((n) => <li key={n.id}><div className="when"><Time iso={n.created_at} /> · {n.author}</div>{n.body}</li>)}</ul>
           ) : <p className="muted">No notes yet.</p>}
-          <form onSubmit={(ev) => { ev.preventDefault(); if (note.trim()) void run(() => api.post(`/alerts/${a.id}/notes`, { body: note }), "Note added.").then(() => setNote("")); }}>
+          <Can perm="alerts.write"><form onSubmit={(ev) => { ev.preventDefault(); if (note.trim()) void run(() => api.post(`/alerts/${a.id}/notes`, { body: note }), "Note added.").then(() => setNote("")); }}>
             <label className="field">Add a note<textarea value={note} onChange={(ev) => setNote(ev.target.value)} maxLength={10000} /></label>
             <button className="btn" type="submit" disabled={!note.trim()} style={{ marginTop: 8 }}>Add note</button>
-          </form>
+          </form></Can>
         </section>
         <section className="card" aria-labelledby="hist-h">
           <div className="card-header"><h2 id="hist-h">Status history</h2></div>

@@ -17,7 +17,7 @@ const MIN_OVERRIDE = 20;
 
 export function ModelDetailPage() {
   const { id } = useParams();
-  const { user } = useAuth();
+  const { can } = useAuth();
   const users = useUserMap();
   const model = useApi(() => api.get<ModelDetail>(`/models/${id}`), [id]);
   const hist = useApi(() => api.get<ModelHistory[]>(`/models/${id}/history`), [id]);
@@ -32,7 +32,7 @@ export function ModelDetailPage() {
   if (model.error) return <ErrorState error={model.error} onRetry={model.reload} />;
   const m = model.data;
   if (!m) return <Loading />;
-  const admin = user?.role === "admin";
+  const admin = can("models.manage");
   const candidate = ["candidate", "evaluating"].includes(m.status);
   const latest = evals.data?.find((e) => e.status === "completed");
   const stale = latest ? (latest.baseline_model_version_id ?? null) !== (active.data?.id ?? null) : false;

@@ -21,7 +21,7 @@ from ..provenance import Provenance, sha256_json
 from ..schema import FeatureSchema, SchemaError
 from ..settings import Settings
 from . import audit
-from .errors import Conflict, InvalidRequest, NotFound
+from .errors import Conflict, InvalidRequest, NotFound, PermissionDenied
 
 log = logging.getLogger(__name__)
 
@@ -270,6 +270,8 @@ def cancel_import(db: Session, import_id: int, cancels: CancelRegistry, actor: U
         raise NotFound("import not found")
     if rec.status not in ("queued", "running"):
         raise Conflict(f"import is already {rec.status}")
+    if actor.role != "admin" and rec.created_by_id != actor.id:
+        raise PermissionDenied("only the user who started an import (or an admin) can cancel it")
     cancels.get(import_id).set()
     if rec.status == "queued":
         rec.status = "cancelled"

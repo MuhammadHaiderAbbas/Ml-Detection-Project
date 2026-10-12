@@ -6,7 +6,7 @@ import { useApi } from "../api/useApi";
 import { useAuth } from "../auth/AuthContext";
 import { Icon, type IconName } from "./Icon";
 
-export const NAV: { to: string; label: string; icon: IconName; phase?: string; adminOnly?: boolean }[] = [
+export const NAV: { to: string; label: string; icon: IconName; phase?: string; perm?: string }[] = [
   { to: "/", label: "Dashboard", icon: "dashboard" },
   { to: "/traffic", label: "Live Traffic", icon: "traffic" },
   { to: "/alerts", label: "Alerts", icon: "alert" },
@@ -17,7 +17,7 @@ export const NAV: { to: string; label: string; icon: IconName; phase?: string; a
   { to: "/reports", label: "Reports", icon: "report" },
   { to: "/data-sources", label: "Data Sources", icon: "database" },
   { to: "/experiments", label: "Experiments", icon: "flask" },
-  { to: "/audit", label: "Audit Logs", icon: "audit", adminOnly: true },
+  { to: "/audit", label: "Audit Logs", icon: "audit", perm: "audit.read" },
   { to: "/settings", label: "Settings", icon: "settings" },
 ];
 
@@ -96,7 +96,7 @@ function AccountMenu() {
 }
 
 export function Layout() {
-  const { user } = useAuth();
+  const { can } = useAuth();
   const [navOpen, setNavOpen] = useState(false);
   const location = useLocation();
   useEffect(() => { setNavOpen(false); }, [location.pathname]);
@@ -108,7 +108,7 @@ export function Layout() {
         <div className="brand"><img src="/favicon.svg" alt="" /> Adaptive IDS</div>
         <nav>
           <ul className="nav">
-            {NAV.filter((n) => !n.adminOnly || user?.role === "admin").map((n) => (
+            {NAV.filter((n) => !n.perm || can(n.perm)).map((n) => (
               <li key={n.to}>
                 <NavLink to={n.to} end={n.to === "/"}>
                   <Icon name={n.icon} className="nav-icon" />

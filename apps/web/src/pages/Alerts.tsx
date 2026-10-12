@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { api, downloadFile } from "../api/client";
+import { Can } from "../components/Can";
 import type { Alert, AlertGroup, Page, User } from "../api/types";
 import { useApi } from "../api/useApi";
 import { AlertStatusBadge, SeverityBadge } from "../components/Badges";
@@ -108,9 +109,9 @@ export function AlertsPage() {
     <>
       <PageHeader title="Alerts" description="Suspicious predictions awaiting or under analyst review. Severity is a triage priority from configured rules."
         actions={<>
-          <button className="btn" onClick={() => void downloadFile("/alerts/export.csv", "alerts.csv", query)}><Icon name="download" size={16} />Export CSV</button>
-          <button className="btn primary" disabled={!selected.size}
-            onClick={() => navigate(`/incidents?create=1&alerts=${[...selected].join(",")}`)}>Create incident ({selected.size})</button>
+          <Can perm="data.export"><button className="btn" onClick={() => void downloadFile("/alerts/export.csv", "alerts.csv", query)}><Icon name="download" size={16} />Export CSV</button></Can>
+          <Can perm="incidents.write"><button className="btn primary" disabled={!selected.size}
+            onClick={() => navigate(`/incidents?create=1&alerts=${[...selected].join(",")}`)}>Create incident ({selected.size})</button></Can>
         </>} />
       <div className="card">
         <div className="filters" role="group" aria-label="Alert filters">

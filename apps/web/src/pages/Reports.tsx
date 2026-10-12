@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { Can, ReadOnlyNote } from "../components/Can";
 import { downloadFile } from "../api/client";
 import { Icon } from "../components/Icon";
 import { PageHeader } from "../components/PageHeader";
@@ -11,7 +12,7 @@ export function ReportsPage() {
         <section className="card">
           <h2>Alerts (CSV)</h2>
           <p className="secondary">All alerts with status, severity rule, model version, import and group. Filter on the <Link to="/alerts">Alerts</Link> page to export a subset.</p>
-          <button className="btn" onClick={() => void downloadFile("/alerts/export.csv", "alerts.csv")}><Icon name="download" size={16} />Download all alerts</button>
+          <Can perm="data.export" fallback={<ReadOnlyNote what="export data" />}><button className="btn" onClick={() => void downloadFile("/alerts/export.csv", "alerts.csv")}><Icon name="download" size={16} />Download all alerts</button></Can>
         </section>
         <section className="card">
           <h2>Incident summary (Markdown)</h2>

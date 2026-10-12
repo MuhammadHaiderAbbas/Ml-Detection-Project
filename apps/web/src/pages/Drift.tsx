@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { api } from "../api/client";
+import { Can } from "../components/Can";
 import type { DriftAnalysis, DriftEvent, ImportRecord, ModelVersion, Page } from "../api/types";
 import { useApi } from "../api/useApi";
 import { DriftSeverityBadge, PlainBadge, VerdictBadge } from "../components/Badges";
@@ -95,7 +96,7 @@ export function DriftPage() {
     <>
       <PageHeader title="Drift Monitor"
         description="Feature drift, prediction drift, performance degradation and suspected concept drift are tracked separately. A drift signal is a prompt for review, not evidence of an attack, and never retrains or promotes a model."
-        actions={!creating ? <button className="btn primary" onClick={() => setCreating(true)}>New analysis</button> : null} />
+        actions={!creating ? <Can perm="drift.write"><button className="btn primary" onClick={() => setCreating(true)}>New analysis</button></Can> : null} />
       {creating ? <div style={{ marginBottom: 16 }}><NewAnalysis onCancel={() => setCreating(false)} /></div> : null}
       {latest?.summary ? (
         <section className="card" aria-labelledby="latest-h">

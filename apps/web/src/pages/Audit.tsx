@@ -8,14 +8,14 @@ import { Banner, Empty, ErrorState, Loading, Time } from "../components/States";
 import { useUrlFilters } from "../lib/filters";
 
 export function AuditPage() {
-  const { user } = useAuth();
+  const { can } = useAuth();
   const f = useUrlFilters();
   const limit = 100;
   const offset = Number(f.get("offset") || 0);
   const { data, error, loading, reload } = useApi(
-    () => (user?.role === "admin" ? api.get<Page<AuditEntry>>("/audit-logs", { action: f.get("action"), entity_type: f.get("entity_type"), limit, offset }) : Promise.resolve(undefined)),
-    [f.params.toString(), user?.role]);
-  if (user?.role !== "admin") return <><PageHeader title="Audit Logs" /><Banner kind="info">Audit logs are visible to administrators only.</Banner></>;
+    () => (can("audit.read") ? api.get<Page<AuditEntry>>("/audit-logs", { action: f.get("action"), entity_type: f.get("entity_type"), limit, offset }) : Promise.resolve(undefined)),
+    [f.params.toString(), can]);
+  if (!can("audit.read")) return <><PageHeader title="Audit Logs" /><Banner kind="info">Audit logs are visible to administrators only.</Banner></>;
   return (
     <>
       <PageHeader title="Audit Logs" description="Sensitive actions: sign-ins, user changes, imports, scoring, model lifecycle, alert and incident decisions, exports." />

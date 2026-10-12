@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 from ... import __version__
 from ...db.models import AuditLog, User
 from ...services import dashboard
-from ..deps import current_user, get_db, require
+from ..deps import allow, get_db
 from ..schemas import AuditOut, Page
 
 router = APIRouter(tags=["system"])
@@ -28,14 +28,14 @@ def health(request: Request, db: Session = Depends(get_db)):
 
 @router.get("/dashboard/summary")
 def summary(import_id: int | None = None, model_version_id: int | None = None, since: datetime | None = None,
-            until: datetime | None = None, _: User = Depends(current_user), db: Session = Depends(get_db)):
+            until: datetime | None = None, _: User = Depends(allow("dashboard.read")), db: Session = Depends(get_db)):
     return dashboard.summary(db, import_id=import_id, model_version_id=model_version_id, since=since, until=until)
 
 
 @router.get("/dashboard/timeline")
 def timeline(import_id: int | None = None, model_version_id: int | None = None, bucket: str = "hour",
              since: datetime | None = None, until: datetime | None = None,
-             _: User = Depends(current_user), db: Session = Depends(get_db)):
+             _: User = Depends(allow("dashboard.read")), db: Session = Depends(get_db)):
     from ...services.errors import InvalidRequest
 
     try:
@@ -46,14 +46,14 @@ def timeline(import_id: int | None = None, model_version_id: int | None = None, 
 
 
 @router.get("/severity-rules")
-def severity_rules(request: Request, _: User = Depends(current_user)):
+def severity_rules(request: Request, _: User = Depends(allow("config.read"))):
     return request.app.state.severity_rules.to_dict()
 
 
 @router.get("/audit-logs", response_model=Page[AuditOut])
 def audit_logs(action: str | None = None, actor_id: int | None = None, entity_type: str | None = None,
                entity_id: str | None = None, limit: int = Query(100, ge=1, le=1000), offset: int = Query(0, ge=0),
-               _: User = Depends(require("admin")), db: Session = Depends(get_db)):
+               _: User = Depends(allow("audit.read")), db: Session = Depends(get_db)):
     q = select(AuditLog)
     for col, val in ((AuditLog.action, action), (AuditLog.actor_id, actor_id),
                      (AuditLog.entity_type, entity_type), (AuditLog.entity_id, entity_id)):
