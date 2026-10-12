@@ -162,8 +162,9 @@ All measured on a 4-core, 16 GB machine ([benchmark](phase-9-commercial-validati
 
 - **Batch scoring:** 2,400–3,800 events per second. **Import:** 7,000–9,600 events per second.
 - **Explanation, first view:** about 0.1–0.4 s, depending on model size.
-- **Peak memory:** under 1.4 GB.
-- **Storage:** about 1 GB per million stored events.
+- **Peak memory:** under 1.4 GB for files up to 150,000 events, and 9.3 GB for a real 1-million-row day
+  file.
+- **Storage:** 1–3 GB per million stored events, depending on the feature count.
 
 A small site's daily flow volume scores in minutes on commodity hardware.
 

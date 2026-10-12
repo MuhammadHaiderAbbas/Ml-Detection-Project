@@ -43,8 +43,11 @@ Read the **[technical case study](docs/case-study.md)** for the full story. In s
   - **New attacks:** no strategy detects a new attack type on its first day.
 
   ([Evaluation](docs/cic-ids2018-evaluation.md))
-- **It runs on modest hardware.** On a 4-core machine: 2,400–3,800 events per second batch scoring, under
-  1.4 GB of memory, and about 1 GB of storage per million events.
+- **It runs on a laptop-class machine.** On 4 cores:
+  - **Throughput:** 2,400–3,800 events per second batch scoring.
+  - **Memory:** a real 1-million-row day file imported and scored in about 10 minutes, peaking at 9.3 GB.
+    Smaller files need under 1.4 GB.
+  - **Storage:** 1–3 GB per million events.
   ([Benchmark](docs/phase-9-commercial-validation.md))
 
 ## What it does

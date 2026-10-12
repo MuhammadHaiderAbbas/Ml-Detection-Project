@@ -139,7 +139,11 @@ real networks. With `Dst Port` and `Protocol` removed:
 | Loading one day file (0.3–1 million rows) | 14–67 s |
 | Largest forest fit (400,000 rows) | 34 s |
 
-The "real day through the product" run below adds import, scoring, explanation and drift timings.
+A real, full day file was also put through the product itself:
+
+- **What it measured:** import, approval, scoring, explanations and backup of 1,040,548 events.
+- **What it found:** the limits that apply to files that large, and a 9.3 GB memory peak.
+- **Where:** [Phase 9, "A real, full day file"](phase-9-commercial-validation.md#a-real-full-day-file-cse-cic-ids2018-15-feb-2018).
 
 ## Reproduce (free)
 
