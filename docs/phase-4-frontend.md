@@ -68,6 +68,6 @@ System/Light/Dark theme switch and sign-out.
 ## Known limitations
 
 - Polling (every 4–30 s, depending on the page) rather than push updates.
-- No SHAP explanations yet. The investigation view says so instead of estimating feature importance.
+- SHAP explanations were added later (see `docs/model-explanations.md`).
 - No PDF export.
 - The UI does not yet support importing from Zeek or NetFlow; it handles CSV only.

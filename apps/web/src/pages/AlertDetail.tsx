@@ -2,11 +2,12 @@ import { Fragment, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Can, ReadOnlyNote } from "../components/Can";
 import { api } from "../api/client";
-import type { AlertDetail, AlertStatus, Incident, Page } from "../api/types";
+import type { AlertDetail, AlertStatus, Explanation, Incident, Page } from "../api/types";
 import { useApi } from "../api/useApi";
 import { useAuth } from "../auth/AuthContext";
 import { AlertStatusBadge, ModelStatusBadge, SeverityBadge } from "../components/Badges";
 import { ConfirmDialog } from "../components/ConfirmDialog";
+import { ExplanationChart } from "../components/ExplanationChart";
 import { PageHeader } from "../components/PageHeader";
 import { Banner, ErrorState, Loading, Time } from "../components/States";
 import { formatScore, humanize } from "../lib/format";
@@ -87,10 +88,12 @@ export function AlertDetailPage() {
             <dt>Model version</dt><dd><Link to={`/models/${m.id}`}><code>{m.version_id}</code></Link> <ModelStatusBadge status={m.status} /></dd>
             <dt>Preprocessing</dt><dd><code>{p.preprocessing_version}</code></dd>
             <dt>Inferred</dt><dd><Time iso={p.inferred_at} /></dd>
-            <dt>Explanation</dt><dd className="muted">Feature attributions (SHAP) are not available yet. They will be computed from this exact model and preprocessing version when the explainability module is added; none are estimated here.</dd>
+            <dt>Explanation</dt><dd><a href="#explain-h">Feature contributions</a> <span className="muted">(below)</span></dd>
           </dl>
         </section>
       </div>
+
+      <ExplanationCard alertId={a.id} />
 
       <div className="grid grid-2" style={{ marginTop: 16 }}>
         <section className="card" aria-labelledby="ev-h">
@@ -157,5 +160,30 @@ export function AlertDetailPage() {
         </ConfirmDialog>
       ) : null}
     </>
+  );
+}
+
+function ExplanationCard({ alertId }: { alertId: number }) {
+  const { data: x, error, loading, reload } = useApi(() => api.get<Explanation>(`/alerts/${alertId}/explanation`), [alertId]);
+  return (
+    <section className="card" style={{ marginTop: 16 }} aria-labelledby="explain-h">
+      <div className="card-header"><h2 id="explain-h">Why the model gave this score</h2><span className="hint">SHAP feature contributions · automated output</span></div>
+      {error ? <ErrorState error={error} onRetry={reload} /> : loading && !x ? <Loading label="Computing the explanation from the model…" /> : !x ? null : !x.available ? (
+        <p className="muted">{x.reason}</p>
+      ) : (
+        <>
+          <ExplanationChart x={x} />
+          <details style={{ marginTop: 12 }}>
+            <summary>Method, verification and limitations</summary>
+            <dl className="kv" style={{ marginTop: 8 }}>
+              <dt>Method</dt><dd>{x.method} <span className="muted">({x.library})</span></dd>
+              <dt>Verified</dt><dd>Re-scored with the same artifact (<code>{x.artifact_sha256?.slice(0, 12)}</code>) and preprocessing (<code>{x.preprocessing_version}</code>), which reproduced the stored prediction. Contributions add up to the model output within {x.additivity_error !== null ? x.additivity_error.toExponential(1) : "—"}.</dd>
+              <dt>Computed</dt><dd><Time iso={x.computed_at} /></dd>
+            </dl>
+            <ul className="plain">{x.limitations.map((l) => <li key={l}>{l}</li>)}</ul>
+          </details>
+        </>
+      )}
+    </section>
   );
 }

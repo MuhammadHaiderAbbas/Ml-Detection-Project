@@ -36,7 +36,7 @@ experiments.run_experiment ──► result.json + report.md (provenance-labelle
 | `adaptive_ids.experiments` | Reproducible runs and reports | §15, §16 | Implemented |
 | `adaptive_ids.research` | Backup, inventory, synthetic demo data | §2, §22 | Implemented |
 | `adaptive_ids.drift` | Feature, prediction, performance and suspected concept drift; ADWIN on bounded signals; controlled experiments | §10, §15 | Implemented (Phase 5) |
-| `adaptive_ids.explainability` | SHAP for supported models | §11 | Phase 2–4 |
+| `adaptive_ids.explainability`, `services.explanations` | Exact SHAP (TreeExplainer) for tree models, verified against the stored prediction and the model output; per-alert and summary views | §11 | Implemented ([model-explanations.md](model-explanations.md)) |
 | `adaptive_ids.services.registry` | Model lifecycle: register from run, gated approve, activate, rollback | §14 | Implemented (Phases 3 and 6) |
 | `adaptive_ids.governance`, `services.governance` | Versioned evaluation protocol; paired candidate-vs-baseline comparison; restorability checks; comparison reports | §11, §14 | Implemented (Phase 6) |
 | `adaptive_ids.permissions`, `api.deps.allow`, `api.hardening` | Role → permission map, per-route enforcement, security headers, body-size limits | §17 | Implemented (Phase 7) |

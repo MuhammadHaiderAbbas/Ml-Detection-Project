@@ -135,6 +135,31 @@ class PreviewOut(BaseModel):
 # --- events / predictions -----------------------------------------------------
 
 
+class ContributionOut(BaseModel):
+    feature: str
+    raw_value: Any = None
+    model_input: float
+    contribution: float
+
+
+class ExplanationOut(BaseModel):
+    available: bool
+    reason: str | None = None
+    prediction_id: int | None = None
+    method: str | None = None
+    library: str | None = None
+    output_space: str | None = None
+    target_class: str | None = None
+    base_value: float | None = None
+    model_output: float | None = None
+    additivity_error: float | None = None
+    artifact_sha256: str | None = None
+    preprocessing_version: str | None = None
+    contributions: list[ContributionOut] = []
+    limitations: list[str] = []
+    computed_at: datetime | None = None
+
+
 class PredictionOut(ORM):
     id: int
     scoring_run_id: int

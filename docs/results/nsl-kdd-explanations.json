@@ -1,0 +1,209 @@
+{
+  "model_version": "nsl-kdd-rf-official-train-model@ac1b1ad64575",
+  "artifact_sha256": "ac1b1ad645754d9bbdb25a84fe69bce2891e143e34d3ed878a336929d664dc29",
+  "import_id": 2,
+  "labelled": true,
+  "benign_label": "normal",
+  "seed": 0,
+  "sample_per_group": 300,
+  "method": "shap.TreeExplainer (exact, tree_path_dependent)",
+  "library": "shap 0.49.1",
+  "output_space": "probability",
+  "groups": {
+    "alert_attack_label": {
+      "predictions": 7450,
+      "sampled": 300,
+      "explained_classes": {
+        "neptune": 191,
+        "ipsweep": 10,
+        "satan": 40,
+        "smurf": 26,
+        "back": 20,
+        "portsweep": 6,
+        "nmap": 4,
+        "pod": 1,
+        "land": 1,
+        "perl": 1
+      },
+      "max_additivity_error": 4.707345624410664e-14,
+      "top_features": [
+        {
+          "feature": "src_bytes",
+          "mean_abs_contribution": 0.0819317092914479,
+          "mean_contribution": 0.08047039652729353
+        },
+        {
+          "feature": "count",
+          "mean_abs_contribution": 0.06966517140506315,
+          "mean_contribution": 0.06779325783927928
+        },
+        {
+          "feature": "dst_host_same_src_port_rate",
+          "mean_abs_contribution": 0.06270104953412578,
+          "mean_contribution": 0.06112709503944424
+        },
+        {
+          "feature": "diff_srv_rate",
+          "mean_abs_contribution": 0.0501864649184571,
+          "mean_contribution": 0.04852936479013827
+        },
+        {
+          "feature": "rerror_rate",
+          "mean_abs_contribution": 0.04730916899901269,
+          "mean_contribution": 0.046615342458643426
+        },
+        {
+          "feature": "same_srv_rate",
+          "mean_abs_contribution": 0.0455332806839537,
+          "mean_contribution": 0.04379496405709972
+        },
+        {
+          "feature": "dst_bytes",
+          "mean_abs_contribution": 0.04523714264928854,
+          "mean_contribution": 0.04523714264928851
+        },
+        {
+          "feature": "dst_host_diff_srv_rate",
+          "mean_abs_contribution": 0.042335669259648795,
+          "mean_contribution": 0.03449245107147406
+        },
+        {
+          "feature": "dst_host_serror_rate",
+          "mean_abs_contribution": 0.03815621735447841,
+          "mean_contribution": 0.03738095239530685
+        },
+        {
+          "feature": "dst_host_rerror_rate",
+          "mean_abs_contribution": 0.03701525834733457,
+          "mean_contribution": 0.03295656195537884
+        }
+      ]
+    },
+    "alert_benign_label": {
+      "predictions": 239,
+      "sampled": 239,
+      "explained_classes": {
+        "satan": 144,
+        "portsweep": 40,
+        "teardrop": 37,
+        "pod": 15,
+        "nmap": 2,
+        "rootkit": 1
+      },
+      "max_additivity_error": 4.3270942384765476e-14,
+      "top_features": [
+        {
+          "feature": "wrong_fragment",
+          "mean_abs_contribution": 0.12331793976510558,
+          "mean_contribution": 0.1233179397651056
+        },
+        {
+          "feature": "src_bytes",
+          "mean_abs_contribution": 0.1142542950718189,
+          "mean_contribution": 0.11390750561826977
+        },
+        {
+          "feature": "count",
+          "mean_abs_contribution": 0.05975150235861205,
+          "mean_contribution": 0.058736748950857516
+        },
+        {
+          "feature": "dst_host_count",
+          "mean_abs_contribution": 0.04442540528016123,
+          "mean_contribution": 0.04176099351095719
+        },
+        {
+          "feature": "dst_bytes",
+          "mean_abs_contribution": 0.0428092747696934,
+          "mean_contribution": 0.04263060874554994
+        },
+        {
+          "feature": "rerror_rate",
+          "mean_abs_contribution": 0.04242137484925685,
+          "mean_contribution": 0.04242137484925686
+        },
+        {
+          "feature": "logged_in",
+          "mean_abs_contribution": 0.039172326553369614,
+          "mean_contribution": 0.039172326553369635
+        },
+        {
+          "feature": "same_srv_rate",
+          "mean_abs_contribution": 0.038501705902462116,
+          "mean_contribution": 0.038121195426163976
+        },
+        {
+          "feature": "dst_host_diff_srv_rate",
+          "mean_abs_contribution": 0.034219428030358996,
+          "mean_contribution": 0.03384207739486395
+        },
+        {
+          "feature": "dst_host_same_srv_rate",
+          "mean_abs_contribution": 0.029566766698751717,
+          "mean_contribution": 0.02717045244015691
+        }
+      ]
+    },
+    "missed_attack_label": {
+      "predictions": 5383,
+      "sampled": 300,
+      "explained_classes": {
+        "normal": 300
+      },
+      "max_additivity_error": 4.629630012686903e-14,
+      "top_features": [
+        {
+          "feature": "src_bytes",
+          "mean_abs_contribution": 0.08086095556516237,
+          "mean_contribution": 0.07759131224938695
+        },
+        {
+          "feature": "dst_host_srv_count",
+          "mean_abs_contribution": 0.07461352379488095,
+          "mean_contribution": 0.07338467085420017
+        },
+        {
+          "feature": "dst_bytes",
+          "mean_abs_contribution": 0.06585146280558808,
+          "mean_contribution": 0.06434771927954737
+        },
+        {
+          "feature": "dst_host_same_src_port_rate",
+          "mean_abs_contribution": 0.06344752784393025,
+          "mean_contribution": 0.06189535214382643
+        },
+        {
+          "feature": "dst_host_same_srv_rate",
+          "mean_abs_contribution": 0.044718759550885515,
+          "mean_contribution": 0.04467621656086087
+        },
+        {
+          "feature": "dst_host_diff_srv_rate",
+          "mean_abs_contribution": 0.0407600818680813,
+          "mean_contribution": 0.04076008186808129
+        },
+        {
+          "feature": "dst_host_count",
+          "mean_abs_contribution": 0.039494333712336634,
+          "mean_contribution": 0.03943023985949768
+        },
+        {
+          "feature": "wrong_fragment",
+          "mean_abs_contribution": 0.03830158675547163,
+          "mean_contribution": 0.03830158675547164
+        },
+        {
+          "feature": "hot",
+          "mean_abs_contribution": 0.030355248685008867,
+          "mean_contribution": 0.030083349130061502
+        },
+        {
+          "feature": "duration",
+          "mean_abs_contribution": 0.024822687490836645,
+          "mean_contribution": 0.024822687490836652
+        }
+      ]
+    }
+  },
+  "basis": "dataset-provided labels from the imported file; not analyst-confirmed outcomes"
+}

@@ -102,6 +102,13 @@ class Predictor:
             return f"score({self.positive_class}) >= {self.threshold}"
         return "model.predict()"
 
+    def model_frame(self, df: pd.DataFrame) -> pd.DataFrame:
+        """The preprocessed rows exactly as the model receives them (columns in the model's order).
+
+        Rows that preprocessing rejects are left out; explanations use this so they see the same input.
+        """
+        return self.preprocessor.transform(df).X[self._model_feature_order]
+
     def _model_input(self, X: pd.DataFrame) -> Any:
         X = X[self._model_feature_order]
         if getattr(self.model, "feature_names_in_", None) is not None:

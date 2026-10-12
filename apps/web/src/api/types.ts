@@ -168,3 +168,12 @@ export interface DriftEvent {
   status: "new" | "acknowledged" | "investigating" | "closed"; created_at: string; updated_at: string;
 }
 export interface DriftEventDetail { event: DriftEvent; notes: { id: number; author: string | null; kind: string; body: string; created_at: string }[]; interpretation: string }
+
+export interface Contribution { feature: string; raw_value: number | null; model_input: number; contribution: number }
+export interface Explanation {
+  available: boolean; reason: string | null; prediction_id: number | null; method: string | null; library: string | null;
+  output_space: "probability" | "log_odds" | "class_logit" | null; target_class: string | null;
+  base_value: number | null; model_output: number | null; additivity_error: number | null;
+  artifact_sha256: string | null; preprocessing_version: string | null;
+  contributions: Contribution[]; limitations: string[]; computed_at: string | null;
+}

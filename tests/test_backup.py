@@ -8,6 +8,8 @@ from dataclasses import replace
 from pathlib import Path
 
 import pytest
+from alembic.config import Config
+from alembic.script import ScriptDirectory
 from api_support import ADMIN_PW, ANALYST_PW, REPO, demo_runs, env, scored_import  # noqa: F401
 from sqlalchemy import func, select
 
@@ -41,7 +43,7 @@ def test_backup_verify_and_restore_round_trip(env, populated, tmp_path):
     out = backup.create(settings, tmp_path / "backups", configs_dir=REPO / "configs")
     manifest = json.loads((out / "manifest.json").read_text())
     paths = {f["path"] for f in manifest["files"]}
-    assert manifest["schema_revision"] == "0004" and manifest["database"] in ("sqlite", "postgresql")
+    assert manifest["schema_revision"] == ScriptDirectory.from_config(Config(str(REPO / "alembic.ini"))).get_current_head() and manifest["database"] in ("sqlite", "postgresql")
     assert any(p.startswith("storage/") for p in paths) and any(p.endswith(".joblib") for p in paths)
     assert "configs/evaluation-protocol.json" in paths
     assert "password" not in (out / "manifest.json").read_text().lower()

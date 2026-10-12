@@ -184,6 +184,25 @@ def _cmd_retention(a: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_explain_summary(a: argparse.Namespace) -> int:
+    import json as _json
+
+    from .db import make_engine, make_session_factory, session_scope
+    from .services import explanations
+    from .services.scoring import ModelCache
+
+    with session_scope(make_session_factory(make_engine(_settings().database_url))) as db:
+        res = explanations.summarize(db, ModelCache(), a.import_id, a.model_id,
+                                     sample_per_group=a.sample, seed=a.seed)
+    text = _json.dumps(res, indent=2, default=str)
+    if a.out:
+        Path(a.out).write_text(text + "\n", encoding="utf-8")
+        print(f"Wrote {a.out}")
+    else:
+        print(text)
+    return 0
+
+
 def _cmd_data_backup(a: argparse.Namespace) -> int:
     import json as _json
 
@@ -300,6 +319,14 @@ def main(argv: list[str] | None = None) -> int:
     s.add_argument("--apply", action="store_true", help="delete; without it this is a dry run")
     s.add_argument("--policy", help="policy file (default ADAPTIVE_IDS_RETENTION_POLICY or configs/retention.json)")
     s.set_defaults(fn=_cmd_retention)
+
+    s = sub.add_parser("explain-summary", help="mean SHAP contribution per feature over a seeded sample of scored events")
+    s.add_argument("--import-id", type=int, required=True, help="a scored import")
+    s.add_argument("--model-id", type=int, required=True, help="the model version that scored it")
+    s.add_argument("--sample", type=int, default=200, help="events per group (default 200)")
+    s.add_argument("--seed", type=int, default=0)
+    s.add_argument("--out", help="write JSON here instead of printing it")
+    s.set_defaults(fn=_cmd_explain_summary)
 
     s = sub.add_parser("data-backup", help="back up the database, uploads, runs/models and configs with a hash manifest")
     s.add_argument("path", help="destination folder (or, with --verify, a backup folder to check)")

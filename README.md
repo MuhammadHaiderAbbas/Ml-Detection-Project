@@ -65,7 +65,9 @@ project. This repository is being built in small, tested milestones.
 - **Data:** `adaptive-ids retention` (dry run or `--apply`; evidence is kept), and `adaptive-ids data-backup` / `data-restore` with SHA-256 manifests and post-restore model checks.
 - **CI:** blocking `pip-audit` and `bandit`, `npm audit`, PostgreSQL tests, and a fresh-setup job that follows this README.
 
-Not built yet: SHAP explanations. See [`docs/architecture.md`](docs/architecture.md).
+**Model explanations**
+
+- Every alert shows exact SHAP feature contributions (TreeExplainer) for the model and preprocessing that made it. They are only shown after the prediction is reproduced and the contributions add up to the model output. See [`docs/model-explanations.md`](docs/model-explanations.md), including a real NSL-KDD false positive traced to one feature.
 
 ## Quick start (Windows PowerShell)
 
@@ -119,7 +121,8 @@ Web dashboard, captured from the running app on 2026-10-11 with the SYNTHETIC de
 | [Candidate evaluation (NSL-KDD)](docs/screenshots/ui-09-candidate-evaluation.png) | [Approve with override](docs/screenshots/ui-10-approve-override.png) |
 | [Model governance and restorability](docs/screenshots/ui-11-model-governance.png) | [Candidate evaluation (dark)](docs/screenshots/ui-12-candidate-evaluation-dark.png) |
 | [Read-only viewer](docs/screenshots/ui-13-viewer-read-only.png) | [Account security and user admin](docs/screenshots/ui-14-account-security.png) |
-| [Sign-in throttling](docs/screenshots/ui-15-login-throttled.png) | |
+| [Sign-in throttling](docs/screenshots/ui-15-login-throttled.png) | [Alert explanation (SHAP)](docs/screenshots/ui-16-alert-explanation.png) |
+| [Alert explanation (dark)](docs/screenshots/ui-17-alert-explanation-dark.png) | [NSL-KDD false positive explained](docs/screenshots/ui-18-nsl-kdd-false-positive-explanation.png) |
 
 Engine output captured on 2026-10-10 (images 2–4 use SYNTHETIC demo data; the scores show the pipeline works, not detection performance):
 

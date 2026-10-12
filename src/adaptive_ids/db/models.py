@@ -279,6 +279,31 @@ class Prediction(Base):
     __table_args__ = (UniqueConstraint("event_id", "model_version_id"),)
 
 
+class PredictionExplanation(Base):
+    """A SHAP explanation of one stored prediction, computed from the exact artifact that made it.
+
+    Kept so an analyst's later review sees the same attribution they based a decision on. It records
+    the artifact hash and library version, and the additivity error that was checked when it was made.
+    """
+
+    __tablename__ = "prediction_explanations"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    prediction_id: Mapped[int] = mapped_column(ForeignKey("predictions.id", ondelete="CASCADE"), unique=True)
+    model_version_id: Mapped[int] = mapped_column(ForeignKey("model_versions.id"), index=True)
+    artifact_sha256: Mapped[str] = mapped_column(String(64))
+    preprocessing_version: Mapped[str] = mapped_column(String(100))
+    method: Mapped[str] = mapped_column(String(100))
+    library: Mapped[str] = mapped_column(String(60))
+    output_space: Mapped[str] = mapped_column(String(20))
+    target_class: Mapped[str] = mapped_column(String(200))
+    base_value: Mapped[float] = mapped_column(Float)
+    model_output: Mapped[float] = mapped_column(Float)
+    additivity_error: Mapped[float] = mapped_column(Float)
+    contributions: Mapped[list[Any]]
+    limitations: Mapped[list[Any]]
+    computed_at: Mapped[datetime] = mapped_column(default=utcnow)
+
+
 # --------------------------------------------------------------------------- alerts / incidents
 
 

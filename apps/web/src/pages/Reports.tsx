@@ -28,8 +28,12 @@ export function ReportsPage() {
           <p className="secondary">Verdicts, per-feature statistics, thresholds, events and limitations, plus per-window results as CSV. Export from any <Link to="/drift">drift analysis</Link>.</p>
         </section>
         <section className="card">
-          <h2>Planned</h2>
-          <p className="secondary">Model comparison reports (Phase 6) and PDF output are not available yet.</p>
+          <h2>Candidate evaluation reports (Markdown)</h2>
+          <p className="secondary">Candidate versus baseline on the same labelled events: gates, confidence intervals, verdict and approval basis. Export from any evaluation under <Link to="/models">Model Management</Link>.</p>
+        </section>
+        <section className="card">
+          <h2>Model explanations (JSON)</h2>
+          <p className="secondary">Per-alert SHAP contributions are on each alert page. For a whole scoring run, <code>adaptive-ids explain-summary</code> writes the features that drive alerts, false positives and misses. PDF output is not available.</p>
         </section>
       </div>
     </>

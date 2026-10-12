@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 
 from ...db.models import User
 from ...services import alerts as svc
+from ...services import explanations
 from ...textsafety import csv_cell
 from ..deps import allow, client_ip, get_db
 from ..schemas import (
@@ -20,6 +21,7 @@ from ..schemas import (
     AlertOut,
     AssignBody,
     EventOut,
+    ExplanationOut,
     ModelOut,
     NoteBody,
     Page,
@@ -90,6 +92,13 @@ def alert_detail(alert_id: int, _: User = Depends(allow("alerts.read")), db: Ses
                                  changed_at=h.changed_at, note=h.note) for h, by in d["history"]],
         related_alerts=[AlertOut.model_validate(r) for r in d["related_alerts"]],
     )
+
+
+@router.get("/alerts/{alert_id}/explanation", response_model=ExplanationOut)
+def alert_explanation(alert_id: int, request: Request, _: User = Depends(allow("alerts.read")),
+                      db: Session = Depends(get_db)):
+    """SHAP attribution for the alert's prediction, computed from the exact model and preprocessing that made it."""
+    return explanations.for_alert(db, alert_id, request.app.state.model_cache)
 
 
 @router.post("/alerts/{alert_id}/status", response_model=AlertOut)
