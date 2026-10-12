@@ -1,9 +1,34 @@
 # Architecture
 
 Adaptive IDS is a **modular monolith**: one Python package with clear module
-boundaries, and later a FastAPI layer and a React frontend on top. Every
-displayed number must trace back to an import record, a model version, a
-preprocessing version and an experiment or database record.
+boundaries, a FastAPI layer over it, and a React frontend served by the same
+process. Every displayed number must trace back to an import record, a model
+version, a preprocessing version and an experiment or database record.
+
+## Runtime view (1.0)
+
+```
+ Browser (React + TypeScript, served by the API)
+        │  HTTPS via your reverse proxy, or http://127.0.0.1
+        ▼
+ FastAPI ── security headers, size limits, per-route permission (admin / analyst / viewer)
+        │
+        ├─ services: imports · scoring · alerts · incidents · drift · governance · registry
+        │            explanations · dashboard · auth · audit · retention · backup
+        │
+        ├─ engine:   schema · ingestion · preprocessing · detection (trusted artifacts) · evaluation
+        │            drift · governance (paired comparison) · explainability (exact SHAP)
+        │
+        ├─ PostgreSQL 16 (or SQLite): users, events, predictions, alerts, incidents, drift,
+        │            model versions and evaluations, explanations, audit log (Alembic migrations 0001–0005)
+        └─ local files: uploaded CSVs (retention policy), experiment runs and model artifacts (SHA-256 allowlist)
+```
+
+No component makes outbound network calls. Background work (imports, scoring, evaluations, drift analyses)
+runs in the API process. A scoring run either completes or fails as a whole, so it never leaves partial
+predictions.
+
+## Data and model flow
 
 ```
 CSV / replay / (later) Zeek, NetFlow
@@ -45,7 +70,7 @@ experiments.run_experiment ──► result.json + report.md (provenance-labelle
 | `adaptive_ids.db` + `migrations/` | SQLAlchemy models, Alembic migrations (PostgreSQL target) | §4 | Implemented (Phase 3) |
 | `adaptive_ids.services` | Imports, scoring, alerts, incidents, dashboard, auth, audit | §6, §7, §12, §13, §17 | Implemented (Phase 3) |
 | `adaptive_ids.api` (FastAPI) | HTTP API, roles, safe errors | §4, §17, §18 | Implemented (Phase 3) |
-| `apps/web` (React, TypeScript, Vite, Recharts) | Dashboard and the 12 sidebar pages | §5, §6, §11, §19 | Implemented (Phases 4–5) |
+| `apps/web` (React, TypeScript, Vite, Recharts) | Dashboard and the 12 sidebar pages, including the alert explanation view | §5, §6, §11, §19 | Implemented (Phases 4–7, 1.0) |
 
 ## Provenance
 
@@ -56,9 +81,23 @@ experiment config refuses combinations that would blur these categories, for
 example a new run claiming `original_dissertation`, or a retrained model labelled
 as a baseline reproduction.
 
-## Security decisions so far
+## Security decisions
 
 - Model pickles are loaded only after a SHA-256 allowlist check. Preprocessor state is JSON.
 - Imported CSVs are read as text and validated before numeric conversion, with size and row limits.
-- Data, captures and model binaries are git-ignored by default.
+- Data, captures and model binaries are git-ignored by default, and a CI test checks the tracked files.
 - No network calls, no external AI services, no API keys.
+- Every API route declares one permission. The threat model, the full controls matrix and the operations
+  runbook are in [`phase-7-security.md`](phase-7-security.md).
+
+## Key decisions
+
+| Decision | Why |
+|---|---|
+| Modular monolith, single process | Easy to install and audit for a local-first tool; the module boundaries allow splitting later if a pilot needs it |
+| Provenance label on every dataset and result | Synthetic, reproduced and experimental numbers must never be confused |
+| Predictions and analyst decisions in separate tables | A model output can never be mistaken for a confirmed attack |
+| Four separate drift signals; no automatic retraining | They have different causes and need different responses; promotion stays a human decision |
+| Non-inferiority gates on paired data | "Better on average" can hide a regression that matters operationally, such as false positives |
+| Exact SHAP only, verified before display | An approximate or mismatched explanation is worse than none in an investigation |
+| Batch import, not live capture (1.0) | It covers authorised offline analysis and pilots; live ingestion waits for evidence that it is needed |

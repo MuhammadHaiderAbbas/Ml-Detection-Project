@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you refer to this software, please cite it as below. Use is subject to the LICENSE (all rights reserved)."
+title: "Adaptive IDS: ML-based network anomaly detection with concept drift monitoring and model governance"
+type: software
+authors:
+  - family-names: "Abbas"
+    given-names: "Muhammad Haider"
+version: "1.0.0"
+date-released: "2026-10-12"
+repository-code: "https://github.com/MuhammadHaiderAbbas/Ml-Detection-Project"
+license-url: "https://github.com/MuhammadHaiderAbbas/Ml-Detection-Project/blob/main/LICENSE"
+keywords:
+  - intrusion detection
+  - machine learning
+  - concept drift
+  - model governance
+  - explainability

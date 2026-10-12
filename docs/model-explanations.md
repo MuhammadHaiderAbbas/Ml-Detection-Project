@@ -90,8 +90,9 @@ traffic, and a modeller knows what to fix (training data with benign fragmentati
 | 4 | `diff_srv_rate` 0.050 | `dst_host_count` 0.044 | `dst_host_same_src_port_rate` 0.063 |
 | 5 | `rerror_rate` 0.047 | `dst_bytes` 0.043 | `dst_host_same_srv_rate` 0.045 |
 
-Computing one explanation for this 200-tree, 23-class forest takes about 0.1 s; the 839-event summary
-took 98 s on one CPU core.
+The first view of an alert's explanation took a median of 0.40 s for this 200-tree, 23-class forest
+(20 alerts; [`results/benchmark-nsl-kdd.json`](results/benchmark-nsl-kdd.json)). Later views read the stored
+explanation, in about 15 ms. In batch, the 839-event summary took 98 s on one CPU core.
 
 ## Use it
 

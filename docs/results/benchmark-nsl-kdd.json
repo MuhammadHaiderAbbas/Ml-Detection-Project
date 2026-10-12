@@ -1,0 +1,75 @@
+{
+  "measured_at": "2026-10-12T01:57:38+00:00",
+  "app_version": "1.0.0",
+  "machine": {
+    "os": "Linux-6.18.44-fc-v114-x86_64-with-glibc2.39",
+    "python": "3.10.20",
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "logical_cpus": 4,
+    "usable_cpus": 4,
+    "memory_gb": 15.7
+  },
+  "database": "sqlite",
+  "dataset": "KDDTest+.csv",
+  "provenance": "controlled_experiment",
+  "model_run": "nsl-kdd-rf-official-train-20261011T201130Z",
+  "steps": {
+    "import": {
+      "seconds": 3.162,
+      "events": 22544,
+      "events_per_second": 7130,
+      "file_mb": 3.8
+    },
+    "evaluate_candidate": {
+      "seconds": 2.466,
+      "events": 22544,
+      "verdict": "pass"
+    },
+    "approve_with_restore_check": {
+      "seconds": 0.333
+    },
+    "activate": {
+      "seconds": 0.352
+    },
+    "score": {
+      "seconds": 7.527,
+      "events": 22544,
+      "events_per_second": 2995,
+      "alerts_created": 7689
+    },
+    "alert_explanation_first_view": {
+      "count": 20,
+      "median_ms": 396.9,
+      "max_ms": 594.0
+    },
+    "alert_explanation_stored": {
+      "ms": 15.5
+    },
+    "import_reference": {
+      "seconds": 21.932,
+      "events": 125973,
+      "events_per_second": 5744
+    },
+    "drift_analysis": {
+      "seconds": 22.758,
+      "events": 148517,
+      "events_per_second": 6526
+    },
+    "dashboard_summary": {
+      "seconds": 0.048
+    },
+    "backup": {
+      "seconds": 2.852
+    }
+  },
+  "peak_process_memory_mb": 1351.2,
+  "storage": {
+    "database_mb": 172.8,
+    "uploads_mb": 24.9,
+    "backup_mb": 337.3
+  },
+  "notes": [
+    "One process; the API's background work runs inside the request in the test client, so each step's time is the full server-side work for that step.",
+    "Peak memory is the whole benchmark process (application, test client and data generation)."
+  ]
+}

@@ -26,6 +26,8 @@ SECRET_PATTERNS = {
     "credentials in a URL": re.compile(r"postgres(?:ql)?(?:\+\w+)?://[^:\s/]+:(?!change-me|ci_only_password|adaptive_ids_dev|\$|\{)[^@\s]{6,}@"),
 }
 MAX_BYTES = 2_000_000
+# The recorded demonstration is the one deliberate exception: a screen recording of SYNTHETIC data.
+MEDIA_LIMITS = {"docs/demo/adaptive-ids-demo.mp4": 8_000_000}
 
 
 def _tracked() -> list[str]:
@@ -42,7 +44,8 @@ def test_no_datasets_models_or_local_state_are_tracked():
 
 
 def test_no_large_files_are_tracked():
-    big = [(p, (REPO / p).stat().st_size) for p in _tracked() if (REPO / p).is_file() and (REPO / p).stat().st_size > MAX_BYTES]
+    big = [(p, (REPO / p).stat().st_size) for p in _tracked()
+           if (REPO / p).is_file() and (REPO / p).stat().st_size > MEDIA_LIMITS.get(p, MAX_BYTES)]
     assert big == [], f"files over {MAX_BYTES} bytes (datasets or captures?): {big}"
 
 

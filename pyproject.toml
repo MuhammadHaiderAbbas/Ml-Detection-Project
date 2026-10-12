@@ -4,9 +4,12 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "adaptive-ids"
-version = "0.1.0"
-description = "Adaptive IDS — ML-based network anomaly detection with concept drift (research engine)"
+version = "1.0.0"
+description = "Adaptive IDS — ML-based network anomaly detection with concept drift"
 readme = "README.md"
+license = {file = "LICENSE"}
+authors = [{name = "Muhammad Haider Abbas"}]
+classifiers = ["License :: Other/Proprietary License", "Private :: Do Not Upload"]
 requires-python = ">=3.10"
 # Ranges here; exact tested pins live in requirements.lock.txt. Align these with the
 # original MSc environment once its requirements are inventoried (see docs/milestone-1-status.md).
