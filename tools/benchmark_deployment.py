@@ -69,32 +69,6 @@ def _machine() -> dict:
             "logical_cpus": os.cpu_count(), "usable_cpus": usable, "memory_gb": mem_gb}
 
 
-def _peak_rss_mb() -> float | None:
-    """Peak resident memory of this process, in MB."""
-    if sys.platform == "win32":
-        import ctypes
-        from ctypes import wintypes
-
-        class Counters(ctypes.Structure):
-            _fields_ = [("cb", wintypes.DWORD), ("PageFaultCount", wintypes.DWORD),
-                        ("PeakWorkingSetSize", ctypes.c_size_t), ("WorkingSetSize", ctypes.c_size_t),
-                        ("QuotaPeakPagedPoolUsage", ctypes.c_size_t), ("QuotaPagedPoolUsage", ctypes.c_size_t),
-                        ("QuotaPeakNonPagedPoolUsage", ctypes.c_size_t), ("QuotaNonPagedPoolUsage", ctypes.c_size_t),
-                        ("PagefileUsage", ctypes.c_size_t), ("PeakPagefileUsage", ctypes.c_size_t)]
-
-        c = Counters()
-        c.cb = ctypes.sizeof(c)
-        get_info = ctypes.windll.psapi.GetProcessMemoryInfo
-        get_info.argtypes = [wintypes.HANDLE, ctypes.POINTER(Counters), wintypes.DWORD]
-        if not get_info(ctypes.windll.kernel32.GetCurrentProcess(), ctypes.byref(c), c.cb):
-            return None
-        return round(c.PeakWorkingSetSize / 1024 / 1024, 1)
-    import resource  # Unix only
-
-    peak = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
-    return round(peak / 1024 / (1024 if sys.platform == "darwin" else 1), 1)
-
-
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--synthetic", type=int, help="replay this many SYNTHETIC events")
@@ -118,6 +92,7 @@ def main() -> int:
     from adaptive_ids import __version__
     from adaptive_ids.api import create_app
     from adaptive_ids.cli import main as cli
+    from adaptive_ids.experiments.environment import peak_memory_mb
     from adaptive_ids.db import make_engine, make_session_factory, session_scope
     from adaptive_ids.services import auth
     from adaptive_ids.settings import Settings
@@ -255,7 +230,7 @@ def main() -> int:
             "app_version": __version__, "machine": _machine(),
             "database": "postgresql" if url.startswith("postgresql") else "sqlite",
             "dataset": label, "provenance": provenance, "model_run": run_name, "steps": steps,
-            "peak_process_memory_mb": _peak_rss_mb(),
+            "peak_process_memory_mb": peak_memory_mb(),
             "storage": {
                 "database_mb": db_mb,
                 "uploads_mb": round(sum(p.stat().st_size for p in (work / "storage").rglob("*") if p.is_file()) / 1e6, 1),

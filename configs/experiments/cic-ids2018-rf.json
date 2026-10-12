@@ -1,0 +1,25 @@
+{
+  "experiment_id": "cic-ids2018-rf-day1",
+  "objective": "Train a Random Forest on a seeded sample of the first CSE-CIC-IDS2018 capture day (14-02-2018: benign, FTP and SSH brute force) so the model can be run through the platform on later, real day files. Controlled experiment on a public dataset; later days contain attack types this model has never seen.",
+  "provenance": "controlled_experiment",
+  "dataset": {
+    "path": "data/processed/cic-ids2018/Wednesday-14-02-2018-sample.csv",
+    "name": "cse-cic-ids2018-day1-sample",
+    "version": "Wednesday-14-02-2018 (raw sha256 acff8bc61376ee031d80878ee6099e0b1a87a1bd711d8068298421418c9f8147), sampled by adaptive-ids cic-ids2018-sample --benign-cap 60000 --attack-cap 20000 --seed 0",
+    "column_mapping": {},
+    "duplicate_policy": "keep"
+  },
+  "schema_path": "configs/schemas/cse-cic-ids2018.json",
+  "split": {"method": "stratified_random", "test_fraction": 0.2, "val_fraction": 0.0, "seed": 0},
+  "preprocessing": {"imputation": "none", "scaling": "none", "version": "1.0.0"},
+  "model": {
+    "mode": "train",
+    "estimator": "RandomForestClassifier",
+    "params": {"n_estimators": 100, "n_jobs": -1, "random_state": 0}
+  },
+  "decision": {},
+  "evaluation": {"benign_label": "Benign", "benchmark": {"batch_size": 1000, "repeats": 3}},
+  "reported_results": {},
+  "output_dir": "experiments/runs",
+  "save_predictions": false
+}
