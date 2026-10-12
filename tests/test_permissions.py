@@ -16,25 +16,31 @@ AUTH_ONLY = {("POST", "/api/auth/logout"), ("GET", "/api/auth/me"), ("POST", "/a
 WRITE_SUFFIXES = (".write", ".import", ".run", ".export", ".manage")
 
 
+def _walk(d, acc):
+    if getattr(d.call, "permission", None):
+        acc.append(d.call.permission)
+    if d.call is deps.current_user:
+        acc.append("<auth>")
+    for sub in d.dependencies:
+        _walk(sub, acc)
+
+
 def _routes():
-    app = create_app(Settings(database_url="sqlite://"))
+    """Every API route with its declared permissions, read from our routers (stable across FastAPI versions)."""
+    from adaptive_ids.api.routes import alerts, auth, drift, governance, imports, incidents, models, scoring, system
+
     out = []
-
-    def walk(d, acc):
-        if getattr(d.call, "permission", None):
-            acc.append(d.call.permission)
-        if d.call is deps.current_user:
-            acc.append("<auth>")
-        for s in d.dependencies:
-            walk(s, acc)
-
-    for r in app.routes:
-        if not hasattr(r, "dependant"):
-            continue
-        acc: list[str] = []
-        walk(r.dependant, acc)
-        for m in r.methods - {"HEAD"}:
-            out.append((m, r.path, [a for a in acc if a != "<auth>"], "<auth>" in acc))
+    for mod in (system, auth, imports, models, governance, scoring, alerts, incidents, drift):
+        for r in mod.router.routes:
+            acc: list[str] = []
+            _walk(r.dependant, acc)
+            for m in r.methods - {"HEAD"}:
+                out.append((m, "/api" + r.path, [a for a in acc if a != "<auth>"], "<auth>" in acc))
+    # cross-check against the app itself, so a router missing from the list above fails loudly
+    spec = create_app(Settings(database_url="sqlite://")).openapi()["paths"]
+    served = {(m.upper(), path) for path, ops in spec.items() for m in ops}
+    assert served == {(m, p) for m, p, _, _ in out}, "route walk and the served API differ"
+    assert len(out) > 50
     return out
 
 

@@ -156,9 +156,9 @@ def update_user(db: Session, user_id: int, *, actor: User, is_active: bool | Non
         except ValueError as exc:
             raise InvalidRequest(str(exc)) from exc
         user.password_hash = hash_password(password)
-        changes["password"] = "reset"
+        changes["password_reset"] = True
         audit.record(db, "user.password_reset", actor=actor, entity_type="user", entity_id=user.id, client_ip=client_ip)
-    if changes.get("is_active") is False or "role" in changes or "password" in changes:
+    if changes.get("is_active") is False or "role" in changes or "password_reset" in changes:
         _revoke_sessions(db, user.id)
     return user
 

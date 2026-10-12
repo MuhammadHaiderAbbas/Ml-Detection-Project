@@ -22,7 +22,7 @@ import json
 import os
 import shutil
 import sqlite3
-import subprocess
+import subprocess  # pg_dump/pg_restore by absolute path, argument list, no shell  # nosec B404
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -99,11 +99,13 @@ def create(settings: Settings, dest: str | Path, *, configs_dir: str | Path = "c
             src.close()
             dst.close()
         else:
-            if not shutil.which("pg_dump"):
+            exe = shutil.which("pg_dump")
+            if not exe:
                 raise BackupError("pg_dump not found on PATH; install the PostgreSQL client tools")
             env, args = _pg_env_args(settings.database_url)
-            r = subprocess.run(["pg_dump", "--format=custom", "--no-owner", "--file", str(out / "database.dump"), *args],
-                               env=env, capture_output=True, text=True, check=False)
+            cmd = [exe, "--format=custom", "--no-owner", "--file", str(out / "database.dump"), *args]
+            # absolute path, argument list, no shell; the password travels in the environment
+            r = subprocess.run(cmd, env=env, capture_output=True, text=True, check=False)  # nosec B603
             if r.returncode != 0:
                 raise BackupError(f"pg_dump failed: {r.stderr.strip()[:500]}")
         _copy_tree(Path(settings.storage_dir), out / "storage")
@@ -172,11 +174,13 @@ def restore(settings: Settings, backup_dir: str | Path, *, force: bool = False) 
     else:
         if not force:
             raise BackupError("restoring PostgreSQL replaces the current database contents; pass --force")
-        if not shutil.which("pg_restore"):
+        exe = shutil.which("pg_restore")
+        if not exe:
             raise BackupError("pg_restore not found on PATH; install the PostgreSQL client tools")
         env, args = _pg_env_args(settings.database_url)
-        r = subprocess.run(["pg_restore", "--clean", "--if-exists", "--no-owner", "--single-transaction", *args,
-                            str(root / "database.dump")], env=env, capture_output=True, text=True, check=False)
+        cmd = [exe, "--clean", "--if-exists", "--no-owner", "--single-transaction", *args, str(root / "database.dump")]
+        # absolute path, argument list, no shell; the password travels in the environment
+        r = subprocess.run(cmd, env=env, capture_output=True, text=True, check=False)  # nosec B603
         if r.returncode != 0:
             raise BackupError(f"pg_restore failed: {r.stderr.strip()[:500]}")
     _restore_dir(root / "storage", Path(settings.storage_dir), force)

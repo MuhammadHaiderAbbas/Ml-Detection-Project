@@ -132,10 +132,10 @@ def load_verified_artifact(
 
             model = joblib.load(path)
         else:
-            import pickle
+            import pickle  # only reached after the SHA-256 check above  # nosec B403
 
             with open(path, "rb") as fh:
-                model = pickle.load(fh)  # noqa: S301 - hash-verified trusted artifact
+                model = pickle.load(fh)  # noqa: S301 - hash-verified trusted artifact  # nosec B301
     if not hasattr(model, "predict"):
         raise ArtifactTrustError(
             f"artifact {label!r} loaded an object of type {type(model).__name__} with no predict()"

@@ -5,7 +5,7 @@ from __future__ import annotations
 import os
 import platform
 import shutil
-import subprocess
+import subprocess  # fixed commands (git, nvidia-smi) resolved with shutil.which, no shell  # nosec B404
 import sys
 from importlib import metadata
 from pathlib import Path
@@ -57,7 +57,7 @@ def _gpu() -> dict[str, Any]:
     if not exe:
         return {"available": False, "detail": "nvidia-smi not found"}
     try:
-        res = subprocess.run(
+        res = subprocess.run(  # absolute path, fixed arguments  # nosec B603
             [exe, "--query-gpu=name,memory.total,driver_version", "--format=csv,noheader"],
             capture_output=True, text=True, timeout=10, check=False,
         )
@@ -72,14 +72,13 @@ def _git_commit(repo_dir: Path) -> str | None:
     if not exe:
         return None
     try:
-        res = subprocess.run(
+        res = subprocess.run(  # absolute path, fixed arguments  # nosec B603
             [exe, "-C", str(repo_dir), "rev-parse", "HEAD"], capture_output=True, text=True, timeout=10, check=False
         )
         commit = res.stdout.strip() or None
         if commit:
-            dirty = subprocess.run(
-                [exe, "-C", str(repo_dir), "status", "--porcelain"], capture_output=True, text=True, timeout=10, check=False
-            ).stdout.strip()
+            status_cmd = [exe, "-C", str(repo_dir), "status", "--porcelain"]  # absolute path, fixed arguments
+            dirty = subprocess.run(status_cmd, capture_output=True, text=True, timeout=10, check=False).stdout.strip()  # nosec B603
             return commit + ("+dirty" if dirty else "")
     except (OSError, subprocess.SubprocessError):
         return None
