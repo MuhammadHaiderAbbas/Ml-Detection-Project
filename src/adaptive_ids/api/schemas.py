@@ -63,8 +63,17 @@ class UserCreate(BaseModel):
     role: Literal["admin", "analyst", "viewer"]
 
 
-class UserActive(BaseModel):
-    is_active: bool
+class UserUpdate(BaseModel):
+    """Admin changes to an account; any field left out is unchanged."""
+
+    is_active: bool | None = None
+    role: Literal["admin", "analyst", "viewer"] | None = None
+    password: str | None = Field(None, min_length=12, max_length=256, description="Set a new password (reset).")
+
+
+class PasswordChange(BaseModel):
+    current_password: str = Field(min_length=1, max_length=256)
+    new_password: str = Field(min_length=12, max_length=256)
 
 
 # --- imports ------------------------------------------------------------------

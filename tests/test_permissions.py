@@ -128,7 +128,7 @@ def test_only_the_importer_or_an_admin_can_cancel(env, tmp_path):
 
 def test_admin_can_create_a_viewer(env):
     admin = env.login("admin", ADMIN_PW)
-    r = env.client.post("/api/users", json={"username": "auditor", "password": "auditor-password-1", "role": "viewer"}, headers=admin)
+    r = env.client.post("/api/users", json={"username": "auditor", "password": "maple-river-signal-9", "role": "viewer"}, headers=admin)
     assert r.status_code == 201 and r.json()["role"] == "viewer"
-    assert env.client.post("/api/users", json={"username": "x-root", "password": "auditor-password-1", "role": "root"},
+    assert env.client.post("/api/users", json={"username": "x-root", "password": "maple-river-signal-9", "role": "root"},
                            headers=admin).status_code == 422

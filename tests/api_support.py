@@ -24,9 +24,9 @@ from adaptive_ids.services import auth
 from adaptive_ids.settings import Settings
 
 REPO = Path(__file__).resolve().parents[1]
-ADMIN_PW = "admin-password-123"
-ANALYST_PW = "analyst-password-123"
-VIEWER_PW = "viewer-password-123"
+ADMIN_PW = "tr0ub4dor-staple-01"
+ANALYST_PW = "blue-harbour-lantern-7"
+VIEWER_PW = "quiet-meadow-orbit-42"
 
 
 def alembic(url: str, action: str) -> None:

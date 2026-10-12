@@ -91,6 +91,7 @@ class SessionToken(Base):
     created_at: Mapped[datetime] = mapped_column(default=utcnow)
     expires_at: Mapped[datetime]
     revoked_at: Mapped[datetime | None]
+    last_seen_at: Mapped[datetime | None]  # idle timeout; updated at most once a minute
     client_ip: Mapped[str | None] = mapped_column(String(64))
     user: Mapped[User] = relationship()
 
@@ -361,6 +362,7 @@ class AuditLog(Base):
 
 
 Index("ix_alerts_status_severity", Alert.status, Alert.severity)
+Index("ix_audit_logs_action_at", AuditLog.action, AuditLog.at)  # login throttling and retention scans
 
 
 # --------------------------------------------------------------------------- drift

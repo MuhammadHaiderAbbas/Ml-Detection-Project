@@ -56,7 +56,7 @@ jobs:
           alembic check
           alembic downgrade base
       - name: API tests (PostgreSQL)
-        run: python -m pytest tests/test_api.py tests/test_drift_api.py tests/test_governance.py
+        run: python -m pytest tests/test_api.py tests/test_drift_api.py tests/test_governance.py tests/test_permissions.py tests/test_accounts.py
 
   web:
     runs-on: ubuntu-latest

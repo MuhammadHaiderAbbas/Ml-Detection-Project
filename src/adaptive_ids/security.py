@@ -15,6 +15,26 @@ def _b64(b: bytes) -> str:
     return base64.b64encode(b).decode("ascii")
 
 
+MAX_PASSWORD_LENGTH = 256
+# A short list of passwords that pass the length rule but are still trivially guessable.
+_COMMON = {"password1234", "123456789012", "qwertyuiopas", "adminadmin12", "letmein12345", "changeme1234",
+           "password123!", "welcome12345", "iloveyou1234", "abcdefghijkl"}
+
+
+def check_password_policy(password: str, username: str | None = None) -> None:
+    """Raise ValueError with a user-facing reason if ``password`` is not acceptable."""
+    if len(password) < MIN_PASSWORD_LENGTH:
+        raise ValueError(f"password must be at least {MIN_PASSWORD_LENGTH} characters")
+    if len(password) > MAX_PASSWORD_LENGTH:
+        raise ValueError(f"password must be at most {MAX_PASSWORD_LENGTH} characters")
+    if len(set(password)) < 4:
+        raise ValueError("password is too repetitive")
+    if password.lower() in _COMMON:
+        raise ValueError("password is too common")
+    if username and username.lower() in password.lower():
+        raise ValueError("password must not contain the username")
+
+
 def hash_password(password: str) -> str:
     if len(password) < MIN_PASSWORD_LENGTH:
         raise ValueError(f"password must be at least {MIN_PASSWORD_LENGTH} characters")

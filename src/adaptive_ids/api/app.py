@@ -13,7 +13,7 @@ from fastapi.responses import JSONResponse
 
 from .. import __version__
 from ..db import make_engine, make_session_factory
-from ..services.errors import ServiceError
+from ..services.errors import ServiceError, TooManyRequests
 from ..services.imports import CancelRegistry
 from ..services.scoring import ModelCache
 from ..services.severity import SeverityRules
@@ -47,6 +47,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @app.exception_handler(ServiceError)
     async def service_error(_: Request, exc: ServiceError):
         headers = {"WWW-Authenticate": "Bearer"} if exc.status_code == 401 else None
+        if isinstance(exc, TooManyRequests):
+            headers = {"Retry-After": str(exc.retry_after_s)}
         return JSONResponse({"detail": exc.message}, status_code=exc.status_code, headers=headers)
 
     @app.exception_handler(RequestValidationError)

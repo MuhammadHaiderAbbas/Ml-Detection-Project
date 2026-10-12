@@ -27,3 +27,11 @@ class NotFound(ServiceError):
 
 class Conflict(ServiceError):
     status_code = 409
+
+
+class TooManyRequests(ServiceError):
+    status_code = 429
+
+    def __init__(self, message: str, retry_after_s: int):
+        super().__init__(message)
+        self.retry_after_s = retry_after_s

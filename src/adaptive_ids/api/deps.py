@@ -37,7 +37,7 @@ def current_user(request: Request, db: Session = Depends(get_db)) -> User:
     token = bearer_token(request)
     if token is None:
         raise NotAuthenticated("authentication required")
-    return auth_svc.authenticate(db, token)
+    return auth_svc.authenticate(db, token, idle_minutes=request.app.state.settings.session_idle_minutes)
 
 
 def allow(permission: str) -> Callable[..., User]:
