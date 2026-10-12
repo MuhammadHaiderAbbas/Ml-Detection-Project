@@ -22,9 +22,7 @@ These are not problems, but they become public with the repository:
 1. **Commit author emails.** One commit is authored with the owner's personal email address; the others use
    a no-reply address. If you prefer, set GitHub's *Keep my email address private* option for future
    commits. Changing past commits would mean rewriting history.
-2. **Dissertation grade.** `docs/milestone-1-status.md` mentions the "86 %" that appears in the planning
-   transcripts, interpreted as the dissertation grade. Keep it or remove it.
-3. **Licence.** All rights reserved (`LICENSE`). Viewing on GitHub and evaluation runs are permitted;
+2. **Licence.** All rights reserved (`LICENSE`). Viewing on GitHub and evaluation runs are permitted;
    everything else needs permission. A public repository under this licence is *source-available*, not open
    source.
 

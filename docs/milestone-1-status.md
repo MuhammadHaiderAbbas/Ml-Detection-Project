@@ -27,7 +27,7 @@ The unsupervised, deep-learning and drift results in the notebook are recorded a
 | Item | What it contains | Usable for reproduction? |
 |---|---|---|
 | Repository at start | `README.md` only (one line) | No |
-| `final_project.docx` (uploaded 2026-10-10) | Transcripts of earlier planning chats ("Chat 01"–"Chat 04"), not the dissertation. Includes: candidate datasets (CIC-IDS2018, UNSW-NB15, CIC-IDS2017); a recalled 10-stage notebook workflow (audit, cleaning/leakage, feature engineering, splitting, class weighting, SMOTE, evaluation, SHAP, drift, reporting); the original environment (Python 3.10.11, PyCharm, GTX 1050); the original folder path; a mention of "86%" (apparently the dissertation grade). | No. It says itself that the datasets, training runs, saved models and metrics were **unverified**. |
+| `final_project.docx` (uploaded 2026-10-10) | Transcripts of earlier planning chats ("Chat 01"–"Chat 04"), not the dissertation. Includes: candidate datasets (CIC-IDS2018, UNSW-NB15, CIC-IDS2017); a recalled 10-stage notebook workflow (audit, cleaning/leakage, feature engineering, splitting, class weighting, SMOTE, evaluation, SHAP, drift, reporting); the original environment (Python 3.10.11, PyCharm, GTX 1050); the original folder path. | No. It says itself that the datasets, training runs, saved models and metrics were **unverified**. |
 
 Facts I'm treating as **unverified context** (not evidence) until the original files are inspected:
 
@@ -36,8 +36,6 @@ Facts I'm treating as **unverified context** (not evidence) until the original f
 - whether SMOTE was applied, and whether it was applied only to training data;
 - which model was final, and how it was saved (`joblib.dump` was reported);
 - every metric value.
-
-The "86%" mentioned in the transcripts appears to be the dissertation **grade**. It is not treated as a model accuracy.
 
 ## 2. Deliverables checklist (spec §22)
 
