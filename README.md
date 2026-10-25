@@ -9,7 +9,7 @@ each score. It watches for four kinds of drift separately, and lets a new model 
 after a paired evaluation and an explicit, audited approval. It runs entirely on one machine: no cloud
 services, no external AI APIs and no telemetry.
 
-[![Demo walkthrough (1 min 40 s, synthetic data)](docs/screenshots/ui-16-alert-explanation.png)](docs/demo/adaptive-ids-demo.mp4)
+[![Demo walkthrough (2 min, synthetic data)](docs/screenshots/ui-16-alert-explanation.png)](docs/demo/adaptive-ids-demo.mp4)
 
 *Above: an alert's SHAP explanation. Click for the [recorded walkthrough](docs/demo/adaptive-ids-demo.mp4)
 ([narration script](docs/demo-script.md)).*
