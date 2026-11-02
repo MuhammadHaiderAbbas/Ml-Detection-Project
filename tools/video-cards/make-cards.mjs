@@ -25,11 +25,17 @@ const cards = {
   intro: `${logo}<h1>Machine-learning intrusion detection you can explain, monitor and change safely</h1>
     <p>Runs on your own hardware. No data leaves your network.</p>
     <div class="small">Walkthrough of the working product · demo data is clearly labelled SYNTHETIC</div>`,
-  results: `<h1>Tested on public datasets</h1><ul>
-    <li><i></i><div><b>The approval gate blocked an update</b> that would have added 7.7 points of false positives<span class="src">CSE-CIC-IDS2018</span></div></li>
-    <li><i></i><div><b>Explanations traced 22 % of false positives</b> to a single learned feature<span class="src">NSL-KDD</span></div></li>
-    <li><i></i><div><b>Honest about limits:</b> no model caught new attack types on the day they first appeared<span class="src">CSE-CIC-IDS2018</span></div></li></ul>`,
-  end: `${logo}<h1>Looking for SOC teams and MSSPs for a free, read-only evaluation</h1>
+  chapter: `<h1>Now on real public data</h1><p>NSL-KDD benchmark: models trained only on the training file, tested on unseen records</p>`,
+  results: `<h1>Tested over time on CSE\u2011CIC\u2011IDS2018</h1><ul>
+    <li><i></i><div><b>The approval gate blocked an update</b> that would have added 7.7 points of false positives</div></li>
+    <li><i></i><div><b>When an attack type returned,</b> the governed model's recall rose from 0.2\u00a0% to 56\u00a0% with no rise in false positives</div></li>
+    <li><i></i><div><b>Honest about limits:</b> no model caught new attack types on the day they first appeared</div></li></ul>`,
+  offer: `<h1>Free 6-week evaluation for SOC teams and MSSPs</h1><ul>
+    <li><i></i><div><b>Runs on your hardware</b> — no data leaves your network</div></li>
+    <li><i></i><div><b>Read-only,</b> alongside your existing tools</div></li>
+    <li><i></i><div><b>Success criteria agreed up front</b></div></li>
+    <li><i></i><div><b>A results report you approve</b> before anyone else sees it</div></li></ul>`,
+  end: `${logo}<h1>Let’s talk about an evaluation on your network</h1>
     <p>Muhammad Haider Abbas · Founder</p><div class="cta">Message me on LinkedIn</div>`,
 };
 const b = await chromium.launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {});
