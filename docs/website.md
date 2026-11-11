@@ -15,7 +15,7 @@ requests.
 | Settings (Supabase URL and publishable key, LinkedIn, contact email) | `site/assets/js/config.js` |
 | Images | `site/assets/img/` (screenshots from the running app, WebP) |
 | Video | copied from `docs/demo/adaptive-ids-demo.mp4` at build time |
-| Build | `tools/site/build.sh OUT_DIR SITE_URL [BASE_PATH]` |
+| Build | `python tools/site/build.py OUT_DIR SITE_URL [BASE_PATH]` |
 | Database table | `tools/site/supabase-evaluation-requests.sql` (already applied) |
 | Tests | `tests/test_site.py` |
 
@@ -82,7 +82,7 @@ Buy the domain, then:
 - **Preview locally:**
 
   ```bash
-  tools/site/build.sh _site http://127.0.0.1:8900
+  python tools/site/build.py _site http://127.0.0.1:8900
   python3 -m http.server 8900 --directory _site
   ```
 

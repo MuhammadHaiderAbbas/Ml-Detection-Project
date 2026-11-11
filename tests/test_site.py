@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import re
-import shutil
 import subprocess  # nosec B404 - runs this repository's own build script
+import sys
 from html.parser import HTMLParser
 from pathlib import Path
 
@@ -114,10 +114,9 @@ def test_config_holds_only_public_values():
     assert host in _parse("index.html").csp, "the CSP must allow the form's database host"
 
 
-@pytest.mark.skipif(not shutil.which("bash"), reason="needs bash")
 def test_build_fills_every_placeholder(tmp_path):
     out = tmp_path / "_site"
-    subprocess.run(["bash", str(REPO / "tools/site/build.sh"), str(out), "https://example.org", "/sub"],  # nosec B603 B607
+    subprocess.run([sys.executable, str(REPO / "tools/site/build.py"), str(out), "https://example.org", "/sub"],  # nosec B603
                    check=True, capture_output=True)
     html = (out / "index.html").read_text(encoding="utf-8")
     assert 'href="https://example.org/"' in html and "%%" not in html
