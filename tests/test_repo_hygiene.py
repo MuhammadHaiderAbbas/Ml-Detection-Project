@@ -27,7 +27,7 @@ SECRET_PATTERNS = {
 }
 MAX_BYTES = 2_000_000
 # The recorded demonstration is the one deliberate exception: a screen recording of SYNTHETIC data.
-MEDIA_LIMITS = {"docs/demo/adaptive-ids-demo.mp4": 8_000_000}
+MEDIA_LIMITS = {"docs/demo/adaptive-ids-demo.mp4": 12_000_000}
 
 
 def _tracked() -> list[str]:

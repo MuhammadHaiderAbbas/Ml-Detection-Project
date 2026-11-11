@@ -43,20 +43,57 @@ Raw output: [`benchmark-synthetic-sqlite.json`](results/benchmark-synthetic-sqli
 
 What this means for a pilot:
 
-- **Hardware.** A 4-core machine with 8 GB RAM is comfortably enough for the workloads measured. Peak
-  memory was 0.6–1.4 GB for the whole benchmark process. 16 GB leaves room for PostgreSQL and the
-  operating system. No GPU is needed.
+- **Hardware.** Memory depends on the size of the largest file imported in one go.
+  - **Files of 20,000–150,000 events:** peak memory was 0.6–1.4 GB.
+  - **A real 1-million-row CSE-CIC-IDS2018 day file:** peak memory was **9.3 GB** (below).
+  - **Recommendation:** 16 GB RAM and 4 cores, with files split into parts of about 250,000 rows on smaller
+    machines. No GPU is needed.
 - **Volume.** Batch scoring ran at 2,400–3,800 events per second on one machine, so a day of flow records
   for a small site (for example 1–5 million flows) scores in roughly 5–35 minutes. This is **batch scoring
   of imported files**, the only mode built. Live streaming capture is not implemented, and a pilot must not
   assume it.
-- **Storage.** About 0.8–1.2 KB per stored event, including its prediction and any alert, so about
-  1 GB per million events. Keep upload files under the retention policy, which by default deletes them
+- **Storage.** Storage per stored event, including its prediction and any alert, depends on the feature
+  count:
+  - 12–38 features: about 0.8–1.2 KB;
+  - the 78 CSE-CIC-IDS2018 features: about 2.5 KB.
+
+  So plan for 1–3 GB per million events. Keep upload files under the retention policy, which by default deletes them
   after 30 days. Backups were 26 MB (PostgreSQL, compressed) to 111 MB (SQLite) for 120k events.
 - **Database.** SQLite was faster on one machine, while PostgreSQL gives concurrent users, online backups
   with `pg_dump`, and access control. Use PostgreSQL for any pilot with more than one analyst.
 - **Explanations.** The cost depends on model size. For a large forest, expect up to about half a second
   when an alert is first opened, and near-instant afterwards.
+
+### A real, full day file (CSE-CIC-IDS2018, 15 Feb 2018)
+
+The unmodified 376 MB file (1,048,575 rows) went through the same workflow with a model trained on the
+previous day ([`benchmark-cic-ids2018-real-day.json`](results/benchmark-cic-ids2018-real-day.json)):
+
+| Step | Measured |
+|---|---|
+| Import (validate, reject defective rows, store) | 293 s, 3,552 events/s, 1,040,548 events accepted |
+| Batch scoring | 325 s, 3,206 events/s, 21 alerts |
+| Candidate evaluation (on a 90,990-event sample of the day) | 12.6 s |
+| Alert explanation, first view / stored | 136 ms median / 11 ms |
+| Drift analysis on the whole day | **Refused:** "window has 1040548 events; the limit per analysis is 1000000" |
+| Evaluation on the whole day | **Refused:** "the limit per evaluation is 1000000" |
+| Backup | 13.7 s, 3.5 GB |
+| Peak process memory | 9.3 GB |
+| Database size | 3.0 GB |
+
+What this shows:
+
+- **Large files are slower.** Throughput was lower than with small files, and import was the slowest step.
+- **Limits are enforced.** The million-event limits on evaluations and drift analyses refuse with a clear
+  message rather than running out of memory. To analyse a whole large day, use a time window
+  (`since`/`until`) or split the file.
+- **The row limit needs raising.** Importing a file over a million rows needs `ADAPTIVE_IDS_MAX_IMPORT_ROWS`
+  raised.
+- **Few alerts is correct here, not a fault.** Only 21 alerts on a day with about 52,000 attack flows matches
+  the chronological study: the previous day's model has never seen this day's attacks.
+- **The first approval has no performance floor.** The candidate evaluation passed, because with no earlier
+  model to compare against only the validity gates apply. A deployment should set `min_attack_recall` (and
+  `max_false_positive_rate`) in `configs/evaluation-protocol.json`.
 
 What it doesn't measure: concurrent users, network capture, multi-day continuous operation, or hardware
 other than the reference machine. The pilot plan adds these (see "Deployment checks" there).

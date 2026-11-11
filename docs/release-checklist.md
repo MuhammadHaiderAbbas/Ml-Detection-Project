@@ -39,6 +39,7 @@ These are not problems, but they become public with the repository:
       `concept-drift`, `explainable-ai`, `fastapi`, `react`), and a website link if you have one.
 - [ ] Create release **v1.0.0** from `main`: tag `v1.0.0`, with the `CHANGELOG.md` 1.0.0 section as notes and
       `docs/demo/adaptive-ids-demo.mp4` attached.
+- [ ] Publish the website and connect the domain: follow [`website.md`](website.md).
 - [ ] Pin the repository on your GitHub profile.
 - [ ] Optional: record a narrated version of the demo using `docs/demo-script.md`, and link it from the
       README.

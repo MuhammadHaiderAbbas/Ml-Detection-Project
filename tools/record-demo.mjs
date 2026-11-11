@@ -1,4 +1,5 @@
-// Records a captioned walkthrough of the SYNTHETIC demo as a video (WebM, 1280x720).
+// Records a captioned walkthrough of the SYNTHETIC demo as a video (WebM).
+// DEMO_FORMAT=landscape (default, 1920x1080) or vertical (1080x1920, for Shorts, Reels and TikTok).
 //
 // Prerequisites:
 //   adaptive-ids db-upgrade && adaptive-ids create-user admin --role admin
@@ -21,23 +22,37 @@ const PASSWORD = process.env.DEMO_PASSWORD;
 if (!PASSWORD) throw new Error("set DEMO_PASSWORD to the demo admin's password");
 mkdirSync(OUT, { recursive: true });
 
-const size = { width: 1280, height: 720 };
+const VERTICAL = process.env.DEMO_FORMAT === "vertical";
+// Playwright records frames at the viewport's CSS-pixel size (a larger video size only adds padding).
+// Landscape: a 1920x1080 viewport with the page zoomed 1.5x, so the app lays out as at 1280x720 but renders
+// sharply at full HD. Vertical: a 540x960 phone-width viewport (the app's mobile layout); upscale the
+// recording to 1080x1920 afterwards.
+const viewport = VERTICAL ? { width: 540, height: 960 } : { width: 1920, height: 1080 };
+const zoom = VERTICAL ? 1 : 1.5;
+const PACE = VERTICAL ? 0.8 : 1; // vertical cuts are shorter
 const browser = await chromium.launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {});
 // bypassCSP only lets the recorder draw its caption overlay; the app itself is unchanged.
-const ctx = await browser.newContext({ viewport: size, recordVideo: { dir: OUT, size }, bypassCSP: true, colorScheme: "light" });
+const ctx = await browser.newContext({ viewport, recordVideo: { dir: OUT, size: viewport }, bypassCSP: true,
+  colorScheme: "light" });
+if (zoom !== 1) {
+  await ctx.addInitScript((z) => {
+    document.addEventListener("DOMContentLoaded", () => { document.documentElement.style.zoom = String(z); });
+  }, zoom);
+}
 const page = await ctx.newPage();
 const pause = (ms) => page.waitForTimeout(ms);
 
 async function caption(title, body = "", ms = 4500) {
-  await page.evaluate(([t, b]) => {
+  await page.evaluate(([t, b, vertical]) => {
     let el = document.getElementById("__demo_caption");
     if (!el) {
       el = document.createElement("div");
       el.id = "__demo_caption";
       Object.assign(el.style, {
-        position: "fixed", left: "50%", bottom: "28px", transform: "translateX(-50%)", zIndex: "99999",
-        maxWidth: "880px", padding: "14px 20px", borderRadius: "10px", background: "rgba(11,11,11,0.86)",
-        color: "#fff", font: "15px/1.45 system-ui, sans-serif", boxShadow: "0 6px 24px rgba(0,0,0,0.25)",
+        position: "fixed", left: "50%", bottom: vertical ? "56px" : "28px", transform: "translateX(-50%)", zIndex: "99999",
+        width: vertical ? "88%" : "auto", maxWidth: "880px", padding: vertical ? "16px 18px" : "14px 20px",
+        borderRadius: "12px", background: "rgba(11,11,11,0.88)", color: "#fff",
+        font: `${vertical ? 17 : 15}px/1.45 system-ui, sans-serif`, boxShadow: "0 6px 24px rgba(0,0,0,0.25)",
         pointerEvents: "none",
       });
       document.body.appendChild(el);
@@ -45,11 +60,11 @@ async function caption(title, body = "", ms = 4500) {
     el.replaceChildren();
     const h = document.createElement("div");
     h.textContent = t;
-    Object.assign(h.style, { fontWeight: "600", fontSize: "17px", marginBottom: b ? "4px" : "0" });
+    Object.assign(h.style, { fontWeight: "600", fontSize: vertical ? "20px" : "17px", marginBottom: b ? "4px" : "0" });
     el.appendChild(h);
     if (b) { const p = document.createElement("div"); p.textContent = b; el.appendChild(p); }
-  }, [title, body]);
-  await pause(ms);
+  }, [title, body, VERTICAL]);
+  await pause(ms * PACE);
 }
 
 async function go(path) {
@@ -135,7 +150,7 @@ await ctx.close();
 await browser.close();
 const video = readdirSync(OUT).filter((f) => f.endsWith(".webm")).map((f) => join(OUT, f))[0];
 if (video) {
-  const target = join(OUT, "adaptive-ids-demo.webm");
+  const target = join(OUT, `adaptive-ids-demo-${VERTICAL ? "vertical" : "landscape"}.webm`);
   renameSync(video, target);
   console.log(`Wrote ${target}`);
 }

@@ -69,32 +69,6 @@ def _machine() -> dict:
             "logical_cpus": os.cpu_count(), "usable_cpus": usable, "memory_gb": mem_gb}
 
 
-def _peak_rss_mb() -> float | None:
-    """Peak resident memory of this process, in MB."""
-    if sys.platform == "win32":
-        import ctypes
-        from ctypes import wintypes
-
-        class Counters(ctypes.Structure):
-            _fields_ = [("cb", wintypes.DWORD), ("PageFaultCount", wintypes.DWORD),
-                        ("PeakWorkingSetSize", ctypes.c_size_t), ("WorkingSetSize", ctypes.c_size_t),
-                        ("QuotaPeakPagedPoolUsage", ctypes.c_size_t), ("QuotaPagedPoolUsage", ctypes.c_size_t),
-                        ("QuotaPeakNonPagedPoolUsage", ctypes.c_size_t), ("QuotaNonPagedPoolUsage", ctypes.c_size_t),
-                        ("PagefileUsage", ctypes.c_size_t), ("PeakPagefileUsage", ctypes.c_size_t)]
-
-        c = Counters()
-        c.cb = ctypes.sizeof(c)
-        get_info = ctypes.windll.psapi.GetProcessMemoryInfo
-        get_info.argtypes = [wintypes.HANDLE, ctypes.POINTER(Counters), wintypes.DWORD]
-        if not get_info(ctypes.windll.kernel32.GetCurrentProcess(), ctypes.byref(c), c.cb):
-            return None
-        return round(c.PeakWorkingSetSize / 1024 / 1024, 1)
-    import resource  # Unix only
-
-    peak = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
-    return round(peak / 1024 / (1024 if sys.platform == "darwin" else 1), 1)
-
-
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--synthetic", type=int, help="replay this many SYNTHETIC events")
@@ -104,6 +78,7 @@ def main() -> int:
     ap.add_argument("--provenance", default="controlled_experiment")
     ap.add_argument("--database-url")
     ap.add_argument("--explanations", type=int, default=20, help="alert explanations to time")
+    ap.add_argument("--max-import-rows", type=int, help="raise the import row limit (default: the application's)")
     ap.add_argument("--out")
     a = ap.parse_args()
     # Paths given on the command line are relative to where the tool was started; the application's
@@ -118,6 +93,7 @@ def main() -> int:
     from adaptive_ids import __version__
     from adaptive_ids.api import create_app
     from adaptive_ids.cli import main as cli
+    from adaptive_ids.experiments.environment import peak_memory_mb
     from adaptive_ids.db import make_engine, make_session_factory, session_scope
     from adaptive_ids.services import auth
     from adaptive_ids.settings import Settings
@@ -153,7 +129,8 @@ def main() -> int:
         os.environ["ADAPTIVE_IDS_DATABASE_URL"] = url
         cli(["db-upgrade"])
         settings = Settings(database_url=url, storage_dir=work / "storage", runs_dir=runs_dir,
-                            schemas_dir=REPO / "configs/schemas", max_upload_mb=2000)
+                            schemas_dir=REPO / "configs/schemas", max_upload_mb=2000,
+                            **({"max_import_rows": a.max_import_rows} if a.max_import_rows else {}))
         with session_scope(make_session_factory(make_engine(url))) as db:
             auth.create_user(db, "bench", PASSWORD, "admin")
 
@@ -232,11 +209,12 @@ def main() -> int:
                         "window": {"mode": "events", "size": max(500, n // 20)}}
                 r = c.post("/api/drift/analyses", json=body, headers=h)
                 _check(r.status_code == 202, r.text)
-                d = c.get(f"/api/drift/analyses/{r.json()['id']}", headers=h).json()
-                _check(d["status"] == "completed", d)
-                return d
+                return c.get(f"/api/drift/analyses/{r.json()['id']}", headers=h).json()
 
-            timed("drift_analysis", drift, n + n_ref)
+            d = timed("drift_analysis", drift, n + n_ref)
+            if d["status"] != "completed":
+                # A refusal (for example a window over the application's limit) is a measured result, not a crash.
+                steps["drift_analysis"] = {"refused": d.get("error") or d["status"]}
             timed("dashboard_summary", lambda: c.get("/api/dashboard/summary", headers=h).raise_for_status())
 
         os.environ["ADAPTIVE_IDS_STORAGE_DIR"] = str(work / "storage")
@@ -255,7 +233,7 @@ def main() -> int:
             "app_version": __version__, "machine": _machine(),
             "database": "postgresql" if url.startswith("postgresql") else "sqlite",
             "dataset": label, "provenance": provenance, "model_run": run_name, "steps": steps,
-            "peak_process_memory_mb": _peak_rss_mb(),
+            "peak_process_memory_mb": peak_memory_mb(),
             "storage": {
                 "database_mb": db_mb,
                 "uploads_mb": round(sum(p.stat().st_size for p in (work / "storage").rglob("*") if p.is_file()) / 1e6, 1),

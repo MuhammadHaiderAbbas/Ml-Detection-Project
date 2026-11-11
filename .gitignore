@@ -37,3 +37,6 @@ Thumbs.db
 
 # Local runtime data (database, uploads)
 var/
+
+# Built website (tools/site/build.sh)
+_site/

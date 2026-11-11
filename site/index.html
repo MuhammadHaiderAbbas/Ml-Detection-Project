@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; media-src 'self'; font-src 'self'; connect-src https://iemfjnspqlobfjvucdsi.supabase.co; base-uri 'self'; form-action 'none'; manifest-src 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Adaptive IDS: explainable, governed machine-learning intrusion detection</title>
+<meta name="description" content="On-premises machine-learning intrusion detection for small security teams and MSSPs: every alert explained, drift monitored, and no model update without evidence and sign-off.">
+<link rel="canonical" href="%%SITE_URL%%/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Adaptive IDS: ML intrusion detection you can explain, monitor and change safely">
+<meta property="og:description" content="Every alert explained. Drift monitored. No model update without evidence. Runs on your own hardware.">
+<meta property="og:url" content="%%SITE_URL%%/">
+<meta property="og:image" content="%%SITE_URL%%/assets/img/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/css/site.css">
+<script src="assets/js/config.js" defer></script>
+<script src="assets/js/site.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="./" aria-label="Adaptive IDS home">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#1c5cab"/><path d="M16 6l8 3.4v5.7c0 5.6-3.9 9.6-8 11.3-4.1-1.7-8-5.7-8-11.3V9.4z" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"/><path d="M12.4 15.8l2.5 2.5 4.8-4.9" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Adaptive IDS
+    </a>
+    <button class="menu-btn" type="button" aria-expanded="false" aria-controls="site-nav">Menu</button>
+    <nav class="nav" id="site-nav" aria-label="Main">
+      <a href="#product">Product</a>
+      <a href="#how">How it works</a>
+      <a href="#evidence">Evidence</a>
+      <a href="#faq">FAQ</a>
+      <a class="btn" href="#evaluation">Request an evaluation</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <p class="eyebrow">Network intrusion detection for small security teams and MSSPs</p>
+      <h1>Machine-learning detection you can explain, monitor and change safely.</h1>
+      <p class="lead">Adaptive IDS scores your network-flow records with a machine-learning model and makes every step accountable: each alert shows why it fired, traffic changes are flagged as drift, and no new model goes live without evidence and a named approver.</p>
+      <div class="actions">
+        <a class="btn" href="#evaluation">Request a free evaluation</a>
+        <a class="btn secondary" href="#demo">Watch the 2-minute demo</a>
+      </div>
+      <ul class="trust">
+        <li>Runs on your own hardware</li>
+        <li>No data leaves your network</li>
+        <li>Read-only, alongside your existing tools</li>
+      </ul>
+    </div>
+    <figure>
+      <div class="shot"><img src="assets/img/explanation.webp" width="1600" height="1000" alt="An alert in Adaptive IDS with its explanation: bars show which network-flow features raised or lowered the model's score." fetchpriority="high"></div>
+      <figcaption>Every alert explains itself: which features pushed the model's score up (orange) or down (blue). Demo data is synthetic and labelled as such.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section id="demo">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Demo</p>
+      <h2>See it working in two minutes</h2>
+      <p class="lead">A captioned walkthrough of the real application: alerts, explanations, drift monitoring and a model update that the approval gate blocks.</p>
+    </div>
+    <div class="video-frame">
+      <video controls preload="metadata" playsinline poster="assets/img/video-poster.webp">
+        <source src="assets/video/adaptive-ids-demo.mp4" type="video/mp4">
+        Your browser can't play this video. <a href="assets/video/adaptive-ids-demo.mp4">Download it</a> instead.
+      </video>
+    </div>
+    <p class="note">The walkthrough uses the built-in, clearly labelled SYNTHETIC demo data, so its scores are near-perfect by design. Results on public research datasets are under <a href="#evidence">Evidence</a>.</p>
+  </div>
+</section>
+
+<section id="problem">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">The problem</p>
+      <h2>ML detection is easy to switch on and hard to trust</h2>
+      <p class="lead">Security teams are offered machine-learning detection they can't see inside, can't tell is still working, and can't change safely, so it ends up ignored or trusted blindly.</p>
+    </div>
+    <div class="grid-3">
+      <div class="card">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6M12 17h.01"/></svg></div>
+        <h3>Opaque alerts</h3>
+        <p>A score or "anomaly" with no reason. Analysts rebuild the reason by hand, or stop trusting the tool.</p>
+      </div>
+      <div class="card">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg></div>
+        <h3>Silent decay</h3>
+        <p>Networks change. Detection quality drifts with them, and nobody notices until something is missed or the queue floods.</p>
+      </div>
+      <div class="card">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 3v4M12 17v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M3 12h4M17 12h4"/></svg></div>
+        <h3>Ungoverned updates</h3>
+        <p>A retrained model goes live because it "looks better", with no paired comparison, no named approver and no tested way back.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="product">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Product</p>
+      <h2>Accountable at every step</h2>
+      <p class="lead">A self-hosted web application with a browser dashboard. Import network-flow exports, score them, investigate alerts, watch for drift and govern model changes, all with an audit trail.</p>
+    </div>
+
+    <div class="feature">
+      <div>
+        <h3>Explanations that are checked, not estimated</h3>
+        <p class="muted">Exact SHAP contributions for every alert, from the same model that produced it.</p>
+        <ul>
+          <li>The event is re-scored before the explanation is shown, and must reproduce the stored prediction.</li>
+          <li>The contributions must add up to the model's score, or nothing is shown.</li>
+          <li>Analyst decisions are stored apart from model output: a prediction is never called a confirmed attack.</li>
+        </ul>
+      </div>
+      <figure><div class="shot"><img src="assets/img/alerts.webp" width="1600" height="1000" loading="lazy" alt="The alert queue in Adaptive IDS with status, severity, predicted class and score."></div></figure>
+    </div>
+
+    <div class="feature flip">
+      <div>
+        <h3>Drift, four ways, kept separate</h3>
+        <p class="muted">Feature, prediction, performance and suspected concept drift each have different causes and responses.</p>
+        <ul>
+          <li>Per-feature statistics against a reference window, with documented thresholds.</li>
+          <li>Each drift signal becomes an event to acknowledge, investigate and close with a note.</li>
+          <li>Drift never retrains or promotes a model by itself.</li>
+        </ul>
+      </div>
+      <figure><div class="shot"><img src="assets/img/drift-analysis.webp" width="1600" height="1000" loading="lazy" alt="A drift analysis comparing a reference week with a current week, showing feature drift detected and other signals not detected."></div></figure>
+    </div>
+
+    <div class="feature">
+      <div>
+        <h3>Model updates need evidence and a signature</h3>
+        <p class="muted">A candidate is compared with the active model on the same labelled events.</p>
+        <ul>
+          <li>It must not be worse on recall, F1 or false-positive rate by more than a set margin, judged on paired confidence intervals.</li>
+          <li>A failed candidate can only go live with a written, audited override.</li>
+          <li>Activation and rollback first prove the model still loads and reproduces its recorded outputs.</li>
+        </ul>
+      </div>
+      <figure><div class="shot"><img src="assets/img/evaluation.webp" width="1600" height="1000" loading="lazy" alt="A candidate evaluation with a failed verdict because the false-positive rate rose beyond the allowed margin."></div></figure>
+    </div>
+
+    <div class="feature flip">
+      <div>
+        <h3>Built to run on your premises</h3>
+        <p class="muted">Local-first by design, with the controls a security buyer expects.</p>
+        <ul>
+          <li>Runs on one machine inside your network; makes no outbound connections.</li>
+          <li>Admin, analyst and read-only viewer roles; throttled sign-in; idle sessions.</li>
+          <li>Audit log of every sign-in, import, decision, approval and export; verified backup and restore.</li>
+        </ul>
+      </div>
+      <figure><div class="shot"><img src="assets/img/dashboard.webp" width="1600" height="1000" loading="lazy" alt="The Adaptive IDS dashboard with event counts, alert tiles and a traffic chart, marked as demonstration data."></div></figure>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">How it works</p>
+      <h2>Analysts decide; models change only through governance</h2>
+    </div>
+    <svg class="flow" viewBox="0 0 1100 330" role="img" aria-labelledby="flow-title flow-desc">
+      <title id="flow-title">How Adaptive IDS works</title>
+      <desc id="flow-desc">Flow records are imported and validated, scored by a hash-verified model and turned into alerts. Analysts investigate alerts with an explanation. A drift monitor watches the imported traffic. New candidate models go through governance before they can replace the active model.</desc>
+      <defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="f-arrow"/></marker></defs>
+      <g class="f-lines">
+        <path d="M200 70H260" marker-end="url(#arr)"/><path d="M460 70H520" marker-end="url(#arr)"/><path d="M720 70H780" marker-end="url(#arr)"/>
+        <path d="M360 100V160" marker-end="url(#arr)"/><path d="M620 160V100" marker-end="url(#arr)"/><path d="M880 100V160" marker-end="url(#arr)"/>
+        <path d="M620 250V220" marker-end="url(#arr)"/>
+      </g>
+      <g><rect class="f-box" x="20" y="40" width="180" height="60" rx="10"/><text x="110" y="66" class="f-name">Flow records</text><text x="110" y="86" class="f-sub">CSV from your network</text></g>
+      <g><rect class="f-box" x="260" y="40" width="200" height="60" rx="10"/><text x="360" y="66" class="f-name">Validated import</text><text x="360" y="86" class="f-sub">bad rows rejected, with why</text></g>
+      <g><rect class="f-box" x="520" y="40" width="200" height="60" rx="10"/><text x="620" y="66" class="f-name">Scoring</text><text x="620" y="86" class="f-sub">hash-verified model</text></g>
+      <g><rect class="f-box" x="780" y="40" width="200" height="60" rx="10"/><text x="880" y="66" class="f-name">Alerts</text><text x="880" y="86" class="f-sub">rule-based severity</text></g>
+      <g><rect class="f-box" x="260" y="160" width="200" height="60" rx="10"/><text x="360" y="186" class="f-name">Drift monitor</text><text x="360" y="206" class="f-sub">4 signals, reviewed</text></g>
+      <g><rect class="f-box f-accent" x="520" y="160" width="200" height="60" rx="10"/><text x="620" y="186" class="f-name">Model governance</text><text x="620" y="206" class="f-sub">evaluate, approve, restore</text></g>
+      <g><rect class="f-box f-accent" x="780" y="160" width="200" height="60" rx="10"/><text x="880" y="186" class="f-name">Investigation</text><text x="880" y="206" class="f-sub">explanation, decision</text></g>
+      <g><rect class="f-box" x="520" y="250" width="200" height="60" rx="10"/><text x="620" y="276" class="f-name">Candidate model</text><text x="620" y="296" class="f-sub">trained on new labels</text></g>
+      <g><rect class="f-box" x="780" y="250" width="200" height="60" rx="10"/><text x="880" y="276" class="f-name">Incidents, reports</text><text x="880" y="296" class="f-sub">audited exports</text></g>
+      <path d="M880 220V250" class="f-line" marker-end="url(#arr)"/>
+    </svg>
+  </div>
+</section>
+
+<section id="evidence">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Evidence</p>
+      <h2>Tested on public datasets, including where it falls short</h2>
+      <p class="lead">Every figure below was measured by the product on public research data (NSL-KDD and CSE-CIC-IDS2018). It has not yet run on a customer network; that is what an evaluation adds.</p>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="num">+7.7 pts</div>false-positive rate the approval gate kept out of production by blocking a retrained model<span class="src">CSE-CIC-IDS2018, chronological test</span></div>
+      <div class="stat"><div class="num">22 %</div>of false positives traced by the explanations to a single feature the model learned from incomplete training data<span class="src">NSL-KDD official test set</span></div>
+      <div class="stat"><div class="num">0.2 → 56 %</div>attack recall when a known attack type returned and the governed model was updated, with no rise in false positives<span class="src">CSE-CIC-IDS2018, web attacks</span></div>
+    </div>
+    <div class="grid-2">
+      <figure><div class="shot"><img src="assets/img/nsl-false-positive.webp" width="1400" height="813" loading="lazy" alt="Explanation of a false positive on NSL-KDD: one feature, wrong_fragment, contributes almost all of the score."></div><figcaption>A normal NSL-KDD record flagged as "teardrop", almost entirely because of one feature. All 52 such test records were flagged.</figcaption></figure>
+      <figure><div class="shot"><img src="assets/img/nsl-evaluation.webp" width="1600" height="1734" loading="lazy" alt="Candidate evaluation on NSL-KDD with a failed verdict: better recall, but false positives beyond the margin."></div><figcaption>On NSL-KDD a candidate catches 3.3 points more attacks but raises false positives 1.7 points, beyond the 0.5-point margin: verdict fail.</figcaption></figure>
+    </div>
+    <div class="limits">
+      <h3>Honest limits</h3>
+      <ul>
+        <li>No model in our tests caught new attack types on the day they first appeared. Adaptive IDS shows you when that is happening rather than hiding it.</li>
+        <li>On attack types not seen in training, NSL-KDD recall is about 60 % at a 2–4 % false-positive rate.</li>
+        <li>It analyses exported flow files in batch; live capture is on the roadmap, driven by evaluation feedback.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="who">
+  <div class="wrap grid-2">
+    <div>
+      <p class="eyebrow">Who it's for</p>
+      <h2>Teams that must justify every alert</h2>
+    </div>
+    <ul class="who-list">
+      <li class="card"><h3>Managed security providers</h3><p>One install per client site, an explanation and audit trail behind every alert you report, and governed model changes across clients.</p></li>
+      <li class="card"><h3>Regulated small and medium organisations</h3><p>Network data stays on site, and auditors can see how automated detection decisions were made and approved.</p></li>
+      <li class="card"><h3>Universities and training providers</h3><p>A working platform for teaching explainable, governed machine learning in security.</p></li>
+    </ul>
+  </div>
+</section>
+
+<section id="evaluation">
+  <div class="wrap eval-grid">
+    <div>
+      <p class="eyebrow">Free evaluation</p>
+      <h2>Try it on your network for six weeks, at no cost</h2>
+      <p class="lead">A read-only evaluation on one network segment, on your own hardware, judged against success criteria we agree before any results exist.</p>
+      <ol class="steps">
+        <li><div><strong>Week 1, set-up.</strong> Install on your machine together, load your first flow export, agree the success criteria.</div></li>
+        <li><div><strong>Weeks 2–5, use.</strong> Your analysts triage explained alerts alongside existing tools; a 30-minute call each week.</div></li>
+        <li><div><strong>Week 6, results.</strong> A report you approve before anyone else sees it; data deleted or kept, as you choose.</div></li>
+      </ol>
+      <p class="muted small">No data leaves your organisation and no remote access is needed. A one-page authorisation, covering scope, retention and deletion, is signed before any data is used.</p>
+    </div>
+
+    <form class="card" id="eval-form" novalidate>
+      <h3>Request an evaluation or a feedback call</h3>
+      <p class="muted small">We reply within two working days. Please don't include network data or credentials.</p>
+      <div class="row-2">
+        <div class="field"><label for="f-name">Your name</label><input id="f-name" name="name" autocomplete="name" required minlength="2" maxlength="120"></div>
+        <div class="field"><label for="f-email">Work email</label><input id="f-email" name="email" type="email" autocomplete="email" required maxlength="254"></div>
+      </div>
+      <div class="row-2">
+        <div class="field"><label for="f-org">Organisation</label><input id="f-org" name="organisation" autocomplete="organization" required minlength="2" maxlength="160"></div>
+        <div class="field"><label for="f-role">Role <span class="muted">(optional)</span></label><input id="f-role" name="role" autocomplete="organization-title" maxlength="120"></div>
+      </div>
+      <div class="row-2">
+        <div class="field"><label for="f-type">Organisation type</label>
+          <select id="f-type" name="organisation_type" required>
+            <option value="">Choose…</option>
+            <option value="mssp">Managed security provider (MSSP)</option>
+            <option value="sme">Small or medium organisation</option>
+            <option value="enterprise">Large organisation</option>
+            <option value="public_sector">Public sector</option>
+            <option value="education">University or training</option>
+            <option value="other">Other</option>
+          </select></div>
+        <div class="field"><label for="f-interest">I'm interested in</label>
+          <select id="f-interest" name="interest" required>
+            <option value="evaluation">A free 6-week evaluation</option>
+            <option value="feedback_call">A 20-minute feedback call</option>
+            <option value="partnership">A partnership</option>
+            <option value="other">Something else</option>
+          </select></div>
+      </div>
+      <div class="field"><label for="f-msg">Anything we should know? <span class="muted">(optional)</span></label><textarea id="f-msg" name="message" maxlength="2000" placeholder="For example, how you export flow data today, or what you'd want to test."></textarea></div>
+      <div class="hp" aria-hidden="true"><label for="f-website">Leave this empty</label><input id="f-website" name="website" tabindex="-1" autocomplete="off"></div>
+      <label class="check"><input type="checkbox" name="consent" id="f-consent" required><span>I agree that Adaptive IDS may store these details to reply to me, as described in the <a href="privacy.html">privacy notice</a>.</span></label>
+      <button class="btn" type="submit">Send request</button>
+      <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
+    </form>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap">
+    <div class="section-head"><p class="eyebrow">FAQ</p><h2>Questions security teams ask</h2></div>
+    <div class="faq">
+      <details><summary>Does it detect zero-day attacks?</summary><p>No, and we won't claim it does. Supervised models learn the attacks they have been shown; our own tests show none caught new attack types on their first day. Adaptive IDS is built to show you when detection is degrading and to make model updates safe.</p></details>
+      <details><summary>Where does our data go?</summary><p>Nowhere. It runs on your machine, inside your network, and makes no outbound connections. During an evaluation, only aggregate results leave, in a report you approve first.</p></details>
+      <details><summary>Does it replace our IDS, SIEM or EDR?</summary><p>No. It runs read-only alongside your existing tools and never blocks or changes traffic.</p></details>
+      <details><summary>What data does it need?</summary><p>Network-flow records exported as CSV (for example CICFlowMeter output or converted NetFlow), and ideally some labelled history. No packet payloads.</p></details>
+      <details><summary>Can it analyse live traffic?</summary><p>Today it analyses exported flow files in batch; a full day of about a million flows imports and scores in roughly ten minutes on a 4-core machine. Live ingestion is on the roadmap if evaluations show it's needed.</p></details>
+      <details><summary>Is it production-ready?</summary><p>It's a tested 1.0 release (over 200 automated tests, security controls, verified backups) that has not yet run on a customer network. That's why we start with a free, read-only evaluation.</p></details>
+      <details><summary>What does it cost?</summary><p>The evaluation is free. After a successful evaluation we agree an annual on-premises licence, with founding-customer terms for the first organisations.</p></details>
+    </div>
+  </div>
+</section>
+
+<section id="about">
+  <div class="wrap founder">
+    <p class="eyebrow">About</p>
+    <h2>Built from research, tested honestly</h2>
+    <p class="lead">Adaptive IDS was founded by Muhammad Haider Abbas, building on his MSc research into machine-learning anomaly detection with concept drift. Before building the product, he re-ran his own dissertation experiments, reproduced every reported figure exactly, and published why those figures overstated real-world performance. The product is designed around that lesson.</p>
+    <p class="actions tight"><a class="btn secondary" href="#evaluation">Get in touch</a><a class="btn secondary" data-link="linkedin" href="#" hidden>LinkedIn</a><a class="btn secondary" data-link="github" href="#" hidden>Source on GitHub</a></p>
+  </div>
+</section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>© 2026 Muhammad Haider Abbas. All rights reserved.</span>
+    <nav aria-label="Footer"><a href="privacy.html">Privacy notice</a><a href="#evaluation">Contact</a><a data-link="github" href="#" hidden>GitHub</a><a data-link="linkedin" href="#" hidden>LinkedIn</a></nav>
+  </div>
+</footer>
+</body>
+</html>

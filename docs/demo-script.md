@@ -1,8 +1,12 @@
 # Demonstration
 
-**Recording:** [`demo/adaptive-ids-demo.mp4`](demo/adaptive-ids-demo.mp4) (1 min 40 s, 1280×720, no audio, with
-on-screen captions). It was recorded on 2026-10-12 from the running application with the built-in SYNTHETIC demo
-data. Every screen in it is real output; nothing was edited.
+**Recording:** [`demo/adaptive-ids-demo.mp4`](demo/adaptive-ids-demo.mp4) (1 min 56 s, 1920×1080, on-screen captions,
+a silent audio track). It starts with a title card and ends with a card of measured public-dataset results and an end
+card. The walkthrough was recorded on 2026-10-25 from the running application with the built-in SYNTHETIC demo data.
+Every screen in it is real output; nothing was edited.
+
+A vertical 1080×1920 cut (1 min 29 s, played 1.13× faster) for Shorts, Reels and TikTok is produced the same way
+with `DEMO_FORMAT=vertical`, which records the app's phone layout at 540×960 and is upscaled to 1080×1920.
 
 It is recorded by a script, so anyone can produce it again from a clean checkout:
 
@@ -15,7 +19,9 @@ ADAPTIVE_IDS_WEB_DIST=apps/web/dist adaptive-ids serve
 # in another terminal
 npm install --no-save playwright && npx playwright install chromium
 DEMO_PASSWORD=<admin password> node tools/record-demo.mjs http://127.0.0.1:8000 demo-recording
-ffmpeg -i demo-recording/adaptive-ids-demo.webm -c:v libx264 -pix_fmt yuv420p -crf 23 adaptive-ids-demo.mp4
+DEMO_FORMAT=vertical DEMO_PASSWORD=<admin password> node tools/record-demo.mjs http://127.0.0.1:8000 demo-recording
+node tools/video-cards/make-cards.mjs demo-recording          # title, results and end cards
+# then join card + walkthrough + cards with ffmpeg (concat filter), H.264, yuv420p, 30 fps
 ```
 
 The demo data is synthetic and easy to separate, so its scores are near-perfect. The video shows the workflow,
@@ -23,7 +29,7 @@ not detection performance. For real-data results, use the NSL-KDD examples in th
 
 ## Narration script (for a voiced version, about 3½ minutes)
 
-Times are approximate positions in the silent recording. Speak over it, or record a longer screen capture
+Times are approximate positions in the walkthrough part; add 4 s for the title card at the start. Speak over it, or record a longer screen capture
 following the same order.
 
 | # | Time | Screen | Say |

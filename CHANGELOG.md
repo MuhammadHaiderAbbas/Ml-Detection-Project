@@ -3,6 +3,18 @@
 All notable changes. Dates are UTC. This project follows semantic versioning from 1.0.0. Entries before
 1.0.0 are development milestones; they were not released or tagged.
 
+## Unreleased
+
+### Added
+- **CSE-CIC-IDS2018 support:**
+  - a verified schema (`cse-cic-ids2018@1.0.0`) checked against the real day files;
+  - a loader that rejects and counts the files' known defects;
+  - `adaptive-ids cic-ids2018-sample`.
+- **Chronological study:** `adaptive-ids cic-ids2018-study` compares static, retrain-always and governed models
+  on later, unseen days, with drift measurements. Results and write-up are in
+  `docs/cic-ids2018-evaluation.md`.
+- **Benchmark tool:** `--max-import-rows` option, for full day files of more than a million rows.
+
 ## 1.0.0 — 2026-10-12 — first complete release
 
 Completes the spec's definition of done: local start, import or replay of authorised data, validation,

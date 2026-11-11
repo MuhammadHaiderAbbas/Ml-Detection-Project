@@ -203,6 +203,24 @@ def _cmd_explain_summary(a: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_cic_study(a: argparse.Namespace) -> int:
+    from .research.cic_ids2018 import run_study
+
+    res = run_study(a.raw_dir, out_dir=a.out_dir, benign_cap=a.benign_cap, attack_cap=a.attack_cap,
+                    max_train_rows=a.max_train_rows, n_estimators=a.trees, seed=a.seed,
+                    drop_features=tuple(a.drop_feature or ()))
+    print(f"Wrote {res['run_dir']}/report.md and result.json ({res['runtime']['total_seconds']} s)")
+    return 0
+
+
+def _cmd_cic_sample(a: argparse.Namespace) -> int:
+    from .research.cic_ids2018 import write_sample
+
+    res = write_sample(a.src, a.dest, benign_cap=a.benign_cap, attack_cap=a.attack_cap, seed=a.seed)
+    print(f"Wrote {res['rows']:,} rows to {a.dest}: {res['labels']}")
+    return 0
+
+
 def _cmd_data_backup(a: argparse.Namespace) -> int:
     import json as _json
 
@@ -327,6 +345,24 @@ def main(argv: list[str] | None = None) -> int:
     s.add_argument("--seed", type=int, default=0)
     s.add_argument("--out", help="write JSON here instead of printing it")
     s.set_defaults(fn=_cmd_explain_summary)
+
+    s = sub.add_parser("cic-ids2018-study", help="chronological static vs adaptive study on CSE-CIC-IDS2018 day CSVs")
+    s.add_argument("raw_dir", help="folder with the processed day CSVs (e.g. Wednesday-14-02-2018.csv)")
+    s.add_argument("--out-dir", default="experiments/runs")
+    s.add_argument("--benign-cap", type=int, default=60_000, help="benign rows sampled per day")
+    s.add_argument("--attack-cap", type=int, default=20_000, help="rows sampled per attack class per day")
+    s.add_argument("--max-train-rows", type=int, default=400_000)
+    s.add_argument("--trees", type=int, default=100)
+    s.add_argument("--seed", type=int, default=0)
+    s.add_argument("--drop-feature", action="append", help="exclude a feature (repeatable), e.g. 'Dst Port'")
+    s.set_defaults(fn=_cmd_cic_study)
+
+    s = sub.add_parser("cic-ids2018-sample", help="write a seeded per-class sample of one CSE-CIC-IDS2018 day CSV")
+    s.add_argument("src"), s.add_argument("dest")
+    s.add_argument("--benign-cap", type=int, default=60_000)
+    s.add_argument("--attack-cap", type=int, default=20_000)
+    s.add_argument("--seed", type=int, default=0)
+    s.set_defaults(fn=_cmd_cic_sample)
 
     s = sub.add_parser("data-backup", help="back up the database, uploads, runs/models and configs with a hash manifest")
     s.add_argument("path", help="destination folder (or, with --verify, a backup folder to check)")
