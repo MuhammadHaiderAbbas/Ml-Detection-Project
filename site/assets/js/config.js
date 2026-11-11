@@ -7,7 +7,7 @@ window.ADAPTIVE_IDS_SITE = {
   supabasePublishableKey: "sb_publishable_XmC893WTfmjviOz7HNUGKA_MLBIdrKF",
   requestsTable: "adaptive_ids_evaluation_requests",
   // Optional links: leave empty to hide them.
-  linkedinUrl: "",
+  linkedinUrl: "https://www.linkedin.com/in/muhammad-haider-abbas",
   githubUrl: "https://github.com/MuhammadHaiderAbbas/Ml-Detection-Project",
   // Optional public contact address for the privacy notice; leave empty to use the form only.
   contactEmail: "",
