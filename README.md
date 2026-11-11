@@ -140,6 +140,7 @@ Engine output captured on 2026-10-10 (images 2–4 use SYNTHETIC demo data; the 
 | Chronological evaluation on CSE-CIC-IDS2018 | [`docs/cic-ids2018-evaluation.md`](docs/cic-ids2018-evaluation.md) |
 | Demo recording and script | [`docs/demo-script.md`](docs/demo-script.md) |
 | Deployment requirements, interviews, pilot | [`docs/phase-9-commercial-validation.md`](docs/phase-9-commercial-validation.md) |
+| Public website (GitHub Pages, request form, domain set-up) | [`docs/website.md`](docs/website.md) |
 | Release checklist and public-release audit | [`docs/release-checklist.md`](docs/release-checklist.md) |
 | Changes | [`CHANGELOG.md`](CHANGELOG.md) |
 
@@ -181,7 +182,8 @@ models/             trusted-artifact manifest (binaries git-ignored)
 data/               raw/ processed/ sample/ (git-ignored)
 experiments/runs/   run outputs (git-ignored)
 docs/               case study, architecture, phase docs, results/, screenshots/, demo/
-tools/              benchmark, demo recorder, third-party notices
+site/               public website (GitHub Pages)
+tools/              benchmark, demo recorder, website build, third-party notices
 tests/              pytest suite
 ```
 
