@@ -26,7 +26,8 @@ jobs:
         run: python -m pytest
 
   test-postgres:
-    runs-on: ubuntu-latest
+    # Pinned: ubuntu-latest (26.04) has no postgresql-client-16, and the client must match the postgres:16 service.
+    runs-on: ubuntu-24.04
     services:
       postgres:
         image: postgres:16
